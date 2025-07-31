@@ -16,7 +16,7 @@ const HeroSection = () => {
   const slides = [
     {
       image: desktop1,
-      subtitle: "Lembut. Gurih. Nagihssssssssssssssssss.",
+      subtitle: "Lembut. Gurih. Nagih.",
       title: "NIKMAT GURIHNYA!<br />BOLU ABON MONYENYO"
     },
     {
