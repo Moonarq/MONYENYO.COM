@@ -4,7 +4,7 @@
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(44, 62, 80, 0.45);
+ 
   z-index: 99999999;
   display: flex;
   align-items: center;
@@ -25,7 +25,6 @@
   align-items: stretch;
   animation: fadeInModal 0.25s;
 }
-
 @keyframes fadeInModal {
   from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
@@ -42,7 +41,6 @@
   cursor: pointer;
   z-index: 2;
 }
-
 .terms-close span {
   font-weight: 400;
   font-size: 32px;
@@ -63,7 +61,6 @@
   border-bottom: 1.5px solid #e5e7e9;
   margin-bottom: 18px;
 }
-
 .terms-tab {
   flex: 1;
   background: none;
@@ -76,7 +73,6 @@
   border-bottom: 2.5px solid transparent;
   transition: color 0.2s, border-bottom 0.2s;
 }
-
 .terms-tab.active {
   color: #1abc5b;
   border-bottom: 2.5px solid #1abc5b;
@@ -88,29 +84,24 @@
   padding-right: 6px;
   margin-bottom: 24px;
 }
-
 .terms-section {
   font-size: 15px;
   color: #222;
 }
-
 .terms-title {
   font-size: 16px;
   font-weight: 700;
   margin: 18px 0 8px 0;
   color: #222;
 }
-
 .terms-section ul {
   margin: 0 0 12px 0;
   padding-left: 18px;
 }
-
 .terms-section li {
   margin-bottom: 6px;
   font-size: 15px;
 }
-
 .terms-modal-btn {
   background: #1abc5b;
   color: #fff;
@@ -125,7 +116,6 @@
   box-shadow: 0 2px 8px rgba(44,62,80,0.08);
   transition: background 0.2s;
 }
-
 .terms-modal-btn:hover {
   background: #159c4a;
 }

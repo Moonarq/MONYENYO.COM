@@ -1,3 +1,4 @@
+/* Cart Icon Styles */
 .language-toggle .cart-icon {
   font-size: 18px;
   color: #333;
@@ -18,6 +19,7 @@
   color: #333 !important;
 }
 
+/* Logo positioning adjustments */
 @media (max-width: 768px) {
   .header.desktop-transparent .desktop-navbar-logo {
     margin-top: 15px;
@@ -34,6 +36,7 @@
     margin-top: 7px;
   }
 }
+
 /* Header/Navbar & Mobile Menu Styles */
 .header {
     position: fixed;
@@ -160,7 +163,6 @@
     border: none !important;
     outline: none !important;
 }
-
 
 .language-toggle {
     color: white;
@@ -359,35 +361,98 @@ Link.logo-text {
     outline: none !important;
 }
 
-/* Responsive header/navbar/mobile menu styles (media queries) akan dipindah juga ke sini */
-
-@media (max-width: 768px) {
-  .header .logo-text {
-    font-size: 1.6rem;
-    line-height: 1.1;
-    letter-spacing: -0.5px;
-  }
-  .language-toggle {
-    display: none !important;
-  }
+.header.desktop-solid .nav-link,
+.header.desktop-solid .social-link,
+.header.desktop-solid .cart-icon {
+  color: #222 !important;
 }
 
-/* Mobile responsive */
+/* MOBILE RESPONSIVE STYLES */
 @media (max-width: 768px) {
+    .header {
+        padding: 15px 0;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .header .container {
+        position: relative;
+        padding: 0 20px;
+    }
+    
     .header .logo-text {
         font-size: 1.6rem;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
         text-decoration: none !important;
         border: none !important;
         outline: none !important;
     }
     
+    /* Logo positioning untuk mobile - center */
+    .nav-logo {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        margin-left: 0;
+    }
+    
+    /* Language toggle - tampilkan hanya cart icon */
     .language-toggle {
+        display: flex !important; /* Override display: none */
+        position: absolute;
+        right: 60px; /* Posisikan di sebelah kiri hamburger menu */
+        top: 50%;
+        transform: translateY(-50%);
+        margin-right: 0;
+    }
+    
+    /* Sembunyikan language buttons di mobile, tampilkan hanya cart icon */
+    .language-toggle .lang-btn,
+    .language-toggle .lang-separator {
         display: none !important;
     }
-}
-
-.header.desktop-solid .nav-link,
-.header.desktop-solid .social-link,
-.header.desktop-solid .cart-icon {
-  color: #222 !important;
+    
+    /* Style cart icon untuk mobile */
+    .language-toggle .cart-icon {
+        display: block !important;
+        color: #fff !important;
+        font-size: 20px;
+        margin-right: 0;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        transition: color 0.3s ease;
+    }
+    
+    .language-toggle .cart-icon:hover {
+        color: #c59d5f !important;
+    }
+    
+    /* Hamburger menu positioning */
+    .hamburger-menu {
+        display: flex !important;
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    /* Sembunyikan desktop navigation di mobile */
+    .nav-menu,
+    .nav-menu-right,
+    .social-icons {
+        display: none !important;
+    }
+    
+    /* Color overrides untuk mobile cart icon berdasarkan navbar state */
+    .header.desktop-transparent .language-toggle .cart-icon {
+        color: #fff !important;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    }
+    
+    .header.desktop-solid .language-toggle .cart-icon {
+        color: #333 !important;
+        text-shadow: none;
+    }
 }
