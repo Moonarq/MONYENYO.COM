@@ -147,13 +147,15 @@
 .checkout-button {
   background-color: #8B4513;
   color: white;
-  padding: 0.75rem 2rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
+  padding: 1rem 2.5rem;       /* Lebih besar dari sebelumnya */
+  border-radius: 0.75rem;     /* Tambah radius untuk nuansa lebih lembut */
+  font-size: 1.125rem;        /* Tambahkan ukuran font (18px) */
+  font-weight: 600;           /* Sedikit lebih tebal */
   border: none;
   cursor: pointer;
   transition: background-color 0.2s;
 }
+
 
 .checkout-button:hover {
   background-color: #8B4513;
@@ -161,6 +163,12 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .checkout-button {
+    padding: 0.75rem 1.5rem;   /* Kurangi padding */
+    font-size: 1rem;           /* Ukuran font sedikit lebih kecil (16px) */
+    border-radius: 0.5rem;     /* Radius normal */
+  }
+  
   .terms-page {
     margin-top: 20px;
   }
