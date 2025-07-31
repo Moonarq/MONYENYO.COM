@@ -43,9 +43,9 @@ const Terms = ({ visible, onClose }) => {
   return createPortal(
     <div className="terms-overlay">
       <div className="terms-modal">
-        <div className="terms-modal-overlay" onClick={onClose} aria-label="Tutup">
+        <button className="terms-close" onClick={onClose} aria-label="Tutup">
           <span>&times;</span>
-        </div>
+        </button>
         <h2 className="terms-modal-title">S&K Asuransi & Proteksi</h2>
         <div className="terms-tabs">
           <button
