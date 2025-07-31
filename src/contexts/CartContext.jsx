@@ -168,8 +168,12 @@ export const CartProvider = ({ children }) => {
     applyCartVoucher,
     removeCartVoucher,
     
-    // Computed values for easy access
-    cartCount: cart.reduce((sum, item) => sum + item.quantity, 0),
+    // ✅ FIXED: Computed values for easy access
+    // cartCount: Jumlah jenis produk (bukan total quantity)
+    cartCount: cart.length, // ✅ Ini yang benar - menghitung jumlah jenis produk
+    // totalQuantity: Total semua quantity (untuk keperluan lain jika diperlukan)
+    totalQuantity: cart.reduce((sum, item) => sum + item.quantity, 0),
+    // cartTotal: Total harga setelah diskon voucher
     cartTotal: (() => {
       const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
       return Math.max(0, subtotal - cartVoucherDiscount);

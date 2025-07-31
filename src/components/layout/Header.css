@@ -480,3 +480,107 @@ Link.logo-text {
 .header.desktop-solid .cart-icon {
   color: #222 !important;
 }
+/* Cart Badge Notification Styles */
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  z-index: 10;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  min-width: 20px;
+  padding: 0;
+}
+
+/* Desktop Cart Badge */
+.language-toggle .cart-icon {
+  position: relative;
+  display: inline-block;
+}
+
+.desktop-cart-badge {
+  /* Inherit base styles from .cart-badge */
+}
+
+/* Mobile Cart Badge */
+.mobile-cart-icon {
+  position: relative;
+  display: inline-flex !important;
+}
+
+.mobile-cart-badge {
+  /* Inherit base styles from .cart-badge */
+}
+
+/* Badge responsive adjustments */
+@media (max-width: 768px) {
+  .cart-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    top: -6px;
+    right: -6px;
+  }
+}
+
+/* Badge animation */
+.cart-badge {
+  animation: badge-appear 0.3s ease-out;
+}
+
+@keyframes badge-appear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Badge color variations */
+.cart-badge.new-item {
+  background: #28a745;
+  animation: badge-pulse 2s ease-in-out;
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Badge for different navbar states */
+.header.desktop-transparent .cart-badge {
+  border-color: rgba(255,255,255,0.8);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.header.desktop-solid .cart-badge {
+  border-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Ensure cart icon doesn't overflow */
+.language-toggle .cart-icon,
+.mobile-cart-icon {
+  overflow: visible;
+}

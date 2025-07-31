@@ -3,16 +3,18 @@ import logoImg from '../../assets/images/logo.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useNavbarScroll } from '../../hooks/useNavbarScroll'
+import { useCart } from '../../contexts/CartContext' // Pastikan path ini sesuai
 import './Header.css'
 
 const Header = () => {
-  // Example: useNavbarScroll returns a state or you can use your own scroll logic
-  // For demonstration, let's assume you have a state called isNavbarSolid
-  // You may need to adjust this logic to fit your actual scroll detection
   const [isNavbarSolid, setIsNavbarSolid] = useState(false);
-
   const location = useLocation()
   const navigate = useNavigate()
+  
+  // Gunakan cart context untuk mendapatkan jumlah jenis produk
+const { cartCount } = useCart();
+const cartItemsCount = cartCount; // Jumlah jenis produk, bukan total quantity
+
   useEffect(() => {
     const updateNavbarSolid = () => {
       const isDesktop = window.innerWidth > 768;
@@ -36,18 +38,17 @@ const Header = () => {
       window.removeEventListener('resize', updateNavbarSolid);
     };
   }, [location.pathname]);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { language, setLanguage, t } = useLanguage()
   const lastScrollPosition = useRef(0)
   
-  // Use navbar scroll hook
   useNavbarScroll()
 
-  // Enhanced mobile menu functionality
-  // Simpan posisi scroll secepat mungkin sebelum apapun berubah
   const saveScrollPosition = () => {
     lastScrollPosition.current = window.scrollY
   }
+
   const handleHamburgerClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -70,24 +71,19 @@ const Header = () => {
   const closeMobileMenu = () => {
     setIsMenuOpen(false)
     document.body.classList.remove('mobile-menu-active')
-    // Reset style body DULU
     document.body.style.position = ''
     document.body.style.top = ''
     document.body.style.left = ''
     document.body.style.right = ''
     document.body.style.width = ''
     document.body.style.overflow = ''
-    // Paksa scroll-behavior: auto di html sebelum scrollTo
     document.documentElement.classList.add('no-smooth-scroll')
     setTimeout(() => {
       if (window.scrollY !== lastScrollPosition.current) {
         window.scrollTo({ top: lastScrollPosition.current, left: 0, behavior: 'auto' })
       }
-      // Hapus class setelah scrollTo (beri delay kecil agar pasti instant)
       setTimeout(() => {
         document.documentElement.classList.remove('no-smooth-scroll')
-        // --- FORCE header update after menu close (mobile) ---
-        // This will force the header to update its class (solid/coklat) instantly
         if (typeof window !== 'undefined') {
           const event = new window.Event('scroll');
           window.dispatchEvent(event);
@@ -96,7 +92,6 @@ const Header = () => {
     }, 0)
   }
 
-  // Handle escape key and cleanup
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isMenuOpen) {
@@ -106,7 +101,6 @@ const Header = () => {
 
     document.addEventListener('keydown', handleKeyDown)
     
-    // Cleanup function to ensure class is removed if component unmounts
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.classList.remove('mobile-menu-active')
@@ -124,16 +118,13 @@ const Header = () => {
     }, 100);
   }
 
-  // Handle navigation with scroll to top
   const handleNavClick = () => {
     closeMobileMenu()
-    // Use setTimeout to ensure navigation happens first, then scroll
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }, 100)
   }
 
-  // Handle desktop navigation with scroll to top
   const handleDesktopNavClick = () => {
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -166,9 +157,14 @@ const Header = () => {
             <span></span>
           </button>
 
-          {/* Mobile Cart Icon */}
+          {/* Mobile Cart Icon with Badge */}
           <Link to="/cart" className="mobile-cart-icon" aria-label="Cart">
             <i className="fas fa-shopping-cart"></i>
+            {cartItemsCount > 0 && (
+              <span className="cart-badge mobile-cart-badge">
+                {cartItemsCount}
+              </span>
+            )}
           </Link>
         </div>
 
@@ -234,7 +230,6 @@ const Header = () => {
               window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             } else {
               closeMobileMenu();
-              // Use navigate to go to home, then scroll to top after navigation
               navigate('/');
               setTimeout(() => {
                 document.documentElement.classList.add('no-smooth-scroll');
@@ -272,32 +267,37 @@ const Header = () => {
           >
             CONTACT
           </Link>
-        
         </nav>
 
         {/* Language Toggle */}
-<div className="language-toggle">
-  <Link to="/cart" className="cart-icon" aria-label="Cart">
-    <i className="fas fa-shopping-cart"></i>
-  </Link>
-  <span 
-    className={`lang-btn ${language === 'en' ? 'active' : ''}`}
-    data-lang="en"
-    onClick={() => handleLanguageChange('en')}
-    style={{ cursor: 'pointer' }}
-  >
-    EN
-  </span>
-  <span className="lang-separator">|</span>
-  <span 
-    className={`lang-btn ${language === 'id' ? 'active' : ''}`}
-    data-lang="id"
-    onClick={() => handleLanguageChange('id')}
-    style={{ cursor: 'pointer' }}
-  >
-    ID
-  </span>
-</div>
+        <div className="language-toggle">
+          {/* Desktop Cart Icon with Badge */}
+          <Link to="/cart" className="cart-icon" aria-label="Cart">
+            <i className="fas fa-shopping-cart"></i>
+            {cartItemsCount > 0 && (
+              <span className="cart-badge desktop-cart-badge">
+                {cartItemsCount}
+              </span>
+            )}
+          </Link>
+          <span 
+            className={`lang-btn ${language === 'en' ? 'active' : ''}`}
+            data-lang="en"
+            onClick={() => handleLanguageChange('en')}
+            style={{ cursor: 'pointer' }}
+          >
+            EN
+          </span>
+          <span className="lang-separator">|</span>
+          <span 
+            className={`lang-btn ${language === 'id' ? 'active' : ''}`}
+            data-lang="id"
+            onClick={() => handleLanguageChange('id')}
+            style={{ cursor: 'pointer' }}
+          >
+            ID
+          </span>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay */}
