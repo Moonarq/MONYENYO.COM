@@ -56,10 +56,6 @@ React.useEffect(() => {
         <title>Menu - Monyenyo</title>
         <meta name="description" content="Explore our delicious menu of traditional Indonesian brownies, pastries, and specialty items." />
         <link rel="icon" href="/favicon_large.ico" type="image/x-icon" />
-        {/* Meta keywords dinamis dari menuItems */}
-        {menuItems && menuItems.length > 0 && (
-          <meta name="keywords" content={menuItems.map(item => item.name).join(', ')} />
-        )}
       </Helmet>
       <div className="menu-page">
         {/* Menu Header Section */}
