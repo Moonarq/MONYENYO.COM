@@ -23,9 +23,10 @@ export const useNavbarScroll = () => {
       const isCartpage = location.pathname.includes('/cart')
       const isCheckout = location.pathname.includes('/checkout')
       const isOrderSuccess = location.pathname.includes('/order-success')
+      const isTerms = location.pathname.includes('/terms')
 
       // Pages with always-visible navbar
-      const isAlwaysVisiblePage = isAbout || isMenu || isBlogs || isOutlets || isContact || isCartpage || isCheckout || isOrderSuccess
+      const isAlwaysVisiblePage = isAbout || isMenu || isBlogs || isOutlets || isContact || isCartpage || isCheckout || isOrderSuccess || isTerms
 
       if (isMobile) {
         // Mobile behavior

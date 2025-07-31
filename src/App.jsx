@@ -16,6 +16,7 @@ import { useSmoothScroll } from './hooks/useSmoothScroll'
 import { CartProvider } from './contexts/CartContext.jsx'
 import Checkout from './pages/Checkout.jsx'
 import OrderSuccess from './pages/OrderSuccess.jsx'
+import TermsPage from './pages/Terms.jsx'
 
 // 👈 Use config instead of hardcoded URL
 axios.defaults.baseURL = API_CONFIG.BASE_URL
@@ -39,6 +40,7 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success" element={<OrderSuccess />} />
+          <Route path="/terms" element={<TermsPage />} />
         </Routes>
       </Layout>
     </CartProvider>

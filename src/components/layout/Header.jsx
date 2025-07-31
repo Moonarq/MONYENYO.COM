@@ -17,7 +17,7 @@ const Header = () => {
     const updateNavbarSolid = () => {
       const isDesktop = window.innerWidth > 768;
       const pathname = location.pathname;
-      const isSpecialPage = ['/about', '/menu', '/blogs', '/outlets', '/contact', '/cart', '/checkout', '/order-success'].some(p => pathname.includes(p));
+      const isSpecialPage = ['/about', '/menu', '/blogs', '/outlets', '/contact', '/cart', '/checkout', '/order-success','/terms'].some(p => pathname.includes(p));
       if (isDesktop && isSpecialPage) {
         setIsNavbarSolid(true);
       } else {

@@ -205,6 +205,33 @@ const Checkout = () => {
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
 
+  // Terms and mobile detection state
+  const [showTerms, setShowTerms] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection useEffect
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // Handle terms click - mobile shows overlay, desktop redirects to page
+  const handleTermsClick = (e) => {
+    e.preventDefault();
+    
+    if (isMobile) {
+      setShowTerms(true);
+    } else {
+      navigate('/terms');
+    }
+  };
+
   // Function to get proper image URL
   const getItemImageUrl = (item) => {
     return getImageUrl(item);
@@ -685,8 +712,6 @@ const Checkout = () => {
 
   // Get checkout totals
   const { subtotalBeforeVoucher, totalVoucherDiscount, finalTotal, totalItems } = calculateCheckoutTotals()
-
-  const [showTerms, setShowTerms] = useState(false);
 
   if (!isBuyNow && cart.length === 0) {
     return (
@@ -1188,14 +1213,18 @@ const Checkout = () => {
                 <p className="payment-note">
                   Dengan melanjutkan pembayaran, kamu menyetujui S&K
                   <br />
-                  <a href="#" onClick={e => {e.preventDefault(); setShowTerms(true);}}>Asuransi Pengiriman & Proteksi</a>
+                  <a href="#" onClick={handleTermsClick}>Asuransi Pengiriman & Proteksi</a>
                 </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <Terms visible={showTerms} onClose={() => setShowTerms(false)} />
+      
+      {/* Only show Terms overlay on mobile */}
+      {isMobile && (
+        <Terms visible={showTerms} onClose={() => setShowTerms(false)} />
+      )}
     </>
   )
 }
