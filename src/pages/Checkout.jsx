@@ -11,8 +11,6 @@ import { useCart } from '../contexts/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useNavbarScroll } from '../hooks/useNavbarScroll'
 import AdditionalVoucherSelector from '../components/common/AdditionalVoucherSelector'
-// ❌ HAPUS import Terms karena tidak lagi menggunakan modal
-// import Terms from './Terms';
 import './Checkout.css'
 import { API_ENDPOINTS, getImageUrl as getApiImageUrl } from '../config/api'
 
@@ -204,9 +202,6 @@ const Checkout = () => {
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
 
-  // ❌ HAPUS state showTerms karena tidak lagi menggunakan modal
-  // const [showTerms, setShowTerms] = useState(false);
-
   // ✅ TAMBAH function untuk navigasi ke halaman Terms
   const handleTermsClick = (e) => {
     e.preventDefault();
@@ -346,27 +341,6 @@ const Checkout = () => {
       value: subdistrict,
       label: subdistrict
     }))
-  }
-
-  // Generate dummy VA numbers based on payment method
-  const generateVANumber = (paymentMethod) => {
-    const timestamp = Date.now().toString().slice(-8)
-    const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-    
-    switch (paymentMethod) {
-      case 'bca':
-        return `70012${timestamp}${randomSuffix}`
-      case 'mandiri':
-        return `8808${timestamp}${randomSuffix}`
-      case 'bri':
-        return `26215${timestamp}${randomSuffix}`
-      case 'gopay':
-        return `GOY${timestamp}${randomSuffix}`
-      case 'alfamart':
-        return `ALF${timestamp}${randomSuffix}`
-      default:
-        return `${timestamp}${randomSuffix}`
-    }
   }
 
   // Calculate totals based on checkout type
@@ -525,7 +499,8 @@ const Checkout = () => {
     setAdditionalCartVoucherDiscount(0)
   }
 
-  const handleCheckout = async () => {
+  // ✅ NEW: Midtrans Payment Handler
+  const handlePay = async () => {
     // Validasi required fields
     const requiredFields = ['name', 'phone', 'address', 'zipCode', 'province', 'regency', 'district', 'subdistrict']
     const missingFields = requiredFields.filter(field => !shippingAddress[field])
@@ -547,8 +522,7 @@ const Checkout = () => {
     payButton.disabled = true
 
     try {
-      // Generate VA number and order number
-      const vaNumber = generateVANumber(selectedPayment)
+      // Get checkout data untuk dikirim ke backend
       const orderNumber = `ORD${Date.now()}`
       const currentDate = new Date().toISOString()
 
@@ -569,13 +543,11 @@ const Checkout = () => {
 
       const readableAddress = getReadableAddress()
 
-      // Prepare checkout data sesuai dengan format yang diexpected
+      // Prepare checkout data untuk Midtrans
       const checkoutData = {
         // Order Info
         order_number: orderNumber,
-        va_number: vaNumber,
         created_at: currentDate,
-        status: 'pending_payment',
         
         // Shipping Address
         shippingAddress: {
@@ -606,7 +578,7 @@ const Checkout = () => {
           cost: useInsurance ? calculateInsuranceCost() : 0
         },
         
-        // Items (format sesuai dengan yang diexpected)
+        // Items
         items: checkoutItems.map(item => ({
           id: item.id,
           name: item.name,
@@ -639,68 +611,85 @@ const Checkout = () => {
         isBuyNow: isBuyNow
       }
 
-      console.log('Sending checkout data:', checkoutData)
+      console.log('Sending checkout data to Midtrans:', checkoutData)
 
-      // Simulate API response for demo purposes
-      // In production, you would replace this with actual API call
-      const simulateApiCall = () => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve({
-              data: {
-                success: true,
-                data: {
-                  order_number: orderNumber,
-                  va_number: vaNumber,
-                  grand_total: calculateTotal(),
-                  status: 'pending_payment',
-                  created_at: currentDate
-                }
-              }
-            })
-          }, 1500) // Simulate 1.5 second API call
-        })
-      }
-
-      // Use simulated API call instead of real axios call for demo  
-      const response = await simulateApiCall()
-
-      // Uncomment below for real API integration:
-      /*
-      const response = await axios.post(API_ENDPOINTS.CHECKOUT, checkoutData, {
+      // Request Midtrans token dengan data checkout
+      const res = await fetch('https://api.monyenyo.com/midtrans/token', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
-        }
-      })
-      */
+        },
+        body: JSON.stringify(checkoutData)
+      });
 
-      if (response.data.success) {
-        // Success - redirect ke success page
-        const orderData = response.data.data
-        
-        // Optional: Clear cart jika bukan buy now
-        if (!isBuyNow) {
-          // Assuming you have clearCart function in your cart context
-          // clearCart()
+      const data = await res.json();
+
+      if (data.token) {
+        // Pastikan Midtrans Snap SDK sudah dimuat
+        if (!window.snap) {
+          alert('Midtrans payment system not loaded. Please refresh the page.');
+          return;
         }
-        
-        // Redirect ke order success page
-        navigate('/order-success', { 
-          state: { 
-            orderData: orderData,
-            checkoutData: checkoutData 
-          } 
-        })
-        
+
+        window.snap.pay(data.token, {
+          onSuccess: function(result) {
+            console.log('Pembayaran sukses:', result);
+            
+            // Optional: Clear cart jika bukan buy now
+            if (!isBuyNow) {
+              // Assuming you have clearCart function in your cart context
+              // clearCart()
+            }
+            
+            // Redirect ke success page dengan data pembayaran
+            navigate('/order-success', { 
+              state: { 
+                orderData: {
+                  order_number: orderNumber,
+                  grand_total: calculateTotal(),
+                  status: 'paid',
+                  created_at: currentDate,
+                  payment_result: result
+                },
+                checkoutData: checkoutData 
+              } 
+            });
+          },
+          onPending: function(result) {
+            console.log('Menunggu pembayaran:', result);
+            
+            // Redirect ke pending page atau success page dengan status pending
+            navigate('/order-success', { 
+              state: { 
+                orderData: {
+                  order_number: orderNumber,
+                  grand_total: calculateTotal(),
+                  status: 'pending_payment',
+                  created_at: currentDate,
+                  payment_result: result
+                },
+                checkoutData: checkoutData 
+              } 
+            });
+          },
+          onError: function(result) {
+            console.error('Pembayaran error:', result);
+            alert('Terjadi kesalahan saat proses pembayaran. Silakan coba lagi.');
+          },
+          onClose: function() {
+            console.log('Kamu menutup popup tanpa menyelesaikan pembayaran');
+            // User menutup popup, tidak perlu redirect
+          }
+        });
       } else {
-        throw new Error(response.data.message || 'Checkout failed')
+        throw new Error(data.message || 'Gagal mendapatkan token pembayaran')
       }
 
     } catch (error) {
-      console.error('Checkout error:', error)
+      console.error('Error saat proses pembayaran:', error);
       
-      let errorMessage = 'Terjadi kesalahan saat checkout. Silakan coba lagi.'
+      let errorMessage = 'Terjadi kesalahan saat proses pembayaran. Silakan coba lagi.'
       
       if (error.response) {
         // Server responded with error status
@@ -728,6 +717,14 @@ const Checkout = () => {
     }
   }
 
+  // ✅ DEPRECATED: Keep old handleCheckout for reference but replace with handlePay
+  const handleCheckout = async () => {
+    // This function is now replaced by handlePay
+    // Keeping it for reference in case you need the old logic
+    console.warn('handleCheckout is deprecated, use handlePay instead')
+    await handlePay()
+  }
+
   // Get checkout totals
   const { subtotalBeforeVoucher, totalVoucherDiscount, finalTotal, totalItems } = calculateCheckoutTotals()
 
@@ -746,6 +743,11 @@ const Checkout = () => {
         <title>Checkout - Monyenyo</title>
         <meta name="description" content="Complete your purchase at Monyenyo" />
         <link rel="icon" href="/images/favicon_large.ico" type="image/x-icon" />
+        {/* ✅ NEW: Load Midtrans Snap SDK */}
+        <script 
+          src="https://app.sandbox.midtrans.com/snap/snap.js" 
+          data-client-key="SB-Mid-client-your_client_key_here"
+        ></script>
       </Helmet>
       
       <div className="checkout-page">
@@ -791,8 +793,6 @@ const Checkout = () => {
                       />
                     </div>
                   </div>
-
-                  {/* Negara di-set otomatis ke Indonesia, tidak perlu input */}
 
                   <div className="form-group">
                     <label className="form-label">
@@ -1224,11 +1224,11 @@ const Checkout = () => {
                   <strong>Rp{calculateTotal().toLocaleString('id-ID')}</strong>
                 </div>
                 
-                <button className="pay-button" onClick={handleCheckout}>
+                {/* ✅ UPDATED: Button now calls handlePay instead of handleCheckout */}
+                <button className="pay-button" onClick={handlePay}>
                   Bayar Sekarang
                 </button>
                 
-                {/* ✅ Link yang mengarahkan ke halaman Terms (bukan modal) */}
                 <p className="payment-note">
                   Dengan melanjutkan pembayaran, kamu menyetujui S&K
                   <br />
@@ -1244,8 +1244,6 @@ const Checkout = () => {
           </div>
         </div>
       </div>
-      
-      {/* ❌ HAPUS komponen Terms modal karena sekarang navigasi ke page */}
     </>
   )
 }
