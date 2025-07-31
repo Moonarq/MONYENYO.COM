@@ -124,9 +124,6 @@ const Checkout = () => {
   // Address data state
   const [addressData, setAddressData] = useState({ provinces: {} });
   const [addressLoading, setAddressLoading] = useState(true);
-  
-  // ✅ NEW: Loading state untuk payment processing
-  const [isProcessing, setIsProcessing] = useState(false);
 
   // Load address data from JSON file on mount
   useEffect(() => {
@@ -154,8 +151,7 @@ const Checkout = () => {
     cartVoucher,
     cartVoucherDiscount,
     applyCartVoucher,
-    removeCartVoucher,
-    clearCart // ✅ NEW: Tambahkan clearCart function
+    removeCartVoucher
   } = useCart()
   const navigate = useNavigate()
   const location = useLocation()
@@ -186,7 +182,6 @@ const Checkout = () => {
   const [shippingAddress, setShippingAddress] = useState({
     name: '',
     phone: '',
-    email: '', // ✅ NEW: Tambah field email
     country: 'Indonesia',
     address: '',
     zipCode: '',
@@ -206,63 +201,6 @@ const Checkout = () => {
     reguler: { name: 'Reguler', price: 0 },
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
-
-  // ✅ NEW: Validation function yang lebih comprehensive
-  const validateForm = () => {
-    const errors = [];
-    
-    // Required fields validation
-    const requiredFields = {
-      name: 'Nama lengkap',
-      phone: 'Nomor telepon',
-      email: 'Email',
-      address: 'Alamat',
-      zipCode: 'Kode pos',
-      province: 'Provinsi',
-      regency: 'Kota',
-      district: 'Kecamatan',
-      subdistrict: 'Kelurahan'
-    };
-    
-    Object.entries(requiredFields).forEach(([field, label]) => {
-      if (!shippingAddress[field]) {
-        errors.push(`${label} harus diisi`);
-      }
-    });
-    
-    // Email validation
-    if (shippingAddress.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shippingAddress.email)) {
-      errors.push('Format email tidak valid');
-    }
-    
-    // Phone number validation
-    if (shippingAddress.phone && !/^(\+62|62|0)[0-9]{9,13}$/.test(shippingAddress.phone)) {
-      errors.push('Format nomor telepon tidak valid (contoh: 08123456789)');
-    }
-    
-    // Zip code validation
-    if (shippingAddress.zipCode && !/^[0-9]{5}$/.test(shippingAddress.zipCode)) {
-      errors.push('Kode pos harus 5 digit angka');
-    }
-    
-    if (!selectedPayment) {
-      errors.push('Pilih metode pembayaran');
-    }
-    
-    return errors;
-  };
-
-  // ✅ NEW: Function untuk save order ke localStorage
-  const saveOrderToLocalStorage = (orderData) => {
-    try {
-      const existingOrders = JSON.parse(localStorage.getItem('monyenyo_orders') || '[]');
-      existingOrders.push(orderData);
-      localStorage.setItem('monyenyo_orders', JSON.stringify(existingOrders));
-      console.log('Order saved to localStorage:', orderData.order_number);
-    } catch (error) {
-      console.error('Error saving order to localStorage:', error);
-    }
-  };
 
   // ✅ TAMBAH function untuk navigasi ke halaman Terms
   const handleTermsClick = (e) => {
@@ -561,18 +499,27 @@ const Checkout = () => {
     setAdditionalCartVoucherDiscount(0)
   }
 
-  // ✅ ENHANCED: Midtrans Payment Handler dengan error handling yang lebih baik
+  // ✅ NEW: Midtrans Payment Handler
   const handlePay = async () => {
-    // Enhanced validation
-    const validationErrors = validateForm();
+    // Validasi required fields
+    const requiredFields = ['name', 'phone', 'address', 'zipCode', 'province', 'regency', 'district', 'subdistrict']
+    const missingFields = requiredFields.filter(field => !shippingAddress[field])
     
-    if (validationErrors.length > 0) {
-      alert(validationErrors.join('\n'));
-      return;
+    if (missingFields.length > 0) {
+      alert('Please fill in all required shipping address fields')
+      return
+    }
+    
+    if (!selectedPayment) {
+      alert('Please select a payment method')
+      return
     }
 
-    // Set loading state
-    setIsProcessing(true);
+    // Loading state
+    const payButton = document.querySelector('.pay-button')
+    const originalButtonText = payButton.textContent
+    payButton.textContent = 'Processing...'
+    payButton.disabled = true
 
     try {
       // Get checkout data untuk dikirim ke backend
@@ -595,131 +542,79 @@ const Checkout = () => {
       }
 
       const readableAddress = getReadableAddress()
-      const grossAmount = calculateTotal()
 
-      // ✅ ENHANCED: Prepare data dalam format yang sesuai dengan Midtrans
+      // Prepare checkout data untuk Midtrans
       const checkoutData = {
-        // ✅ Customer details untuk Midtrans (REQUIRED)
-        customer_details: {
-          first_name: shippingAddress.name.split(' ')[0],
-          last_name: shippingAddress.name.split(' ').slice(1).join(' ') || '',
-          email: shippingAddress.email,
-          phone: shippingAddress.phone
-        },
+        // Order Info
+        order_number: orderNumber,
+        created_at: currentDate,
         
-        // ✅ Shipping address untuk Midtrans
-        shipping_address: {
-          first_name: shippingAddress.name.split(' ')[0],
-          last_name: shippingAddress.name.split(' ').slice(1).join(' ') || '',
+        // Shipping Address
+        shippingAddress: {
+          name: shippingAddress.name,
           phone: shippingAddress.phone,
+          country: shippingAddress.country,
           address: shippingAddress.address,
-          city: readableAddress.city,
-          postal_code: shippingAddress.zipCode,
-          country_code: 'IDN'
+          zipCode: shippingAddress.zipCode,
+          province: readableAddress.province,
+          regency: readableAddress.city,
+          district: readableAddress.district,
+          subdistrict: readableAddress.subdistrict
         },
         
-        // ✅ Transaction details untuk Midtrans (REQUIRED)
-        transaction_details: {
-          order_id: orderNumber,
-          gross_amount: grossAmount
+        // Payment Method
+        paymentMethod: selectedPayment,
+        
+        // Shipping Info
+        shipping: {
+          method: selectedShipping,
+          cost: hasFreeShippingVoucher() ? 0 : (selectedShipping === 'ninja' ? shippingData.ninja.price : 0),
+          isFree: hasFreeShippingVoucher()
         },
         
-        // ✅ Item details untuk Midtrans (REQUIRED)
-        item_details: [
-          // Products
-          ...checkoutItems.map(item => ({
-            id: item.id.toString(),
-            price: item.price,
-            quantity: item.quantity,
-            name: item.name.substring(0, 50) // Midtrans has character limit
-          })),
-          // Shipping sebagai item terpisah jika ada biaya
-          ...(selectedShipping === 'ninja' && !hasFreeShippingVoucher() ? [{
-            id: 'shipping_ninja',
-            price: shippingData.ninja.price,
-            quantity: 1,
-            name: 'Ongkos Kirim - Ninja Xpress'
-          }] : []),
-          // Insurance sebagai item terpisah jika dipilih
-          ...(useInsurance ? [{
-            id: 'insurance',
-            price: calculateInsuranceCost(),
-            quantity: 1,
-            name: 'Asuransi Pengiriman'
-          }] : [])
-        ],
+        // Insurance
+        insurance: {
+          selected: useInsurance,
+          cost: useInsurance ? calculateInsuranceCost() : 0
+        },
         
-        // ✅ Data internal untuk keperluan sistem (tidak dikirim ke Midtrans)
-        internal_data: {
-          // Order Info
-          order_number: orderNumber,
-          created_at: currentDate,
-          
-          // Original Shipping Address dengan kode
-          original_shipping_address: {
-            name: shippingAddress.name,
-            phone: shippingAddress.phone,
-            email: shippingAddress.email,
-            country: shippingAddress.country,
-            address: shippingAddress.address,
-            zipCode: shippingAddress.zipCode,
-            province: shippingAddress.province,
-            regency: shippingAddress.regency,
-            district: shippingAddress.district,
-            subdistrict: shippingAddress.subdistrict
-          },
-          
-          // Readable address
-          readable_address: readableAddress,
-          
-          // Payment Method
-          paymentMethod: selectedPayment,
-          
-          // Shipping Info
-          shipping: {
-            method: selectedShipping,
-            cost: hasFreeShippingVoucher() ? 0 : (selectedShipping === 'ninja' ? shippingData.ninja.price : 0),
-            isFree: hasFreeShippingVoucher()
-          },
-          
-          // Insurance
-          insurance: {
-            selected: useInsurance,
-            cost: useInsurance ? calculateInsuranceCost() : 0
-          },
-          
-          // Vouchers
-          vouchers: isBuyNow ? {
-            primary: primaryVoucher,
-            secondary: secondaryVoucher
-          } : {
-            cart: cartVoucher,
-            additional: additionalCartVoucher
-          },
-          
-          // Totals breakdown
-          totals: {
-            subtotalBeforeVoucher: calculateCheckoutTotals().subtotalBeforeVoucher,
-            totalVoucherDiscount: calculateCheckoutTotals().totalVoucherDiscount,
-            finalTotal: calculateCheckoutTotals().finalTotal,
-            shippingCost: hasFreeShippingVoucher() ? 0 : (selectedShipping === 'ninja' ? shippingData.ninja.price : 0),
-            insuranceCost: useInsurance ? calculateInsuranceCost() : 0,
-            grandTotal: grossAmount
-          },
-          
-          // Additional Info
-          notes: notes || '',
-          isBuyNow: isBuyNow,
-          
-          // Items detail untuk internal
-          original_items: checkoutItems
-        }
+        // Items
+        items: checkoutItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          sku: item.sku || null
+        })),
+        
+        // Vouchers
+        vouchers: isBuyNow ? {
+          primary: primaryVoucher,
+          secondary: secondaryVoucher
+        } : {
+          cart: cartVoucher,
+          additional: additionalCartVoucher
+        },
+        
+        // Totals
+        totals: {
+          subtotalBeforeVoucher: calculateCheckoutTotals().subtotalBeforeVoucher,
+          totalVoucherDiscount: calculateCheckoutTotals().totalVoucherDiscount,
+          finalTotal: calculateCheckoutTotals().finalTotal,
+          shippingCost: hasFreeShippingVoucher() ? 0 : (selectedShipping === 'ninja' ? shippingData.ninja.price : 0),
+          insuranceCost: useInsurance ? calculateInsuranceCost() : 0,
+          grandTotal: calculateTotal()
+        },
+        
+        // Additional Info
+        notes: notes || '',
+        isBuyNow: isBuyNow
       }
 
       console.log('Sending checkout data to Midtrans:', checkoutData)
 
-      // ✅ ENHANCED: Request Midtrans token dengan error handling yang lebih baik
-      const res = await fetch('https://api.monyenyo.com/api/midtrans/token', {
+      // Request Midtrans token dengan data checkout
+     const res = await fetch('https://api.monyenyo.com/api/midtrans/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -728,155 +623,98 @@ const Checkout = () => {
         body: JSON.stringify(checkoutData)
       });
 
-      // ✅ Check response status
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
-      }
 
       const data = await res.json();
 
       if (data.token) {
-        // ✅ ENHANCED: Pastikan Midtrans Snap SDK sudah dimuat
+        // Pastikan Midtrans Snap SDK sudah dimuat
         if (!window.snap) {
-          throw new Error('Midtrans payment system not loaded. Please refresh the page.');
+          alert('Midtrans payment system not loaded. Please refresh the page.');
+          return;
         }
 
-        // ✅ ENHANCED: Snap payment dengan callback yang lebih comprehensive
         window.snap.pay(data.token, {
           onSuccess: function(result) {
             console.log('Pembayaran sukses:', result);
             
-            // ✅ Prepare order data untuk disimpan
-            const orderData = {
-              order_number: orderNumber,
-              ...checkoutData.internal_data,
-              status: 'paid',
-              payment_result: result,
-              completed_at: new Date().toISOString(),
-              midtrans_transaction_id: result.transaction_id,
-              payment_type: result.payment_type
-            };
-            
-            // ✅ Save order ke localStorage
-            saveOrderToLocalStorage(orderData);
-            
-            // ✅ Clear cart jika bukan buy now
-            if (!isBuyNow && clearCart) {
-              clearCart();
+            // Optional: Clear cart jika bukan buy now
+            if (!isBuyNow) {
+              // Assuming you have clearCart function in your cart context
+              // clearCart()
             }
             
-            // ✅ Redirect ke success page
+            // Redirect ke success page dengan data pembayaran
             navigate('/order-success', { 
               state: { 
                 orderData: {
                   order_number: orderNumber,
-                  grand_total: grossAmount,
+                  grand_total: calculateTotal(),
                   status: 'paid',
                   created_at: currentDate,
                   payment_result: result
                 },
-                checkoutData: checkoutData.internal_data 
+                checkoutData: checkoutData 
               } 
             });
           },
-          
           onPending: function(result) {
             console.log('Menunggu pembayaran:', result);
             
-            // ✅ Prepare order data untuk status pending
-            const orderData = {
-              order_number: orderNumber,
-              ...checkoutData.internal_data,
-              status: 'pending_payment',
-              payment_result: result,
-              created_at: currentDate,
-              midtrans_transaction_id: result.transaction_id,
-              payment_type: result.payment_type
-            };
-            
-            // ✅ Save order ke localStorage dengan status pending
-            saveOrderToLocalStorage(orderData);
-            
-            // Redirect ke success page dengan status pending
+            // Redirect ke pending page atau success page dengan status pending
             navigate('/order-success', { 
               state: { 
                 orderData: {
                   order_number: orderNumber,
-                  grand_total: grossAmount,
+                  grand_total: calculateTotal(),
                   status: 'pending_payment',
                   created_at: currentDate,
                   payment_result: result
                 },
-                checkoutData: checkoutData.internal_data 
+                checkoutData: checkoutData 
               } 
             });
           },
-          
           onError: function(result) {
             console.error('Pembayaran error:', result);
-            
-            // ✅ Log error untuk debugging
-            const errorData = {
-              order_number: orderNumber,
-              error_result: result,
-              timestamp: new Date().toISOString()
-            };
-            
-            // ✅ Save error log ke localStorage untuk debugging
-            const errorLogs = JSON.parse(localStorage.getItem('monyenyo_payment_errors') || '[]');
-            errorLogs.push(errorData);
-            localStorage.setItem('monyenyo_payment_errors', JSON.stringify(errorLogs));
-            
-            alert('Terjadi kesalahan saat proses pembayaran. Silakan coba lagi atau hubungi customer service.');
+            alert('Terjadi kesalahan saat proses pembayaran. Silakan coba lagi.');
           },
-          
           onClose: function() {
-            console.log('User menutup popup pembayaran');
-            // User menutup popup, tidak perlu action khusus
-            // Payment tetap bisa dilanjutkan nanti jika pending
+            console.log('Kamu menutup popup tanpa menyelesaikan pembayaran');
+            // User menutup popup, tidak perlu redirect
           }
         });
-        
       } else {
-        throw new Error(data.message || 'Gagal mendapatkan token pembayaran dari server')
+        throw new Error(data.message || 'Gagal mendapatkan token pembayaran')
       }
 
     } catch (error) {
       console.error('Error saat proses pembayaran:', error);
       
-      // ✅ ENHANCED: Better error handling dengan pesan yang lebih user-friendly
-      let errorMessage = 'Terjadi kesalahan saat proses pembayaran. Silakan coba lagi.';
+      let errorMessage = 'Terjadi kesalahan saat proses pembayaran. Silakan coba lagi.'
       
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        errorMessage = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda dan coba lagi.';
-      } else if (error.message.includes('timeout')) {
-        errorMessage = 'Koneksi timeout. Silakan coba lagi.';
-      } else if (error.message.includes('HTTP error! status: 422')) {
-        errorMessage = 'Data yang dikirim tidak valid. Periksa kembali form Anda.';
-      } else if (error.message.includes('HTTP error! status: 500')) {
-        errorMessage = 'Terjadi kesalahan server. Silakan coba beberapa saat lagi.';
-      } else if (error.message) {
-        errorMessage = error.message;
+      if (error.response) {
+        // Server responded with error status
+        if (error.response.status === 422) {
+          // Validation errors
+          const errors = error.response.data.errors
+          if (errors) {
+            const errorMessages = Object.values(errors).flat()
+            errorMessage = errorMessages.join('\n')
+          }
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message
+        }
+      } else if (error.request) {
+        // Network error
+        errorMessage = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'
       }
       
-      alert(errorMessage);
-      
-      // ✅ Log error untuk debugging
-      const errorLog = {
-        timestamp: new Date().toISOString(),
-        error_message: error.message,
-        error_stack: error.stack,
-        checkout_data: checkoutData?.internal_data || 'No data'
-      };
-      
-      const errorLogs = JSON.parse(localStorage.getItem('monyenyo_checkout_errors') || '[]');
-      errorLogs.push(errorLog);
-      localStorage.setItem('monyenyo_checkout_errors', JSON.stringify(errorLogs));
+      alert(errorMessage)
       
     } finally {
-      // ✅ Reset loading state
-      setIsProcessing(false);
+      // Reset button state
+      payButton.textContent = originalButtonText
+      payButton.disabled = false
     }
   }
 
@@ -906,10 +744,10 @@ const Checkout = () => {
         <title>Checkout - Monyenyo</title>
         <meta name="description" content="Complete your purchase at Monyenyo" />
         <link rel="icon" href="/images/favicon_large.ico" type="image/x-icon" />
-        {/* ✅ FIXED: Load Midtrans Snap SDK dengan client key yang benar */}
+        {/* ✅ NEW: Load Midtrans Snap SDK */}
         <script 
           src="https://app.sandbox.midtrans.com/snap/snap.js" 
-          data-client-key="SB-Mid-client-5P2SiGIqGXzKSACK"
+          data-client-key="SB-Mid-client-your_client_key_here"
         ></script>
       </Helmet>
       
@@ -952,23 +790,9 @@ const Checkout = () => {
                         className="form-input"
                         value={shippingAddress.phone}
                         onChange={(e) => handleAddressChange('phone', e.target.value)}
-                        placeholder="08123456789"
+                        placeholder="Nomor Telepon"
                       />
                     </div>
-                  </div>
-
-                  {/* ✅ NEW: Email field untuk Midtrans requirement */}
-                  <div className="form-group">
-                    <label className="form-label">
-                      Email<span className="required">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      className="form-input"
-                      value={shippingAddress.email}
-                      onChange={(e) => handleAddressChange('email', e.target.value)}
-                      placeholder="nama@email.com"
-                    />
                   </div>
 
                   <div className="form-group">
@@ -994,8 +818,7 @@ const Checkout = () => {
                         className="form-input"
                         value={shippingAddress.zipCode}
                         onChange={(e) => handleAddressChange('zipCode', e.target.value)}
-                        placeholder="12345"
-                        maxLength={5}
+                        placeholder="Kode pos"
                       />
                     </div>
                     
@@ -1402,17 +1225,9 @@ const Checkout = () => {
                   <strong>Rp{calculateTotal().toLocaleString('id-ID')}</strong>
                 </div>
                 
-                {/* ✅ ENHANCED: Button dengan loading state dan disabled state */}
-                <button 
-                  className="pay-button" 
-                  onClick={handlePay}
-                  disabled={isProcessing}
-                  style={{
-                    opacity: isProcessing ? 0.7 : 1,
-                    cursor: isProcessing ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  {isProcessing ? 'Memproses Pembayaran...' : 'Bayar Sekarang'}
+                {/* ✅ UPDATED: Button now calls handlePay instead of handleCheckout */}
+                <button className="pay-button" onClick={handlePay}>
+                  Bayar Sekarang
                 </button>
                 
                 <p className="payment-note">
