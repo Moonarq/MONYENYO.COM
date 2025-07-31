@@ -614,7 +614,7 @@ const Checkout = () => {
       console.log('Sending checkout data to Midtrans:', checkoutData)
 
       // Request Midtrans token dengan data checkout
-      const res = await fetch('https://api.monyenyo.com/midtrans/token', {
+     const res = await fetch('https://api.monyenyo.com/api/midtrans/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -622,6 +622,7 @@ const Checkout = () => {
         },
         body: JSON.stringify(checkoutData)
       });
+
 
       const data = await res.json();
 
