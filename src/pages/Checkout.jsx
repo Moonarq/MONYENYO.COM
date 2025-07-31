@@ -501,9 +501,6 @@ const Checkout = () => {
 
   // ✅ NEW: Midtrans Payment Handler
   const handlePay = async () => {
-    if (isProcessing) return; // hindari klik dobel
-    setIsProcessing(true);
-
     // Validasi required fields
     const requiredFields = ['name', 'phone', 'address', 'zipCode', 'province', 'regency', 'district', 'subdistrict']
     const missingFields = requiredFields.filter(field => !shippingAddress[field])
@@ -1230,7 +1227,7 @@ const Checkout = () => {
                 
                 {/* ✅ UPDATED: Button now calls handlePay instead of handleCheckout */}
                  <button className="pay-button" onClick={handlePay} disabled={isProcessing}>
-                   {isProcessing ? 'Memproses...' : 'Bayar Sekarang'}
+                 {isProcessing ? 'Memproses...' : 'Bayar Sekarang'}
               </button>
 
                 
