@@ -6,23 +6,7 @@ const TermsPage = () => {
 
   return (
     <div className="terms-page">
-      {/* Header */}
-      <div className="terms-header">
-        <div className="terms-header-content">
-          <div className="terms-header-flex">
-            <button 
-              onClick={() => navigate(-1)}
-              className="back-button"
-            >
-              <svg className="back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          
-          </div>
-        </div>
-      </div>
-
+    
       {/* Content */}
       <div className="terms-content">
         <div className="terms-card">
