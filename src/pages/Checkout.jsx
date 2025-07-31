@@ -9,13 +9,12 @@ import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../contexts/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useNavbarScroll } from '../hooks/useNavbarScroll' // Import hook navbar scroll
+import { useNavbarScroll } from '../hooks/useNavbarScroll'
 import AdditionalVoucherSelector from '../components/common/AdditionalVoucherSelector'
-import Terms from '../components/common/Terms';
+// ❌ HAPUS import Terms karena tidak lagi menggunakan modal
+// import Terms from './Terms';
 import './Checkout.css'
 import { API_ENDPOINTS, getImageUrl as getApiImageUrl } from '../config/api'
-
-
 
 // Custom Enhanced Select Component
 const EnhancedSelect = ({ 
@@ -205,31 +204,30 @@ const Checkout = () => {
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
 
-  // Terms and mobile detection state
-  const [showTerms, setShowTerms] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  // ❌ HAPUS state showTerms karena tidak lagi menggunakan modal
+  // const [showTerms, setShowTerms] = useState(false);
 
-  // Mobile detection useEffect
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    
-    return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
-
-  // Handle terms click - mobile shows overlay, desktop redirects to page
+  // ✅ TAMBAH function untuk navigasi ke halaman Terms
   const handleTermsClick = (e) => {
     e.preventDefault();
+    // Simpan state checkout saat ini agar bisa kembali ke halaman yang sama
+    const currentState = {
+      checkoutData: {
+        shippingAddress,
+        selectedPayment,
+        selectedShipping,
+        useInsurance,
+        notes,
+        primaryVoucher,
+        secondaryVoucher,
+        additionalCartVoucher,
+        isBuyNow,
+        buyNowData
+      },
+      returnPath: '/checkout'
+    };
     
-    if (isMobile) {
-      setShowTerms(true);
-    } else {
-      navigate('/terms');
-    }
+    navigate('/terms', { state: currentState });
   };
 
   // Function to get proper image URL
@@ -258,7 +256,7 @@ const Checkout = () => {
       setAvailableDistricts({})
       setAvailableSubdistricts([])
     }
-  }, [shippingAddress.province])
+  }, [shippingAddress.province, addressData.provinces])
 
   useEffect(() => {
     if (shippingAddress.province && shippingAddress.regency) {
@@ -278,7 +276,7 @@ const Checkout = () => {
       setAvailableDistricts({})
       setAvailableSubdistricts([])
     }
-  }, [shippingAddress.province, shippingAddress.regency])
+  }, [shippingAddress.province, shippingAddress.regency, addressData.provinces])
 
   useEffect(() => {
     if (shippingAddress.province && shippingAddress.regency && shippingAddress.district) {
@@ -299,7 +297,27 @@ const Checkout = () => {
     } else {
       setAvailableSubdistricts([])
     }
-  }, [shippingAddress.province, shippingAddress.regency, shippingAddress.district])
+  }, [shippingAddress.province, shippingAddress.regency, shippingAddress.district, addressData.provinces])
+
+  // ✅ TAMBAH useEffect untuk restore state jika kembali dari halaman Terms
+  useEffect(() => {
+    if (location.state?.checkoutData) {
+      const { checkoutData } = location.state;
+      
+      // Restore semua state yang disimpan
+      setShippingAddress(checkoutData.shippingAddress || shippingAddress);
+      setSelectedPayment(checkoutData.selectedPayment || '');
+      setSelectedShipping(checkoutData.selectedShipping || 'reguler');
+      setUseInsurance(checkoutData.useInsurance ?? true);
+      setNotes(checkoutData.notes || '');
+      setPrimaryVoucher(checkoutData.primaryVoucher || null);
+      setSecondaryVoucher(checkoutData.secondaryVoucher || null);
+      setAdditionalCartVoucher(checkoutData.additionalCartVoucher || null);
+      
+      // Clear state setelah restore untuk menghindari restore berulang
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Generate dropdown options (moved inside Checkout to access addressData)
   const getProvinceOptions = () => {
@@ -939,7 +957,7 @@ const Checkout = () => {
                 {/* Notes */}
                 <div className="notes-section">
                   <div className="notes-header">
-                    <span> Kasih Catatan</span>
+                    <span>📝 Kasih Catatan</span>
                     <span className="char-count">{notes.length}/200</span>
                   </div>
                   <textarea 
@@ -1210,10 +1228,16 @@ const Checkout = () => {
                   Bayar Sekarang
                 </button>
                 
+                {/* ✅ Link yang mengarahkan ke halaman Terms (bukan modal) */}
                 <p className="payment-note">
                   Dengan melanjutkan pembayaran, kamu menyetujui S&K
                   <br />
-                  <a href="#" onClick={handleTermsClick}>Asuransi Pengiriman & Proteksi</a>
+                  <a 
+                    href="#" 
+                    onClick={handleTermsClick}
+                  >
+                    Asuransi Pengiriman & Proteksi
+                  </a>
                 </p>
               </div>
             </div>
@@ -1221,10 +1245,7 @@ const Checkout = () => {
         </div>
       </div>
       
-      {/* Only show Terms overlay on mobile */}
-      {isMobile && (
-        <Terms visible={showTerms} onClose={() => setShowTerms(false)} />
-      )}
+      {/* ❌ HAPUS komponen Terms modal karena sekarang navigasi ke page */}
     </>
   )
 }
