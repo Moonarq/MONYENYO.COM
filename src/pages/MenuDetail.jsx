@@ -62,7 +62,7 @@ const MenuDetail = () => {
   const [shareOverlayOpen, setShareOverlayOpen] = useState(false);
 
   // Menu voucher state
-  const [menuVoucher, setMenuVoucherState] = useState(getMenuVoucher());
+  const [menuVoucher, setMenuVoucherState] = useState(null);
   const [menuVoucherDiscount, setMenuVoucherDiscount] = useState(0);
 
   // Use navbar scroll hook
@@ -75,6 +75,13 @@ const MenuDetail = () => {
       document.body.classList.remove('menu-detail-page');
     };
   }, []);
+
+  // Selalu reset voucher setiap kali halaman ini dibuka
+  useEffect(() => {
+    clearMenuVoucher();
+    setMenuVoucherState(null);
+    setMenuVoucherDiscount(0);
+  }, [id]);
 
   useEffect(() => {
     fetch(API_ENDPOINTS.PRODUCTS)
