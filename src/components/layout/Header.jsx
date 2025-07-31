@@ -151,18 +151,26 @@ const Header = () => {
   return (
     <header className={`header ${isNavbarSolid ? 'desktop-solid' : 'desktop-transparent'}`}> 
       <div className="container">
-        {/* Hamburger Menu Button (Mobile Only) */}
-        <button 
-          className={`hamburger-menu ${isMenuOpen ? 'active menu-open' : ''}`}
-          onMouseDown={saveScrollPosition}
-          onTouchStart={saveScrollPosition}
-          onClick={handleHamburgerClick}
-          aria-label="Toggle menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+        {/* Mobile Left Section - Hamburger & Cart */}
+        <div className="mobile-left-section">
+          {/* Hamburger Menu Button (Mobile Only) */}
+          <button 
+            className={`hamburger-menu ${isMenuOpen ? 'active menu-open' : ''}`}
+            onMouseDown={saveScrollPosition}
+            onTouchStart={saveScrollPosition}
+            onClick={handleHamburgerClick}
+            aria-label="Toggle menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          {/* Mobile Cart Icon */}
+          <Link to="/cart" className="mobile-cart-icon" aria-label="Cart">
+            <i className="fas fa-shopping-cart"></i>
+          </Link>
+        </div>
 
         {/* Social Media Icons */}
         <div className="social-icons">

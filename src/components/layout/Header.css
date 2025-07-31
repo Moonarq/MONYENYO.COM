@@ -20,7 +20,7 @@
 
 @media (max-width: 768px) {
   .header.desktop-transparent .desktop-navbar-logo {
-    margin-top: 15px;
+    margin-top: -20px; /* FIXED: Changed from 15px to 0px */
   }
 }
 .header.desktop-solid .desktop-navbar-logo {
@@ -34,6 +34,7 @@
     margin-top: 7px;
   }
 }
+
 /* Header/Navbar & Mobile Menu Styles */
 .header {
     position: fixed;
@@ -73,6 +74,58 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+/* Mobile Left Section - Container for Hamburger and Cart */
+.mobile-left-section {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  height: 30px;
+}
+
+/* Mobile Cart Icon */
+.mobile-cart-icon {
+  font-size: 26px; /* dari 18px */
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; /* dari 30px */
+  height: 36px; /* dari 30px */
+}
+
+
+.mobile-cart-icon:hover {
+  color: #c59d5f;
+}
+
+/* Mobile cart icon color for different navbar states */
+.header.desktop-transparent .mobile-cart-icon {
+  color: #fff !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  margin-left: 38px; /* Atur sesuai kebutuhan, misalnya 8px atau 10px */
+  margin-top: 35px; /* Atur sesuai kebutuhan, misalnya 8px atau 10px */
+}
+
+.header.desktop-solid .mobile-cart-icon {
+  color: #fff !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  margin-right: 245px;
+  margin-top: 1px;
+
+  font-size: 26px;   /* dari default 18px → sedikit lebih besar */
+  width: 34px;       /* dari 30px → tambah sedikit */
+  height: 34px;
+}
+
+
+.header.show-on-scroll-up .mobile-cart-icon {
+  color: #fff !important;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
 }
 
 .social-icons {
@@ -161,7 +214,6 @@
     outline: none !important;
 }
 
-
 .language-toggle {
     color: white;
     font-weight: 600;
@@ -199,7 +251,7 @@
     display: block;
     height: 3px;
     width: 100%;
-    background: #ffffff;
+    background: #1b1818;
     margin: 3px 0;
     transition: all 0.3s ease;
     border-radius: 2px;
@@ -373,7 +425,7 @@ Link.logo-text {
 }
 
 /* Mobile responsive */
-@media (max-width: 768px) {
+@media (max-width: 768px) {    
     .header .logo-text {
         font-size: 1.6rem;
         text-decoration: none !important;
@@ -384,6 +436,43 @@ Link.logo-text {
     .language-toggle {
         display: none !important;
     }
+    
+    /* Show mobile left section only on mobile */
+    .mobile-left-section {
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    /* Hide desktop hamburger when mobile left section is active */
+    .header .container > .hamburger-menu {
+        display: none !important;
+    }
+    
+    /* Mobile hamburger menu styling adjustments */
+    .mobile-left-section .hamburger-menu {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Mobile hamburger span colors for different navbar states */
+    .header.desktop-transparent .mobile-left-section .hamburger-menu span {
+        background: #ffffff;
+         transform: translateY(-13px);
+    }
+    
+    .header.desktop-solid .mobile-left-section .hamburger-menu span,
+    .header.show-on-scroll-up .mobile-left-section .hamburger-menu span {
+        background: #ffffff !important;
+    }
+}
+
+/* Hide mobile left section on desktop */
+@media (min-width: 769px) {
+  .mobile-left-section {
+    display: none !important;
+  }
 }
 
 .header.desktop-solid .nav-link,
