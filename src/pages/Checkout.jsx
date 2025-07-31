@@ -14,6 +14,20 @@ import AdditionalVoucherSelector from '../components/common/AdditionalVoucherSel
 import './Checkout.css'
 import { API_ENDPOINTS, getImageUrl as getApiImageUrl } from '../config/api'
 
+// ✅ TAMBAH: Helper functions untuk mengelola menuVoucher di localStorage
+const getMenuVoucher = () => {
+  try {
+    const menuVoucher = localStorage.getItem('menuVoucher');
+    return menuVoucher ? JSON.parse(menuVoucher) : null;
+  } catch {
+    return null;
+  }
+};
+
+const clearMenuVoucher = () => {
+  localStorage.removeItem('menuVoucher');
+};
+
 // Custom Enhanced Select Component
 const EnhancedSelect = ({ 
   value, 
@@ -201,6 +215,21 @@ const Checkout = () => {
     reguler: { name: 'Reguler', price: 0 },
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
+
+  // ✅ FIXED: Load menu voucher on component mount for Buy Now mode
+  useEffect(() => {
+    if (isBuyNow) {
+      const savedMenuVoucher = getMenuVoucher();
+      console.log('Loading menu voucher from localStorage:', savedMenuVoucher);
+      
+      if (savedMenuVoucher && savedMenuVoucher.voucher && savedMenuVoucher.discount) {
+        // Set as primary voucher
+        setPrimaryVoucher(savedMenuVoucher.voucher);
+        setPrimaryVoucherDiscount(savedMenuVoucher.discount);
+        console.log('Applied menu voucher as primary:', savedMenuVoucher.voucher.name, 'with discount:', savedMenuVoucher.discount);
+      }
+    }
+  }, [isBuyNow]);
 
   // ✅ FIXED: Fungsi untuk menghitung discount voucher dengan struktur data yang benar
   const calculateVoucherDiscount = (voucher, subtotal) => {
@@ -460,10 +489,25 @@ const Checkout = () => {
     }
   }
 
-  // Get existing vouchers from cart (for cart checkout)
-  const getExistingCartVouchers = () => {
-    if (isBuyNow) return []
+  // ✅ FIXED: Get existing vouchers - Include menu voucher for Buy Now mode
+  const getExistingVouchers = () => {
+    if (isBuyNow) {
+      const existingVouchers = []
+      
+      // Add primary voucher if exists (including from menu detail)
+      if (primaryVoucher) {
+        existingVouchers.push(primaryVoucher)
+      }
+      
+      // Add secondary voucher if exists
+      if (secondaryVoucher) {
+        existingVouchers.push(secondaryVoucher)
+      }
+      
+      return existingVouchers
+    }
     
+    // For cart checkout
     const existingVouchers = []
     
     // Add cart-level voucher if exists
@@ -641,6 +685,11 @@ const Checkout = () => {
     payButton.disabled = true
 
     try {
+      // ✅ CLEAR menu voucher after successful payment initiation
+      if (isBuyNow) {
+        clearMenuVoucher();
+      }
+
       // Get checkout data untuk dikirim ke backend
       const orderNumber = `ORD${Date.now()}`
       const currentDate = new Date().toISOString()
@@ -1171,22 +1220,41 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Enhanced Voucher Section for Buy Now */}
+              {/* ✅ FIXED: Enhanced Voucher Section for Buy Now - Show menu voucher status */}
               {isBuyNow && (
                 <div className="buy-now-voucher-section">
-                  <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Voucher Diskon (Max 2)</h4>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Voucher Diskon (Max 2)</h4>
                   
-                  {/* Primary Voucher Selector */}
-                  <div className="voucher-selector-wrapper">
-                    <h5>Voucher Pertama</h5>
-                    <AdditionalVoucherSelector
-                      totalAmount={subtotalBeforeVoucher}
-                      existingVouchers={secondaryVoucher ? [secondaryVoucher] : []}
-                      onVoucherApplied={handlePrimaryVoucherApplied}
-                      onVoucherRemoved={handlePrimaryVoucherRemoved}
-                      appliedAdditionalVoucher={primaryVoucher}
-                    />
-                  </div>
+                  {/* Show menu voucher info if applied as primary */}
+                  {primaryVoucher && (
+                    <div className="voucher-applied-info">
+                      <div className="voucher-success">
+                        <span className="checkmark">✓</span>
+                        <div>
+                          <strong>Voucher 1: {primaryVoucher.name}</strong>
+                          <p>Diskon: Rp{primaryVoucherDiscount.toLocaleString('id-ID')} 🎉</p>
+                          {/* Show if this came from menu detail */}
+                          <small style={{color: '#666', fontSize: '12px'}}>
+                            {getMenuVoucher() ? 'Dari menu detail' : 'Dipilih di checkout'}
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Primary Voucher Selector - Only show if no primary voucher */}
+                  {!primaryVoucher && (
+                    <div className="voucher-selector-wrapper">
+                      <h5>Voucher Pertama</h5>
+                      <AdditionalVoucherSelector
+                        totalAmount={subtotalBeforeVoucher}
+                        existingVouchers={getExistingVouchers().filter(v => v !== primaryVoucher)}
+                        onVoucherApplied={handlePrimaryVoucherApplied}
+                        onVoucherRemoved={handlePrimaryVoucherRemoved}
+                        appliedAdditionalVoucher={primaryVoucher}
+                      />
+                    </div>
+                  )}
 
                   {/* Secondary Voucher Selector - Only show if primary voucher is selected */}
                   {primaryVoucher && (
@@ -1194,7 +1262,7 @@ const Checkout = () => {
                       <h5>Voucher Kedua</h5>
                       <AdditionalVoucherSelector
                         totalAmount={Math.max(0, subtotalBeforeVoucher - primaryVoucherDiscount)}
-                        existingVouchers={[primaryVoucher]}
+                        existingVouchers={getExistingVouchers()}
                         onVoucherApplied={handleSecondaryVoucherApplied}
                         onVoucherRemoved={handleSecondaryVoucherRemoved}
                         appliedAdditionalVoucher={secondaryVoucher}
@@ -1227,7 +1295,7 @@ const Checkout = () => {
                     <h5>Tambah Voucher Lagi</h5>
                     <AdditionalVoucherSelector
                       totalAmount={Math.max(0, subtotalBeforeVoucher - (cartVoucherDiscount || 0))}
-                      existingVouchers={cartVoucher ? [cartVoucher] : []}
+                      existingVouchers={getExistingVouchers()}
                       onVoucherApplied={handleAdditionalCartVoucherApplied}
                       onVoucherRemoved={handleAdditionalCartVoucherRemoved}
                       appliedAdditionalVoucher={additionalCartVoucher}
