@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import './Terms.css';
 
@@ -38,11 +38,25 @@ const TERMS_CONTENT = {
 
 const Terms = ({ visible, onClose }) => {
   const [tab, setTab] = useState('shipping');
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (visible) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [visible]);
+
   if (!visible) return null;
 
   return createPortal(
-    <div className="terms-overlay">
-      <div className="terms-modal">
+    <div className="terms-overlay" onClick={onClose}>
+      <div className="terms-modal" onClick={(e) => e.stopPropagation()}>
         <button className="terms-close" onClick={onClose} aria-label="Tutup">
           <span>&times;</span>
         </button>
@@ -71,4 +85,35 @@ const Terms = ({ visible, onClose }) => {
   );
 };
 
-export default Terms;
+// Demo component to test the Terms overlay
+export default function TermsDemo() {
+  const [showTerms, setShowTerms] = useState(false);
+
+  return (
+    <div style={{ padding: '20px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <h2>Demo Terms & Conditions Overlay</h2>
+      <button 
+        onClick={() => setShowTerms(true)}
+        style={{
+          background: '#1abc5b',
+          color: 'white',
+          border: 'none',
+          padding: '12px 24px',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          fontSize: '16px',
+          fontWeight: '600'
+        }}
+      >
+        Buka S&K Asuransi & Proteksi
+      </button>
+      
+      <Terms 
+        visible={showTerms} 
+        onClose={() => setShowTerms(false)} 
+      />
+    </div>
+  );
+}
+
+export { Terms };
