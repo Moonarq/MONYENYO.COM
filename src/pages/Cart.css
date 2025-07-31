@@ -569,7 +569,7 @@
 
 /* Universal Green Text - Semua Nilai Voucher Warna Hijau */
 .voucher-value {
-  font-size: 1.1rem;
+  font-size: 4rem;
   color: var(--cart-voucher-green);
   font-weight: 700;
   margin: 0;
