@@ -7,7 +7,7 @@ import CartOverlay from '../components/common/CartOverlay';
 import ShareOverlay from '../components/common/ShareOverlay';
 import MenuDetailVoucherSelector from '../components/common/MenuDetailVoucherSelector';
 import { useCart } from '../contexts/CartContext';
-import { API_ENDPOINTS, getImageUrl } from '../config/api'
+import { API_ENDPOINTS, getImageUrl as getApiImageUrl } from '../config/api'
 
 // Helper to get and set cart in localStorage
 const getCart = () => {
@@ -99,6 +99,19 @@ const MenuDetail = () => {
       setMenuVoucherDiscount(savedMenuVoucher.discount);
     }
   }, []);
+
+  // FIXED: Function to get proper image URL
+  const getItemImageUrl = (imagePath) => {
+    if (!imagePath) return '/images/placeholder.jpg';
+    
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http') || imagePath.startsWith('/images/')) {
+      return imagePath;
+    }
+    
+    // Otherwise, use API config to build full URL
+    return getApiImageUrl(imagePath);
+  };
 
   // Function to calculate discounted price
   const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
@@ -265,14 +278,14 @@ const MenuDetail = () => {
           <div className="product-gallery">
             <div className="main-image">
               <img 
-                    src={
-                      item.images && item.images.length > 0 
-                        ? getImageUrl(item.images[activeImg]) 
-                        : item.image
-                    } 
+                src={
+                  item.images && item.images.length > 0 
+                    ? getItemImageUrl(item.images[activeImg]) 
+                    : getItemImageUrl(item.image)
+                } 
                 alt={t(item.name)} 
                 onError={(e) => {
-                  e.target.src = item.image || '/images/placeholder.jpg';
+                  e.target.src = '/images/placeholder.jpg';
                 }}
               />
             </div>
@@ -284,15 +297,11 @@ const MenuDetail = () => {
                   className={`thumbnail ${activeImg === idx ? 'active' : ''}`}
                   onClick={() => setActiveImg(idx)}
                 >
-                 <img
-                    src={
-                      item.images && item.images.length > 0 
-                        ? getImageUrl(img)  
-                        : img
-                    }
+                  <img
+                    src={getItemImageUrl(img)}
                     alt={`Gambar ${idx + 1}`}
                     onError={(e) => {
-                      e.target.src = item.image || '/images/placeholder.jpg';
+                      e.target.src = '/images/placeholder.jpg';
                     }}
                   />
                 </div>
