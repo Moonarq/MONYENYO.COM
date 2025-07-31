@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useNavbarScroll } from '../hooks/useNavbarScroll';
 import './Cart.css';
+import { API_ENDPOINTS } from '../config/api';
 
 
 
@@ -29,7 +30,7 @@ const VoucherAPI = {
    */
   getVouchers: async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/vouchers');
+      const response = await fetch(API_ENDPOINTS.VOUCHERS);
       if (!response.ok) throw new Error('Failed to fetch vouchers');
       return await response.json();
     } catch (error) {
@@ -43,7 +44,7 @@ const VoucherAPI = {
    */
   validateVoucher: async (voucherName, totalAmount) => {
     try {
-      const response = await fetch('http://localhost:8000/api/vouchers/validate', {
+      const response = await fetch(`${API_ENDPOINTS.VOUCHERS}/validate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ const VoucherAPI = {
    */
   applyVoucher: async (voucherName) => {
     try {
-      const response = await fetch('http://localhost:8000/api/vouchers/apply', {
+      const response = await fetch(`${API_ENDPOINTS.VOUCHERS}/apply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +141,7 @@ const ProductInfo = ({ item, onImageError }) => (
   <div className="cart-product-container">
     <img
       src={item.images && item.images.length > 0 
-        ? `http://localhost:8000/storage/${item.images[0]}` 
+        ? getImageUrl(item.images[0])
         : item.image || '/images/placeholder.jpg'}
       alt={item.name}
       className="cart-product-img"

@@ -1,5 +1,6 @@
 // src/contexts/CartContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_ENDPOINTS, getImageUrl } from '../config/api'
 
 const CartContext = createContext();
 
@@ -140,7 +141,7 @@ export const CartProvider = ({ children }) => {
   const getImageUrl = (item) => {
     // If item has images array from server, use the first one
     if (item.images && item.images.length > 0) {
-      return `http://localhost:8000/storage/${item.images[0]}`;
+     return getImageUrl(item.images[0]);
     }
     // Otherwise use the regular image field
     return item.image || '/images/placeholder.jpg';
