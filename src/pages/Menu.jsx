@@ -13,6 +13,8 @@ import desktop5 from '../assets/images/desktop5.jpg';
 import desktop6 from '../assets/images/desktop6.jpg';
 import menu7 from '../assets/images/menu7.jpg';
 import menu8 from '../assets/images/menu8.jpg';
+import { API_ENDPOINTS, getImageUrl } from '../config/api'
+
 
 const Menu = () => {
   const { t } = useLanguage();
@@ -33,20 +35,20 @@ const Menu = () => {
     };
   }, []);
 
-  React.useEffect(() => {
-    const promoHTML = '<br/><span class="promo-badge promo-pulse">CLICK PROMO SPESIAL!</span>';
-    fetch('http://localhost:8000/api/products')
-      .then(res => res.json())
-      .then(data => {
-        setMenuItems(data.map(item => ({
-          ...item,
-          name: t(item.name),
-          description: t(item.description) + promoHTML,
-          category: t(item.category)
-        })));
-        setLoading(false);
-      });
-  }, [t]);
+React.useEffect(() => {
+  const promoHTML = '<br/><span class="promo-badge promo-pulse">CLICK PROMO SPESIAL!</span>';
+  fetch(API_ENDPOINTS.PRODUCTS)  
+    .then(res => res.json())
+    .then(data => {
+      setMenuItems(data.map(item => ({
+        ...item,
+        name: t(item.name),
+        description: t(item.description) + promoHTML,
+        category: t(item.category)
+      })));
+      setLoading(false);
+    });
+}, [t]);
 
   return (
     <>
@@ -96,8 +98,8 @@ const Menu = () => {
                   >
                     <div className="menu-image">
                       <img
-                        src={item.images && item.images.length > 0 ? `http://localhost:8000/storage/${item.images[0]}` : item.image}
-                        alt={item.name}
+                        src={item.images && item.images.length > 0 ? getImageUrl(item.images[0]) : item.image}
+                        alt={item.name} 
                         loading="lazy"
                         onError={(e) => {
                           e.target.src = item.image || '/images/placeholder.jpg';

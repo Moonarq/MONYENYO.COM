@@ -1,6 +1,7 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
-import axios from 'axios' // 👈 Add this import
+import axios from 'axios'
+import API_CONFIG from './config/api' // 👈 Import config
 import Layout from './components/layout/Layout'
 import ScrollToTop from './components/common/ScrollToTop'
 import Home from './pages/Home'
@@ -16,8 +17,8 @@ import { CartProvider } from './contexts/CartContext.jsx'
 import Checkout from './pages/Checkout.jsx'
 import OrderSuccess from './pages/OrderSuccess.jsx'
 
-// 👈 Add axios configuration
-axios.defaults.baseURL = 'https://api.monyenyo.com'  // 👈 Ganti ke subdomain API
+// 👈 Use config instead of hardcoded URL
+axios.defaults.baseURL = API_CONFIG.BASE_URL
 axios.defaults.headers.common['Accept'] = 'application/json'
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 

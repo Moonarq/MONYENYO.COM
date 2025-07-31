@@ -7,6 +7,7 @@ import CartOverlay from '../components/common/CartOverlay';
 import ShareOverlay from '../components/common/ShareOverlay';
 import MenuDetailVoucherSelector from '../components/common/MenuDetailVoucherSelector';
 import { useCart } from '../contexts/CartContext';
+import { API_ENDPOINTS, getImageUrl } from '../config/api'
 
 // Helper to get and set cart in localStorage
 const getCart = () => {
@@ -76,7 +77,7 @@ const MenuDetail = () => {
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/products')
+    fetch(API_ENDPOINTS.PRODUCTS)
       .then(res => res.json())
       .then(data => {
         const found = data.find(m => String(m.id) === String(id));
@@ -264,11 +265,11 @@ const MenuDetail = () => {
           <div className="product-gallery">
             <div className="main-image">
               <img 
-                src={
-                  item.images && item.images.length > 0 
-                    ? `http://localhost:8000/storage/${item.images[activeImg]}` 
-                    : item.image
-                } 
+                    src={
+                      item.images && item.images.length > 0 
+                        ? getImageUrl(item.images[activeImg]) 
+                        : item.image
+                    } 
                 alt={t(item.name)} 
                 onError={(e) => {
                   e.target.src = item.image || '/images/placeholder.jpg';
@@ -283,10 +284,10 @@ const MenuDetail = () => {
                   className={`thumbnail ${activeImg === idx ? 'active' : ''}`}
                   onClick={() => setActiveImg(idx)}
                 >
-                  <img
+                 <img
                     src={
                       item.images && item.images.length > 0 
-                        ? `http://localhost:8000/storage/${img}` 
+                        ? getImageUrl(img)  
                         : img
                     }
                     alt={`Gambar ${idx + 1}`}

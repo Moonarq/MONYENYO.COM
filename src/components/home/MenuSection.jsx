@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../../hooks/useLanguage'
 import './MenuSection.css'
+import { getImageUrl } from '../config/api'
 
 const promoHTML = '<br/><span class="promo-badge promo-pulse">CLICK PROMO SPESIAL!</span>'
 
@@ -18,7 +19,7 @@ const MenuSection = () => {
   }
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/products')
+    fetch(API_ENDPOINTS.PRODUCTS) 
       .then(res => res.json())
       .then(data => {
         setMenuItems(data.map(item => ({
@@ -69,7 +70,7 @@ const MenuSection = () => {
                   <img 
                     src={
                       item.images && item.images.length > 0 
-                        ? `http://localhost:8000/storage/${item.images[0]}` 
+                        ? getImageUrl(item.images[0]) 
                         : item.image
                     } 
                     alt={item.name}
