@@ -221,11 +221,10 @@ const Checkout = () => {
     if (isBuyNow) {
       const savedMenuVoucher = getMenuVoucher();
       console.log('Loading menu voucher from localStorage:', savedMenuVoucher);
-      
-      if (savedMenuVoucher && savedMenuVoucher.voucher && savedMenuVoucher.discount) {
-        // Set as primary voucher
+      // Set as primary voucher jika ada voucher, walaupun discount-nya 0 (untuk free_shipping)
+      if (savedMenuVoucher && savedMenuVoucher.voucher) {
         setPrimaryVoucher(savedMenuVoucher.voucher);
-        setPrimaryVoucherDiscount(savedMenuVoucher.discount);
+        setPrimaryVoucherDiscount(Number(savedMenuVoucher.discount) || 0);
         console.log('Applied menu voucher as primary:', savedMenuVoucher.voucher.name, 'with discount:', savedMenuVoucher.discount);
       }
     }
