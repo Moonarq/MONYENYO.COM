@@ -1226,10 +1226,9 @@ const Checkout = () => {
                 </div>
                 
                 {/* ✅ UPDATED: Button now calls handlePay instead of handleCheckout */}
-                 <button className="pay-button" onClick={handlePay} disabled={isProcessing}>
-                 {isProcessing ? 'Memproses...' : 'Bayar Sekarang'}
-              </button>
-
+                <button className="pay-button" onClick={handlePay}>
+                  Bayar Sekarang
+                </button>
                 
                 <p className="payment-note">
                   Dengan melanjutkan pembayaran, kamu menyetujui S&K
