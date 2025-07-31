@@ -150,6 +150,7 @@ const Checkout = () => {
     cart, 
     getCartTotals, 
     calculateItemTotal, 
+    getImageUrl,
     cartVoucher,
     cartVoucherDiscount,
     applyCartVoucher,
@@ -206,13 +207,7 @@ const Checkout = () => {
 
   // Function to get proper image URL
   const getItemImageUrl = (item) => {
-    // Check if item has image property and use API config getImageUrl
-    if (item.image) {
-      return getApiImageUrl(item.image);
-    }
-    
-    // Fallback to placeholder
-    return '/images/placeholder.jpg';
+    return getImageUrl(item);
   }
 
   // Update available options when province/city/district changes

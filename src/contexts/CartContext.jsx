@@ -1,6 +1,6 @@
 // src/contexts/CartContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { API_ENDPOINTS, getImageUrl } from '../config/api'
+import { API_ENDPOINTS, getImageUrl as getApiImageUrl } from '../config/api'
 
 const CartContext = createContext();
 
@@ -137,14 +137,18 @@ export const CartProvider = ({ children }) => {
     };
   };
 
-  // Get proper image URL - matches both components
+  // FIXED: Get proper image URL - Remove circular reference
   const getImageUrl = (item) => {
     // If item has images array from server, use the first one
     if (item.images && item.images.length > 0) {
-     return getImageUrl(item.images[0]);
+      return getApiImageUrl(item.images[0]); // Use the imported function with different name
     }
-    // Otherwise use the regular image field
-    return item.image || '/images/placeholder.jpg';
+    // If item has single image property
+    if (item.image) {
+      return getApiImageUrl(item.image);
+    }
+    // Otherwise use placeholder
+    return '/images/placeholder.jpg';
   };
 
   const contextValue = {
