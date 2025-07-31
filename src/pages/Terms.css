@@ -161,6 +161,10 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .terms-page {
+    margin-top: 20px;
+  }
+ 
   .terms-content {
     padding: 1rem;
   }
