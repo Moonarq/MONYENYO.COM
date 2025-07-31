@@ -18,9 +18,7 @@ const TermsPage = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="terms-title">
-              Syarat & Ketentuan Asuransi Pengiriman & Proteksi
-            </h1>
+          
           </div>
         </div>
       </div>
