@@ -747,7 +747,7 @@ const Checkout = () => {
         {/* ✅ NEW: Load Midtrans Snap SDK */}
         <script 
           src="https://app.sandbox.midtrans.com/snap/snap.js" 
-          data-client-key="SB-Mid-client-your_client_key_here"
+          data-client-key="Mid-client-5P2SiGIqGXzKSACK"
         ></script>
       </Helmet>
       
