@@ -202,30 +202,6 @@ const Checkout = () => {
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
 
-  // ✅ FIXED: Fungsi untuk menghitung discount voucher dengan benar
-  const calculateVoucherDiscount = (voucher, subtotal) => {
-    if (!voucher) return 0;
-    
-    switch (voucher.type) {
-      case 'fixed':
-        // Potongan tetap: langsung gunakan nilai discount
-        return Math.min(voucher.discount, subtotal);
-      
-      case 'percentage':
-        // Potongan persentase: hitung persentase dari subtotal
-        const percentageDiscount = Math.floor((subtotal * voucher.discount) / 100);
-        // Jika ada max_discount, batasi sesuai max_discount
-        return voucher.max_discount ? Math.min(percentageDiscount, voucher.max_discount) : percentageDiscount;
-      
-      case 'free_shipping':
-        // Gratis ongkir: tidak mengurangi subtotal, hanya membebaskan ongkir
-        return 0;
-      
-      default:
-        return 0;
-    }
-  };
-
   // ✅ TAMBAH function untuk navigasi ke halaman Terms
   const handleTermsClick = (e) => {
     e.preventDefault();
@@ -338,46 +314,6 @@ const Checkout = () => {
     }
   }, [location.state]);
 
-  // ✅ FIXED: Update discount calculation saat voucher berubah
-  useEffect(() => {
-    if (isBuyNow) {
-      const item = buyNowData;
-      const subtotal = item.price * item.quantity;
-      
-      // Hitung ulang discount untuk primary voucher
-      if (primaryVoucher) {
-        const discount = calculateVoucherDiscount(primaryVoucher, subtotal);
-        setPrimaryVoucherDiscount(discount);
-      } else {
-        setPrimaryVoucherDiscount(0);
-      }
-      
-      // Hitung ulang discount untuk secondary voucher
-      if (secondaryVoucher) {
-        const remainingSubtotal = Math.max(0, subtotal - primaryVoucherDiscount);
-        const discount = calculateVoucherDiscount(secondaryVoucher, remainingSubtotal);
-        setSecondaryVoucherDiscount(discount);
-      } else {
-        setSecondaryVoucherDiscount(0);
-      }
-    }
-  }, [primaryVoucher, secondaryVoucher, buyNowData, isBuyNow, primaryVoucherDiscount]);
-
-  useEffect(() => {
-    if (!isBuyNow) {
-      const cartTotals = getCartTotals();
-      
-      // Hitung ulang discount untuk additional cart voucher
-      if (additionalCartVoucher) {
-        const remainingSubtotal = Math.max(0, cartTotals.subtotalBeforeVoucher - cartTotals.totalVoucherDiscount);
-        const discount = calculateVoucherDiscount(additionalCartVoucher, remainingSubtotal);
-        setAdditionalCartVoucherDiscount(discount);
-      } else {
-        setAdditionalCartVoucherDiscount(0);
-      }
-    }
-  }, [additionalCartVoucher, cart, isBuyNow, cartVoucherDiscount]);
-
   // Generate dropdown options (moved inside Checkout to access addressData)
   const getProvinceOptions = () => {
     return Object.entries(addressData.provinces).map(([key, province]) => ({
@@ -407,13 +343,13 @@ const Checkout = () => {
     }))
   }
 
-  // ✅ FIXED: Calculate totals based on checkout type
+  // Calculate totals based on checkout type
   const calculateCheckoutTotals = () => {
     if (isBuyNow) {
       const item = buyNowData
       const subtotalBeforeVoucher = item.price * item.quantity
       
-      // For buy now, use the new voucher system dengan perhitungan yang benar
+      // For buy now, use the new voucher system
       const totalVoucherDiscount = primaryVoucherDiscount + secondaryVoucherDiscount
       const finalTotal = Math.max(0, subtotalBeforeVoucher - totalVoucherDiscount)
       const totalItems = item.quantity
@@ -530,15 +466,10 @@ const Checkout = () => {
     removeItem(itemId)
   }
 
-  // ✅ FIXED: Primary voucher handlers dengan perhitungan yang benar
-  const handlePrimaryVoucherApplied = (voucher, calculatedDiscount) => {
+  // Primary voucher handlers (for Buy Now)
+  const handlePrimaryVoucherApplied = (voucher, discount) => {
     setPrimaryVoucher(voucher)
-    // Gunakan discount yang sudah dihitung dari AdditionalVoucherSelector
-    // ATAU hitung ulang di sini untuk memastikan konsistensi
-    const item = buyNowData;
-    const subtotal = item.price * item.quantity;
-    const correctDiscount = calculateVoucherDiscount(voucher, subtotal);
-    setPrimaryVoucherDiscount(correctDiscount);
+    setPrimaryVoucherDiscount(discount)
   }
 
   const handlePrimaryVoucherRemoved = () => {
@@ -546,15 +477,10 @@ const Checkout = () => {
     setPrimaryVoucherDiscount(0)
   }
 
-  // ✅ FIXED: Secondary voucher handlers dengan perhitungan yang benar
-  const handleSecondaryVoucherApplied = (voucher, calculatedDiscount) => {
-    setSecondaryVoucher(voucher);
-    // Hitung discount untuk voucher kedua berdasarkan sisa subtotal setelah voucher pertama
-    const item = buyNowData;
-    const subtotal = item.price * item.quantity;
-    const remainingSubtotal = Math.max(0, subtotal - primaryVoucherDiscount);
-    const correctDiscount = calculateVoucherDiscount(voucher, remainingSubtotal);
-    setSecondaryVoucherDiscount(correctDiscount);
+  // Secondary voucher handlers (for Buy Now)
+  const handleSecondaryVoucherApplied = (voucher, discount) => {
+    setSecondaryVoucher(voucher)
+    setSecondaryVoucherDiscount(discount)
   }
 
   const handleSecondaryVoucherRemoved = () => {
@@ -562,14 +488,10 @@ const Checkout = () => {
     setSecondaryVoucherDiscount(0)
   }
 
-  // ✅ FIXED: Additional cart voucher handlers dengan perhitungan yang benar
-  const handleAdditionalCartVoucherApplied = (voucher, calculatedDiscount) => {
-    setAdditionalCartVoucher(voucher);
-    // Hitung discount berdasarkan sisa subtotal setelah voucher cart
-    const cartTotals = getCartTotals();
-    const remainingSubtotal = Math.max(0, cartTotals.subtotalBeforeVoucher - cartTotals.totalVoucherDiscount);
-    const correctDiscount = calculateVoucherDiscount(voucher, remainingSubtotal);
-    setAdditionalCartVoucherDiscount(correctDiscount);
+  // Additional cart voucher handlers (for Cart checkout)
+  const handleAdditionalCartVoucherApplied = (voucher, discount) => {
+    setAdditionalCartVoucher(voucher)
+    setAdditionalCartVoucherDiscount(discount)
   }
 
   const handleAdditionalCartVoucherRemoved = () => {
@@ -700,6 +622,7 @@ const Checkout = () => {
         },
         body: JSON.stringify(checkoutData)
       });
+
 
       const data = await res.json();
 
@@ -1152,7 +1075,7 @@ const Checkout = () => {
                     <div className="voucher-selector-wrapper">
                       <h5>Voucher Kedua</h5>
                       <AdditionalVoucherSelector
-                        totalAmount={Math.max(0, subtotalBeforeVoucher - primaryVoucherDiscount)}
+                        totalAmount={subtotalBeforeVoucher}
                         existingVouchers={[primaryVoucher]}
                         onVoucherApplied={handleSecondaryVoucherApplied}
                         onVoucherRemoved={handleSecondaryVoucherRemoved}
@@ -1185,7 +1108,7 @@ const Checkout = () => {
                   <div className="voucher-selector-wrapper" style={{ marginTop: '16px' }}>
                     <h5>Tambah Voucher Lagi</h5>
                     <AdditionalVoucherSelector
-                      totalAmount={Math.max(0, subtotalBeforeVoucher - (cartVoucherDiscount || 0))}
+                      totalAmount={subtotalBeforeVoucher}
                       existingVouchers={cartVoucher ? [cartVoucher] : []}
                       onVoucherApplied={handleAdditionalCartVoucherApplied}
                       onVoucherRemoved={handleAdditionalCartVoucherRemoved}
