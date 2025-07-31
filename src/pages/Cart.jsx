@@ -451,6 +451,10 @@ const CartSummaryWithVoucher = ({
  * Main Cart Page Component
  */
 const CartPage = () => {
+  // Reset voucher cart setiap kali halaman ini dibuka
+  useEffect(() => {
+    removeCartVoucher();
+  }, []);
   const navigate = useNavigate();
   const { 
     cart, 
