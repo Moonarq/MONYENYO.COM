@@ -957,7 +957,7 @@ const Checkout = () => {
                 {/* Notes */}
                 <div className="notes-section">
                   <div className="notes-header">
-                    <span>📝 Kasih Catatan</span>
+                    <span>Kasih Catatan</span>
                     <span className="char-count">{notes.length}/200</span>
                   </div>
                   <textarea 

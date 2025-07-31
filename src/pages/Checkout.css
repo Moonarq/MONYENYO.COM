@@ -6,6 +6,9 @@
   font-size: 14px;
 }
 
+.voucher-selector-wrapper {
+  margin-top: 5px;
+}
 .select-trigger {
   display: flex;
   align-items: center;
@@ -707,6 +710,7 @@
   align-items: flex-end;
   gap: 2px;
 }
+
 
 .original-price {
   font-size: 12px;
