@@ -1235,7 +1235,7 @@ const Checkout = () => {
                           <p>Diskon: Rp{primaryVoucherDiscount.toLocaleString('id-ID')} 🎉</p>
                           {/* Show if this came from menu detail */}
                           <small style={{color: '#666', fontSize: '12px'}}>
-                            {getMenuVoucher() ? 'Dari menu detail' : 'Dipilih di checkout'}
+                            {getMenuVoucher() ? '' : ''}
                           </small>
                         </div>
                       </div>
