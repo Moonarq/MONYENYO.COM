@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import './CartOverlay.css';
+import { API_ENDPOINTS, getImageUrl } from '../../config/api'
 
 const CartOverlay = ({ cart, visible, onClose, onUpdateQuantity, onRemoveItem }) => {
   const overlayRef = useRef();
@@ -54,7 +55,7 @@ const CartOverlay = ({ cart, visible, onClose, onUpdateQuantity, onRemoveItem })
             cart.map(item => (
               <div className="cart-overlay-row" key={item.id}>
                 <img
-                  src={item.images && item.images.length > 0 ? `http://localhost:8000/storage/${item.images[0]}` : (item.image || '/images/placeholder.jpg')}
+                  src={item.images && item.images.length > 0 ? getImageUrl(item.images[0]) : (item.image || '/images/placeholder.jpg')}
                   alt={item.name}
                   className="cart-overlay-img"
                   onError={e => { e.target.src = '/images/placeholder.jpg'; }}
