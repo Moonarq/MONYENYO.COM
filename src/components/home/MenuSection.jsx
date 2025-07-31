@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../../hooks/useLanguage'
 import './MenuSection.css'
-import { getImageUrl } from '../config/api'
+import { API_ENDPOINTS, getImageUrl } from '../../config/api'
 
 const promoHTML = '<br/><span class="promo-badge promo-pulse">CLICK PROMO SPESIAL!</span>'
 
