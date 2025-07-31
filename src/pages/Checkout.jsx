@@ -13,6 +13,9 @@ import { useNavbarScroll } from '../hooks/useNavbarScroll' // Import hook navbar
 import AdditionalVoucherSelector from '../components/common/AdditionalVoucherSelector'
 import Terms from '../components/common/Terms';
 import './Checkout.css'
+import { API_ENDPOINTS, getImageUrl } from '../config/api'
+
+
 
 // Custom Enhanced Select Component
 const EnhancedSelect = ({ 
