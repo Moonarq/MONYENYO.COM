@@ -1,0 +1,322 @@
+/* Hero Section Styles */
+
+/* Main Hero Section */
+.hero {
+    min-height: 100vh;
+    background: url('../../assets/images/deskrop1.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: background-image 0.8s ease-in-out;
+}
+
+.hero-content {
+    padding-top: 100px;
+    z-index: 2;
+}
+
+.hero-subtitle {
+    color: white !important;
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 25px;
+    opacity: 1;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    margin-left: -480px;
+    position: relative;
+    top: 20px;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    transform: translateY(0);
+}
+
+.hero-title {
+    font-size: 80px;
+    font-weight: 900;
+    color: white !important;
+    line-height: 0.95;
+    letter-spacing: -3px;
+    word-spacing: 10px;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    text-transform: uppercase;
+    margin-left: -480px;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    transform: translateY(0);
+}
+
+/* Slide specific positioning */
+.hero.slide-1 .hero-subtitle,
+.hero.slide-1 .hero-title {
+    margin-left: -287px;
+}
+
+.hero.slide-2 .hero-subtitle,
+.hero.slide-2 .hero-title {
+    margin-right: -10px;
+}
+
+.hero.slide-3 .hero-subtitle,
+.hero.slide-3 .hero-title {
+    margin-right: 60px;
+}
+.hero.slide-4 .hero-subtitle,
+.hero.slide-4 .hero-title {
+    margin-left: -300px;
+}
+.hero.slide-5 .hero-subtitle,
+.hero.slide-5 .hero-title {
+    margin-left: -430px;
+}
+.hero.slide-6 .hero-subtitle,
+.hero.slide-6 .hero-title {
+    margin-left: -500px;
+}
+
+/* Pagination Dots */
+.pagination-dots {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 2;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.dot.active {
+    background: white;
+}
+
+/* Desktop zoom 90% compensation */
+@media (min-width: 769px) {
+    .hero {
+        background-size: cover !important;
+        background-position: center top !important;
+        min-height: 111vh !important; /* Kompensasi zoom dengan tinggi lebih besar */
+    }
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+    /* Hero Mobile Positioning */
+    .hero {
+        align-items: flex-end;
+        padding-bottom: 180px;
+        /* Aggressive caching and optimization for mobile */
+        background-attachment: scroll !important;
+        background-position: center center !important;
+        background-repeat: no-repeat !important;
+        background-size: cover !important;
+        /* Fallback colors for each slide */
+        background-color: #8B4513;
+    }
+    
+    .hero-content {
+        padding-top: 0;
+        width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+        position: relative;
+        z-index: 10;
+    }
+    
+    .hero-text {
+        text-align: left;
+        max-width: 100%;
+    }
+    
+    .hero-subtitle {
+        font-size: 16px;
+        margin-bottom: 15px;
+        margin-left: 0;
+        opacity: 0.9;
+        font-weight: 400;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        color: white !important;
+        position: relative;
+        top: -2px;
+    }
+    
+    .hero-title {
+        font-size: 48px;
+        margin-left: 0;
+        line-height: 1.1;
+        letter-spacing: -2px;
+        font-weight: 900;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+        color: white !important;
+    }
+    
+    /* Remove slide-specific positioning on mobile */
+    .hero.slide-1 .hero-subtitle,
+    .hero.slide-1 .hero-title,
+    .hero.slide-2 .hero-subtitle,
+    .hero.slide-2 .hero-title,
+    .hero.slide-3 .hero-subtitle,
+    .hero.slide-3 .hero-title,
+    .hero.slide-4 .hero-subtitle,
+    .hero.slide-4 .hero-title,
+    .hero.slide-5 .hero-subtitle,
+    .hero.slide-5 .hero-title,
+    .hero.slide-6 .hero-subtitle,
+    .hero.slide-6 .hero-title {
+
+        margin-left: 0;
+    }
+    
+    /* Pagination Dots Mobile */
+    .pagination-dots {
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .dot {
+        width: 10px;
+        height: 10px;
+        margin: 0 6px;
+    }
+    
+    /* Loading state for mobile */
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, #8B4513, #A0522D);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1;
+    }
+    
+    /* Show loading background if image fails */
+    .hero.loading::before {
+        opacity: 0.8;
+    }
+}
+
+/* Mobile Animation Adjustments */
+@media (max-width: 768px) {
+    .fade-in {
+        animation: fadeInUpMobile 0.8s ease-out forwards;
+    }
+    
+    .fade-out {
+        animation: fadeOutDownMobile 0.4s ease-in forwards;
+    }
+    
+    @keyframes fadeInUpMobile {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeOutDownMobile {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(-15px);
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    /* Hero Small Mobile */
+    .hero {
+        padding-bottom: 160px;
+    }
+    
+    .hero-content {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+   .hero .hero-content .hero-text .hero-subtitle {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: white;
+    position: relative;
+    top: -5px;
+}
+
+    .hero-title {
+        font-size: 36px;
+        line-height: 1.05;
+        letter-spacing: -1.5px;
+        color: white !important;
+    }
+    
+    /* Pagination Dots Small Mobile */
+    .pagination-dots {
+        bottom: 30px;
+    }
+    
+    .dot {
+        width: 8px;
+        height: 8px;
+        margin: 0 5px;
+    }
+}
+
+/* Force white color on hero titles for all screen sizes */
+#home.hero .hero-title,
+#home.hero h1.hero-title,
+main#home.hero .hero-title,
+main#home.hero h1.hero-title {
+    color: #ffffff !important;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.6) !important;
+}
+
+#home.hero .hero-subtitle,
+#home.hero p.hero-subtitle,
+main#home.hero .hero-subtitle,
+main#home.hero p.hero-subtitle {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5) !important;
+}
+
+/* Force white title at top of Home page (transparent header) */
+body:not(.about-page):not(.menu-page):not(.blogs-page):not(.contact-page):not(.outlets-page) .header:not(.desktop-solid):not(.show-on-scroll-up) .logo-text,
+body:not(.about-page):not(.menu-page):not(.blogs-page):not(.contact-page):not(.outlets-page) .header:not(.desktop-solid):not(.show-on-scroll-up) .nav-logo .logo-text {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5) !important;
+}
+
+/* Force white hamburger at top of Home page (mobile) */
+body:not(.about-page):not(.menu-page):not(.blogs-page):not(.contact-page):not(.outlets-page) .header:not(.desktop-solid):not(.show-on-scroll-up) .hamburger-menu span {
+    background-color: #ffffff !important;
+}
+
+/* Text Animation Classes */
+.fade-in {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out !important;
+}
+
+.fade-out {
+    opacity: 0 !important;
+    transform: translateY(30px) !important;
+    transition: opacity 0.4s ease-in, transform 0.4s ease-in !important;
+}
+
+/* Enhanced transition for hero elements */

@@ -1,0 +1,134 @@
+/* Overlay background */
+.terms-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(44, 62, 80, 0.45);
+  z-index: 99999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal box */
+.terms-modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+  max-width: 540px;
+  width: 100%;
+  padding: 32px 32px 24px 32px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  animation: fadeInModal 0.25s;
+}
+@keyframes fadeInModal {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.terms-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #222;
+  cursor: pointer;
+  z-index: 2;
+}
+.terms-close span {
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.terms-modal-title {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: left;
+  margin-bottom: 18px;
+  color: #222;
+}
+
+.terms-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1.5px solid #e5e7e9;
+  margin-bottom: 18px;
+}
+.terms-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: #6d7588;
+  padding: 12px 0 10px 0;
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  transition: color 0.2s, border-bottom 0.2s;
+}
+.terms-tab.active {
+  color: #1abc5b;
+  border-bottom: 2.5px solid #1abc5b;
+}
+
+.terms-content-scroll {
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 6px;
+  margin-bottom: 24px;
+}
+.terms-section {
+  font-size: 15px;
+  color: #222;
+}
+.terms-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 18px 0 8px 0;
+  color: #222;
+}
+.terms-section ul {
+  margin: 0 0 12px 0;
+  padding-left: 18px;
+}
+.terms-section li {
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+.terms-modal-btn {
+  background: #1abc5b;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  margin-top: 0;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+  transition: background 0.2s;
+}
+.terms-modal-btn:hover {
+  background: #159c4a;
+}
+
+@media (max-width: 600px) {
+  .terms-modal {
+    max-width: 98vw;
+    padding: 18px 8px 16px 8px;
+  }
+  .terms-modal-title {
+    font-size: 18px;
+  }
+  .terms-content-scroll {
+    max-height: 220px;
+  }
+}

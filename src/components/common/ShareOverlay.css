@@ -1,0 +1,425 @@
+/* Share Overlay Styles */
+.share-overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1050;
+  padding: 0;
+}
+
+.share-overlay-content {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Close Button */
+.share-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  transition: background-color 0.2s;
+}
+
+.share-close-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.share-close-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Mobile styles for close button */
+@media (max-width: 480px) {
+  .share-close-btn {
+    top: 2px;
+    left: -5px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .share-close-btn svg {
+    width: 33px;
+    height: 33px;
+  }
+}
+
+/* Header */
+.share-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.share-header h3 {
+  font-size: 25px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+/* Mobile styles for share header */
+@media (max-width: 480px) {
+  .share-header {
+    margin-bottom: 6px;
+    padding: 0 4px;
+  }
+  .share-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+    margin: 0;
+    line-height: 1.2;
+  }
+}
+
+/* Product Preview */
+.share-product-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.share-product-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.share-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.share-product-info h4 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.share-product-info p {
+  font-size: 14px;
+  color: #666;
+  margin-top: -5px;
+}
+
+/* Affiliate Banner */
+.share-affiliate-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.share-affiliate-banner:hover {
+  transform: translateY(-1px);
+}
+
+.affiliate-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.affiliate-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.affiliate-content {
+  flex: 1;
+}
+
+.affiliate-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.affiliate-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.affiliate-badge {
+  background: rgba(255, 255, 255, 0.3);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.affiliate-content p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0.95;
+}
+
+.affiliate-arrow {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+}
+
+.affiliate-arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Share Question */
+.share-question {
+  margin-bottom: 2px;
+  margin-right: 310px;
+}
+
+.share-question h4 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+  text-align: center;
+}
+
+/* Mobile styles for share question */
+@media (max-width: 480px) {
+  .share-question {
+    margin-bottom: 2px;
+    margin-right: 120px;
+    padding: 0 4px;
+  }
+  .share-question h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+    margin: 0;
+    text-align: center;
+    line-height: 1.2;
+  }
+}
+
+/* SMS Button - Hanya tampil di mobile */
+.sms-mobile-only {
+  display: none !important;
+}
+
+/* Share Options - Responsive Grid */
+.share-options {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(8, 1fr);
+}
+
+/* Desktop styles (default) */
+@media (min-width: 769px) {
+  .share-overlay-backdrop {
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .share-overlay-content {
+    border-radius: 16px;
+    max-width: 600px;
+    width: 90%;
+  }
+  
+  .share-options {
+    grid-template-columns: repeat(7, 1fr);
+  }
+  
+  .sms-mobile-only {
+    display: none !important;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .share-options {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: auto auto;
+    justify-items: center;
+  }
+  
+  /* Show SMS button di mobile */
+  .sms-mobile-only {
+    display: flex !important;
+  }
+  
+  /* Row pertama: WhatsApp, Telegram, Line, Facebook, X */
+  .share-option:nth-child(1),
+  .share-option:nth-child(2),
+  .share-option:nth-child(3),
+  .share-option:nth-child(4),
+  .share-option:nth-child(5) {
+    /* These will automatically fill the first row */
+  }
+  
+  /* Row kedua: SMS, Copy Link, More - centered */
+  .share-option:nth-child(6) {
+    grid-column: 2 / 3;
+  }
+  
+  .share-option:nth-child(7) {
+    grid-column: 3 / 4;
+  }
+  
+  .share-option:nth-child(8) {
+    grid-column: 4 / 5;
+  }
+}
+
+/* Share Option Button */
+.share-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  background: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.share-option:hover {
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
+}
+
+.share-option:active {
+  transform: translateY(0);
+}
+
+/* Share Option Icons */
+.share-option-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.share-option-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Icon Colors */
+.share-option-icon.whatsapp svg {
+  color: #25d366;
+}
+
+.share-option-icon.telegram svg {
+  color: #0088cc;
+}
+
+.share-option-icon.line svg {
+  color: #00b900;
+}
+
+.share-option-icon.facebook svg {
+  color: #1877f2;
+}
+
+.share-option-icon.twitter svg {
+  color: #000000;
+}
+
+.share-option-icon.sms svg {
+  color: #28a745;
+}
+
+.share-option-icon.copy-link svg {
+  color: #6c757d;
+}
+
+.share-option-icon.more svg {
+  color: #495057;
+}
+
+/* Share Option Text */
+.share-option span {
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Small mobile adjustments */
+@media (max-width: 480px) {
+  .share-overlay-content {
+    padding: 16px;
+  }
+  
+  .share-option {
+    padding: 12px 4px;
+    gap: 6px;
+  }
+  
+  .share-option-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .share-option-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .share-option span {
+    font-size: 11px;
+  }
+}

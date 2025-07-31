@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Filament\Resources\AdminResource\Pages;
+
+use App\Filament\Resources\AdminResource;
+use Filament\Resources\Pages\Page;
+
+class Dashboard extends Page
+{
+    protected static string $resource = AdminResource::class;
+
+    protected static string $view = 'filament.resources.admin-resource.pages.dashboard';
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\AdminResource\Widgets\InfoWidget::class,
+        ];
+    }
+}
