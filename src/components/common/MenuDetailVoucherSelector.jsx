@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from "../../hooks/useLanguage";
 import './MenuDetailVoucherSelector.css';
+import { API_ENDPOINTS, getImageUrl } from '../../config/api'
 
 const MenuDetailVoucherSelector = ({ 
   totalAmount, 
@@ -15,6 +16,7 @@ const MenuDetailVoucherSelector = ({
   const [voucherCode, setVoucherCode] = useState('');
   const [validationMessage, setValidationMessage] = useState('');
   const [validationStatus, setValidationStatus] = useState('');
+  
 
   // Fetch available vouchers
   useEffect(() => {
@@ -26,7 +28,7 @@ const MenuDetailVoucherSelector = ({
   const fetchAvailableVouchers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/vouchers');
+      const response = await fetch(API_ENDPOINTS.VOUCHERS);
       const data = await response.json();
       
       // Filter vouchers that are not currently applied
@@ -55,7 +57,7 @@ const MenuDetailVoucherSelector = ({
     setValidationMessage('');
     
     try {
-      const response = await fetch('http://localhost:8000/api/vouchers/validate', {
+      const response = await fetch(`${API_ENDPOINTS.VOUCHERS}/validate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

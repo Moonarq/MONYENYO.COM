@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from "../../hooks/useLanguage";
 import './VoucherSelector.css'; // Assuming you have a CSS file for styling
+import { API_ENDPOINTS, getImageUrl } from '../../config/api'
 
 const VoucherSelector = ({ 
   totalAmount, 
@@ -23,7 +24,7 @@ const VoucherSelector = ({
 
   const fetchVouchers = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/vouchers');
+      const response = await fetch(API_ENDPOINTS.VOUCHERS);
       const data = await response.json();
       setVouchers(data);
     } catch (error) {
@@ -36,7 +37,7 @@ const VoucherSelector = ({
     setValidationMessage('');
     
     try {
-      const response = await fetch('http://localhost:8000/api/vouchers/validate', {
+      const response = await fetch(`${API_ENDPOINTS.VOUCHERS}/validate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

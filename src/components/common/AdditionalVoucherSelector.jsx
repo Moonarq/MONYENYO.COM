@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from "../../hooks/useLanguage";
 import './AdditionalVoucherSelector.css';
+import { API_ENDPOINTS, getImageUrl } from '../../config/api'
 
 const AdditionalVoucherSelector = ({ 
   totalAmount, 
@@ -27,7 +28,7 @@ const AdditionalVoucherSelector = ({
   const fetchAvailableVouchers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/vouchers');
+      const response = await fetch(API_ENDPOINTS.VOUCHERS);
       const data = await response.json();
       
       // Get all applied voucher IDs (from existing vouchers + currently applied additional voucher)
@@ -72,7 +73,7 @@ const AdditionalVoucherSelector = ({
     setValidationMessage('');
     
     try {
-      const response = await fetch('http://localhost:8000/api/vouchers/validate', {
+      const response = await fetch(`${API_ENDPOINTS.VOUCHERS}/validate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

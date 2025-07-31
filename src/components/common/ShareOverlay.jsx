@@ -1,5 +1,6 @@
 import React from 'react';
 import './ShareOverlay.css';
+import { API_ENDPOINTS, getImageUrl } from '../../config/api'
 
 const ShareOverlay = ({ visible, onClose, product }) => {
   if (!visible || !product) return null;
@@ -96,7 +97,7 @@ const ShareOverlay = ({ visible, onClose, product }) => {
             <img 
               src={
                 product.images && product.images.length > 0 
-                  ? `http://localhost:8000/storage/${product.images[0]}` 
+                  ? getImageUrl(product.images[0]) 
                   : product.image
               } 
               alt={product.name}
