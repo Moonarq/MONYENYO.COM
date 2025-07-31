@@ -13,7 +13,7 @@ import { useNavbarScroll } from '../hooks/useNavbarScroll' // Import hook navbar
 import AdditionalVoucherSelector from '../components/common/AdditionalVoucherSelector'
 import Terms from '../components/common/Terms';
 import './Checkout.css'
-import { API_ENDPOINTS, getImageUrl } from '../config/api'
+import { API_ENDPOINTS, getImageUrl as getApiImageUrl } from '../config/api'
 
 
 
@@ -150,7 +150,6 @@ const Checkout = () => {
     cart, 
     getCartTotals, 
     calculateItemTotal, 
-    getImageUrl,
     cartVoucher,
     cartVoucherDiscount,
     applyCartVoucher,
@@ -204,6 +203,17 @@ const Checkout = () => {
     reguler: { name: 'Reguler', price: 0 },
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
+
+  // Function to get proper image URL
+  const getItemImageUrl = (item) => {
+    // Check if item has image property and use API config getImageUrl
+    if (item.image) {
+      return getApiImageUrl(item.image);
+    }
+    
+    // Fallback to placeholder
+    return '/images/placeholder.jpg';
+  }
 
   // Update available options when province/city/district changes
   useEffect(() => {
@@ -612,12 +622,12 @@ const Checkout = () => {
         })
       }
 
-      // Use simulated API call instead of real axios call for demo
+      // Use simulated API call instead of real axios call for demo  
       const response = await simulateApiCall()
 
       // Uncomment below for real API integration:
       /*
-      const response = await axios.post('/api/checkout', checkoutData, {
+      const response = await axios.post(API_ENDPOINTS.CHECKOUT, checkoutData, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
@@ -829,7 +839,7 @@ const Checkout = () => {
                   <div key={item.id} className="product-item">
                     <div className="product-image">
                       <img 
-                        src={getImageUrl(item)} 
+                        src={getItemImageUrl(item)} 
                         alt={item.name}
                         onError={(e) => {
                           e.target.src = '/images/placeholder.jpg'
