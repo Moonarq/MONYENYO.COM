@@ -474,7 +474,7 @@
 }
 
 .voucher-description {
-  font-size: 1rem;
+  font-size: 10rem;
   color: var(--cart-text-secondary);
   font-style: italic;
 }
