@@ -215,8 +215,10 @@ const MenuDetail = () => {
     if (!item) return;
     
     // Gunakan URL backend untuk social preview
-    const shareUrl = `https://api.monyenyo.com/menu/${productId}`;
+    const shareUrl = `https://api.monyenyo.com/menu/${id}`;
     const text = `${item.name} - Monyenyo`;
+    
+    console.log('🔍 Share Debug:', { productId: id, shareUrl, itemName: item.name });
     
     const urls = {
         whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + shareUrl)}`,
