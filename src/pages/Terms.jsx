@@ -14,14 +14,14 @@ const TermsPage = () => {
           {/* Introduction */}
           <div className="terms-section">
             <h2 className="section-title">
-              Asuransi Pengiriman & Proteksi
+              Syarat dan Ketentuan, serta Garansi
             </h2>
             <p className="terms-text">
-              Dengan menggunakan layanan Asuransi Pengiriman & Proteksi, Anda menyetujui 
-              syarat dan ketentuan berikut ini. Silakan baca dengan seksama sebelum melanjutkan 
-              pembelian.
+             Dengan membeli produk melalui website resmi MoNyeNyo, 
+             Anda menyetujui syarat dan Ketentuan berikut ini. 
+             Silahkan Baca dengan seksama sebelum melanjutkan pembelian.
             </p>
-          </div>
+          </div>  
 
           {/* Coverage */}
           <div className="terms-section">
@@ -29,72 +29,76 @@ const TermsPage = () => {
               1. Cakupan Perlindungan
             </h3>
             <ul className="terms-list">
-              <li>Kerusakan barang selama proses pengiriman</li>
-              <li>Kehilangan paket selama dalam perjalanan</li>
-              <li>Keterlambatan pengiriman yang menyebabkan kerugian</li>
-              <li>Barang tidak sesuai dengan deskripsi (dengan bukti yang memadai)</li>
+              Kami memberikan GARANSI 100% uang Kembali terhadap produk yang Anda beli di website resmi MoNyeNYo sebagai upaya perlindungan
+                 terhadap transaksi yang dilakukan dan kenyamanan dalam berbelanja.
             </ul>
           </div>
 
           {/* Terms */}
           <div className="terms-section">
             <h3 className="subsection-title">
-              2. Syarat Klaim
+              2. Ketentuan GARANSI
             </h3>
             <ul className="terms-list">
-              <li>Laporan klaim harus dibuat maksimal 7 hari setelah barang diterima</li>
-              <li>Menyertakan foto/video unboxing sebagai bukti kondisi barang</li>
-              <li>Menyimpan kemasan asli untuk keperluan investigasi</li>
-              <li>Memberikan bukti pembelian dan nomor resi pengiriman</li>
+              <div style={{ marginBottom: '0.75em' }}>
+                GARANSI 100% UANG KEMBALI kami berikan terhadap :
+              </div>
+              <li>Produk diterima sudah berjamur dan tidak layak dikonsumsi.</li>
+              <li>Produk yang diterima tidak sesuai dengan yang dibeli konsumen.</li>
+              <li>Produk pesanan hilang selama dalam perjalanan.</li>
+              <li>Kerusakan Produk selama proses pengiriman</li>
             </ul>
           </div>
 
           {/* Exclusions */}
           <div className="terms-section">
             <h3 className="subsection-title">
-              3. Pengecualian
+             3. Syarat Klaim GARANSI
             </h3>
             <ul className="terms-list">
-              <li>Kerusakan akibat kelalaian penerima</li>
-              <li>Barang pecah belah tanpa tambahan asuransi khusus</li>
-              <li>Kerusakan akibat bencana alam atau force majeure</li>
-              <li>Barang dengan nilai di atas Rp 10.000.000 tanpa konfirmasi khusus</li>
+              <li>Klaim GARANSI harus disertakan video UNBOXING tanpa jeda terhadap paket produk yang diterima</li>
+              <li>Memberikan FOTO bukti pembelian dan nomor resi pengiriman</li>
+              <li>Pengajuan KLAIM harus dikirimkan maksimal 2 hari setelah produk diterima.</li>
+              <li>Pengajuan klaim GARANSI hanya dapat dilakukan melalui customer service resmi MoNyeNyo</li>
+            </ul>
+          </div>
+
+           <div className="terms-section">
+            <h3 className="subsection-title">
+              4. Pengecualian
+            </h3>
+            <ul className="terms-list">
+              <div style={{ marginBottom: '0.75em' }}>
+                GARANSI 100% UANG KEMBALI tidak belaku terhadap KLAIM sebagai berikut :
+              </div>
+              <li>Klaim dikarenakan konsumen salah memilih dan memesan produk</li>
+              <li>Klaim dikarenakan kesalahan informasi dari pembeli berkenaan dengan 
+                Alamat dan nomer kontak yang menyebabkan produk tidak diterima dan mengakibatkan kerusakan.</li>
+              <li>Klaim dikarenakan produk tidak enak di lidah konsumen</li>
+              <li>Klaim yang tidak memenuhi syarat KLAIM GARANSI</li>
+               <li>Kerusakan atau kerugian akibat bencana alam atau force majeru</li>
             </ul>
           </div>
 
           {/* Process */}
           <div className="terms-section">
             <h3 className="subsection-title">
-              4. Proses Klaim
+              5. Proses KLAIM
             </h3>
             <div>
               <p className="process-step">
-                <span className="step-label">Langkah 1:</span> Hubungi customer service melalui chat atau email
+                <span className="step-label">Langkah 1:</span> Hubungi Customer Care / Admin kami melalui chat
               </p>
               <p className="process-step">
-                <span className="step-label">Langkah 2:</span> Kirimkan dokumen pendukung yang diperlukan
+                <span className="step-label">Langkah 2:</span> Kirimkan SYARAT KLAIM GARANSI
               </p>
               <p className="process-step">
-                <span className="step-label">Langkah 3:</span> Tim akan melakukan investigasi (maksimal 14 hari kerja)
-              </p>
-              <p className="process-step">
-                <span className="step-label">Langkah 4:</span> Penggantian akan diproses jika klaim disetujui
+                <span className="step-label">Langkah 3:</span> Proses pengembalian uang akan dilakukan (Maksimal 1-2 hari kerja)
               </p>
             </div>
           </div>
 
-          {/* Compensation */}
-          <div className="terms-section">
-            <h3 className="subsection-title">
-              5. Kompensasi
-            </h3>
-            <ul className="terms-list">
-              <li>Penggantian berupa refund atau pengiriman ulang barang</li>
-              <li>Kompensasi maksimal sesuai dengan nilai barang yang diasuransikan</li>
-              <li>Proses refund akan dilakukan dalam 7-14 hari kerja setelah persetujuan</li>
-            </ul>
-          </div>
-
+   
           {/* Contact */}
           <div className="terms-section">
             <h3 className="subsection-title">
@@ -102,13 +106,10 @@ const TermsPage = () => {
             </h3>
             <div className="contact-box">
               <p className="contact-item">
-                <span className="contact-label">Customer Service:</span> 24/7 melalui chat atau email
+                <span className="contact-label">Customer Service:</span> 0857 2496 0839
               </p>
               <p className="contact-item">
-                <span className="contact-label">Email:</span> support@yourstore.com
-              </p>
-              <p className="contact-item">
-                <span className="contact-label">Hotline:</span> 1500-xxx (24 jam)
+                <span className="contact-label">Email:</span> monyenyo.bdg@gmail.com
               </p>
             </div>
           </div>
@@ -116,9 +117,8 @@ const TermsPage = () => {
           {/* Footer */}
           <div className="terms-footer">
             <p className="footer-text">
-              Syarat dan ketentuan ini berlaku sejak tanggal pembelian dan dapat berubah 
-              sewaktu-waktu tanpa pemberitahuan sebelumnya. Dengan melanjutkan pembelian, 
-              Anda dianggap menyetujui semua ketentuan di atas.
+              Syarat dan ketentuan ini berlaku sejak tanggal pembelian dan dapat berubah sewaktu-waktu tanpa pemberitahuan sebelumnya.
+                Dengan melanjutkan pembelian, Anda dianggap menyetujui semua ketentuan di atas.
             </p>
             <p className="footer-text">
               Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}
