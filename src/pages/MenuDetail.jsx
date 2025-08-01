@@ -215,7 +215,7 @@ const MenuDetail = () => {
     if (!item) return;
     
     // Gunakan URL backend untuk social preview
-    const shareUrl = `https://api.monyenyo.com/menu/${id}`;
+    const shareUrl = `https://monyenyo.com/menu/${id}`;
     const text = `${item.name} - Monyenyo`;
     
     const urls = {
