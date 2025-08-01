@@ -539,7 +539,53 @@ const MenuDetail = () => {
           </div>
         </div>
 
-        {/* Review Section */}
+        {/* Additional Info */}
+        <div className="additional-info">
+          <div className={`info-accordion ${infoOpen.info ? 'open' : ''}`}>
+            <button 
+              className="accordion-header"
+              onClick={() => setInfoOpen(o => ({...o, info: !o.info}))}
+            >
+              <span>Syarat Garansi Produk</span>
+              <span className="accordion-icon">{infoOpen.info ? '−' : '+'}</span>
+            </button>
+
+            {infoOpen.info && (
+              <div className="accordion-content">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      <p><strong>Bentuk Garansi :</strong> Jika produk yang diterima dalam kondisi rusak (berjamur) atau tidak layak dimakan, <strong>Garansi 100% uang kembali</strong>.</p>
+                      <p><strong>Syarat :</strong> Kirimkan video unboxing tanpa jeda dari awal sampai akhir ke admin kami. Tanpa ada video unboxing, garansi tidak berlaku.</p>
+                    `
+                  }}
+                />
+              </div>
+            )}
+          </div>
+            
+          <div 
+            className={`info-accordion ${infoOpen.shipping ? 'open' : ''}`}
+          >
+            <button 
+              className="accordion-header"
+              onClick={() => setInfoOpen(o => ({...o, shipping: !o.shipping}))}
+            >
+              <span>Informasi Pengiriman</span>
+              <span className="accordion-icon">{infoOpen.shipping ? '−' : '+'}</span>
+            </button>
+            {infoOpen.shipping && (
+              <div className="accordion-content">
+                 <p><strong>Waktu pengiriman pesanan:</strong> pukul 20.00 sampai 22.00</p>
+                  <p>Pemesanan di bawah pukul 12.00 dikirim di hari yang sama.</p>
+                  <p>Pemesanan di atas jam 12.00 dikirim keesokan harinya.</p>
+                  <p>Semua produk yang kami kirimkan <strong>fresh from the oven</strong>.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Review Section - DIPINDAHKAN KE PALING BAWAH */}
         <div className="review-section">
           <h3 className="section-title">ULASAN PEMBELI</h3>
           
@@ -702,52 +748,6 @@ const MenuDetail = () => {
                 </button>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="additional-info">
-          <div className={`info-accordion ${infoOpen.info ? 'open' : ''}`}>
-            <button 
-              className="accordion-header"
-              onClick={() => setInfoOpen(o => ({...o, info: !o.info}))}
-            >
-              <span>Syarat Garansi Produk</span>
-              <span className="accordion-icon">{infoOpen.info ? '−' : '+'}</span>
-            </button>
-
-            {infoOpen.info && (
-              <div className="accordion-content">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: `
-                      <p><strong>Bentuk Garansi :</strong> Jika produk yang diterima dalam kondisi rusak (berjamur) atau tidak layak dimakan, <strong>Garansi 100% uang kembali</strong>.</p>
-                      <p><strong>Syarat :</strong> Kirimkan video unboxing tanpa jeda dari awal sampai akhir ke admin kami. Tanpa ada video unboxing, garansi tidak berlaku.</p>
-                    `
-                  }}
-                />
-              </div>
-            )}
-          </div>
-            
-          <div 
-            className={`info-accordion ${infoOpen.shipping ? 'open' : ''}`}
-          >
-            <button 
-              className="accordion-header"
-              onClick={() => setInfoOpen(o => ({...o, shipping: !o.shipping}))}
-            >
-              <span>Informasi Pengiriman</span>
-              <span className="accordion-icon">{infoOpen.shipping ? '−' : '+'}</span>
-            </button>
-            {infoOpen.shipping && (
-              <div className="accordion-content">
-                 <p><strong>Waktu pengiriman pesanan:</strong> pukul 20.00 sampai 22.00</p>
-                  <p>Pemesanan di bawah pukul 12.00 dikirim di hari yang sama.</p>
-                  <p>Pemesanan di atas jam 12.00 dikirim keesokan harinya.</p>
-                  <p>Semua produk yang kami kirimkan <strong>fresh from the oven</strong>.</p>
-              </div>
-            )}
           </div>
         </div>
       </div>
