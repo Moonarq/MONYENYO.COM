@@ -87,7 +87,7 @@ const MenuSection = () => {
                   <h3 className="menu-section-name">{item.name}</h3>
                   <p className="menu-section-desc" dangerouslySetInnerHTML={{ __html: item.description }} />
                   <div className="menu-section-details">
-                    <span className="menu-section-category">{item.category}</span>
+                   
                  
                   </div>
                 </div>
