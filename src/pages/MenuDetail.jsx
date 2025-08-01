@@ -44,53 +44,6 @@ const clearMenuVoucher = () => {
   localStorage.removeItem('menuVoucher');
 };
 
-// Sample review data
-const sampleReviews = [
-  {
-    id: 1,
-    rating: 5,
-    comment: "Alhamdulillah barang sampai sesuai estimasi dengan selamat. Dijamin ori, segel ada. Kotak utuh dan tidak rusak. Kondisi barang sesuai dan terjamin ori",
-    user: "F***l",
-    date: "1 bulan lalu",
-    images: [
-      "/images/review1.jpg",
-      "/images/review2.jpg"
-    ]
-  },
-  {
-    id: 2,
-    rating: 5,
-    comment: "Produk bagus sekali, fresh from the oven dan rasanya enak banget. Pengiriman cepat dan packaging rapi.",
-    user: "A***n",
-    date: "2 minggu lalu",
-    images: []
-  },
-  {
-    id: 3,
-    rating: 4,
-    comment: "Rasa enak, tapi agak manis untuk saya. Overall masih recommended sih.",
-    user: "D***i",
-    date: "3 hari lalu",
-    images: ["/images/review3.jpg"]
-  },
-  {
-    id: 4,
-    rating: 5,
-    comment: "Sudah langganan beli disini, selalu puas dengan kualitasnya. Mantap!",
-    user: "R***o",
-    date: "1 minggu lalu",
-    images: []
-  },
-  {
-    id: 5,
-    rating: 3,
-    comment: "Lumayan enak, tapi kemasan agak penyok waktu sampai.",
-    user: "S***a",
-    date: "5 hari lalu",
-    images: []
-  }
-];
-
 const MenuDetail = () => {
   const { t } = useLanguage();
   const { id } = useParams();
@@ -111,14 +64,6 @@ const MenuDetail = () => {
   // Menu voucher state
   const [menuVoucher, setMenuVoucherState] = useState(null);
   const [menuVoucherDiscount, setMenuVoucherDiscount] = useState(0);
-
-  // Review states
-  const [reviews] = useState(sampleReviews);
-  const [filteredReviews, setFilteredReviews] = useState(sampleReviews);
-  const [selectedRating, setSelectedRating] = useState(null);
-  const [showWithMedia, setShowWithMedia] = useState(false);
-  const [sortBy, setSortBy] = useState('newest');
-  const [showAllReviews, setShowAllReviews] = useState(false);
 
   // Use navbar scroll hook
   useNavbarScroll();
@@ -161,35 +106,6 @@ const MenuDetail = () => {
       setMenuVoucherDiscount(savedMenuVoucher.discount);
     }
   }, []);
-
-  // Filter reviews
-  useEffect(() => {
-    let filtered = [...reviews];
-
-    // Filter by rating
-    if (selectedRating) {
-      filtered = filtered.filter(review => review.rating === selectedRating);
-    }
-
-    // Filter by media
-    if (showWithMedia) {
-      filtered = filtered.filter(review => review.images && review.images.length > 0);
-    }
-
-    // Sort reviews
-    if (sortBy === 'newest') {
-      // Sort by newest (assuming newer reviews have higher IDs)
-      filtered.sort((a, b) => b.id - a.id);
-    } else if (sortBy === 'oldest') {
-      filtered.sort((a, b) => a.id - b.id);  
-    } else if (sortBy === 'highest') {
-      filtered.sort((a, b) => b.rating - a.rating);
-    } else if (sortBy === 'lowest') {
-      filtered.sort((a, b) => a.rating - b.rating);
-    }
-
-    setFilteredReviews(filtered);
-  }, [reviews, selectedRating, showWithMedia, sortBy]);
 
   // FIXED: Function to get proper image URL
   const getItemImageUrl = (imagePath) => {
@@ -298,30 +214,6 @@ const MenuDetail = () => {
   const handleShare = () => {
     setShareOverlayOpen(true);
   };
-
-  // Calculate review statistics
-  const calculateReviewStats = () => {
-    const totalReviews = reviews.length;
-    const ratingCounts = {
-      5: reviews.filter(r => r.rating === 5).length,
-      4: reviews.filter(r => r.rating === 4).length,
-      3: reviews.filter(r => r.rating === 3).length,
-      2: reviews.filter(r => r.rating === 2).length,
-      1: reviews.filter(r => r.rating === 1).length
-    };
-    
-    const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
-    const satisfactionRate = Math.round((ratingCounts[4] + ratingCounts[5]) / totalReviews * 100);
-    
-    return {
-      totalReviews,
-      ratingCounts,
-      averageRating: averageRating.toFixed(1),
-      satisfactionRate
-    };
-  };
-
-  const reviewStats = calculateReviewStats();
 
   if (loading) {
     return (
@@ -485,6 +377,26 @@ const MenuDetail = () => {
                 appliedVoucher={menuVoucher}
               />
             </div>
+
+            {/* Price Summary with Voucher */}
+            {/* {menuVoucherDiscount > 0 && (
+              <div className="price-summary-section">
+                <div className="price-breakdown">
+                  <div className="price-row">
+                    <span>Subtotal:</span>
+                    <span>Rp{subtotalBeforeVoucher.toLocaleString('id-ID')}</span>
+                  </div>
+                  <div className="price-row discount-row">
+                    <span>Diskon Voucher:</span>
+                    <span className="discount-amount">-Rp{menuVoucherDiscount.toLocaleString('id-ID')}</span>
+                  </div>
+                  <div className="price-row total-row">
+                    <span><strong>Total:</strong></span>
+                    <span><strong>Rp{calculateTotalWithVoucher().toLocaleString('id-ID')}</strong></span>
+                  </div>
+                </div>
+              </div>
+            )} */}
             
             {/* Quantity and Actions */}
             <div className="purchase-section">
@@ -540,30 +452,30 @@ const MenuDetail = () => {
         </div>
 
         {/* Additional Info */}
-        <div className="additional-info">
-          <div className={`info-accordion ${infoOpen.info ? 'open' : ''}`}>
-            <button 
-              className="accordion-header"
-              onClick={() => setInfoOpen(o => ({...o, info: !o.info}))}
-            >
-              <span>Syarat Garansi Produk</span>
-              <span className="accordion-icon">{infoOpen.info ? '−' : '+'}</span>
-            </button>
+    <div className="additional-info">
+      <div className={`info-accordion ${infoOpen.info ? 'open' : ''}`}>
+        <button 
+          className="accordion-header"
+          onClick={() => setInfoOpen(o => ({...o, info: !o.info}))}
+        >
+          <span>Syarat Garansi Produk</span>
+          <span className="accordion-icon">{infoOpen.info ? '−' : '+'}</span>
+        </button>
 
-            {infoOpen.info && (
-              <div className="accordion-content">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: `
-                      <p><strong>Bentuk Garansi :</strong> Jika produk yang diterima dalam kondisi rusak (berjamur) atau tidak layak dimakan, <strong>Garansi 100% uang kembali</strong>.</p>
-                      <p><strong>Syarat :</strong> Kirimkan video unboxing tanpa jeda dari awal sampai akhir ke admin kami. Tanpa ada video unboxing, garansi tidak berlaku.</p>
-                    `
-                  }}
-                />
-              </div>
-            )}
+        {infoOpen.info && (
+          <div className="accordion-content">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: `
+                  <p><strong>Bentuk Garansi :</strong> Jika produk yang diterima dalam kondisi rusak (berjamur) atau tidak layak dimakan, <strong>Garansi 100% uang kembali</strong>.</p>
+                  <p><strong>Syarat :</strong> Kirimkan video unboxing tanpa jeda dari awal sampai akhir ke admin kami. Tanpa ada video unboxing, garansi tidak berlaku.</p>
+                `
+              }}
+            />
           </div>
-            
+        )}
+      </div>
+        
           <div 
             className={`info-accordion ${infoOpen.shipping ? 'open' : ''}`}
           >
@@ -582,172 +494,6 @@ const MenuDetail = () => {
                   <p>Semua produk yang kami kirimkan <strong>fresh from the oven</strong>.</p>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Review Section - DIPINDAHKAN KE PALING BAWAH */}
-        <div className="review-section">
-          <h3 className="section-title">ULASAN PEMBELI</h3>
-          
-          {/* Review Summary */}
-          <div className="review-summary">
-            <div className="rating-overview">
-              <div className="rating-score">
-                <span className="star-icon">⭐</span>
-                <span className="score">{reviewStats.averageRating}</span>
-                <span className="max-score">/ 5.0</span>
-              </div>
-              <div className="satisfaction-rate">
-                {reviewStats.satisfactionRate}% pembeli merasa puas
-              </div>
-              <div className="total-reviews">
-                {reviewStats.totalReviews} rating • {reviewStats.totalReviews} ulasan
-              </div>
-            </div>
-            
-            <div className="rating-breakdown">
-              {[5, 4, 3, 2, 1].map(rating => (
-                <div key={rating} className="rating-bar">
-                  <div className="rating-label">
-                    <span className="star-icon">⭐</span>
-                    <span>{rating}</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div 
-                      className="progress-fill" 
-                      style={{ 
-                        width: `${(reviewStats.ratingCounts[rating] / reviewStats.totalReviews) * 100}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <span className="count">({reviewStats.ratingCounts[rating]})</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Review Photos */}
-          <div className="review-photos">
-            <h4>FOTO & VIDEO PEMBELI</h4>
-            <div className="photo-grid">
-              {reviews.filter(r => r.images && r.images.length > 0)
-                .slice(0, 6)
-                .flatMap(r => r.images)
-                .slice(0, 5)
-                .map((image, idx) => (
-                  <div key={idx} className="photo-item">
-                    <img src={image} alt={`Review ${idx + 1}`} />
-                  </div>
-              ))}
-              {reviews.filter(r => r.images && r.images.length > 0).length > 5 && (
-                <div className="photo-item more-photos">
-                  <span>+{reviews.filter(r => r.images && r.images.length > 0).length - 5}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Review Filters */}
-          <div className="review-filters">
-            <div className="filter-section">
-              <h4>FILTER ULASAN</h4>
-              
-              <div className="filter-group">
-                <h5>Media</h5>
-                <label className="filter-checkbox">
-                  <input 
-                    type="checkbox" 
-                    checked={showWithMedia}
-                    onChange={(e) => setShowWithMedia(e.target.checked)}
-                  />
-                  <span>Dengan Foto & Video</span>
-                </label>
-              </div>
-
-              <div className="filter-group">
-                <h5>Rating</h5>
-                {[5, 4, 3, 2, 1].map(rating => (
-                  <label key={rating} className="filter-checkbox">
-                    <input 
-                      type="checkbox" 
-                      checked={selectedRating === rating}
-                      onChange={(e) => setSelectedRating(e.target.checked ? rating : null)}
-                    />
-                    <span>
-                      <span className="star-icon">⭐</span>
-                      {rating}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="reviews-list">
-              <div className="reviews-header">
-                <h4>ULASAN PILIHAN</h4>
-                <div className="reviews-info">
-                  <span>Menampilkan {Math.min(10, filteredReviews.length)} dari {filteredReviews.length} ulasan</span>
-                  <select 
-                    value={sortBy} 
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="sort-select"
-                  >
-                    <option value="newest">Paling Membantu</option>
-                    <option value="oldest">Terlama</option>
-                    <option value="highest">Rating Tertinggi</option>
-                    <option value="lowest">Rating Terendah</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="reviews-content">
-                {(showAllReviews ? filteredReviews : filteredReviews.slice(0, 10)).map(review => (
-                  <div key={review.id} className="review-item">
-                    <div className="review-header">
-                      <div className="review-rating">
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} className={`star ${i < review.rating ? 'filled' : ''}`}>
-                            ⭐
-                          </span>
-                        ))}
-                        <span className="review-date">{review.date}</span>
-                      </div>
-                      <button className="review-menu">⋮</button>
-                    </div>
-                    
-                    <div className="review-user">
-                      <div className="user-avatar">
-                        <span>{review.user.charAt(0)}</span>
-                      </div>
-                      <span className="user-name">{review.user}</span>
-                    </div>
-
-                    <div className="review-comment">
-                      {review.comment}
-                    </div>
-
-                    {review.images && review.images.length > 0 && (
-                      <div className="review-images">
-                        {review.images.slice(0, 5).map((image, idx) => (
-                          <div key={idx} className="review-image">
-                            <img src={image} alt={`Review ${review.id} image ${idx + 1}`} />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {filteredReviews.length > 10 && !showAllReviews && (
-                <button 
-                  className="show-more-reviews"
-                  onClick={() => setShowAllReviews(true)}
-                >
-                  Lihat Semua Ulasan ({filteredReviews.length})
-                </button>
-              )}
-            </div>
           </div>
         </div>
       </div>
