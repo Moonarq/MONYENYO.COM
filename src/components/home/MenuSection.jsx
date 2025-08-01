@@ -88,12 +88,7 @@ const MenuSection = () => {
                   <p className="menu-section-desc" dangerouslySetInnerHTML={{ __html: item.description }} />
                   <div className="menu-section-details">
                     <span className="menu-section-category">{item.category}</span>
-                    <div className="menu-section-rating">
-                      {[...Array(5)].map((_, index) => (
-                        <i key={index} className="fas fa-star"></i>
-                      ))}
-                      <span>{item.rating}</span>
-                    </div>
+                 
                   </div>
                 </div>
               </Link>
