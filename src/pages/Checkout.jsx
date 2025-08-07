@@ -192,9 +192,10 @@ const Checkout = () => {
   const [additionalCartVoucher, setAdditionalCartVoucher] = useState(null)
   const [additionalCartVoucherDiscount, setAdditionalCartVoucherDiscount] = useState(0)
 
-  // Shipping Address Form State
+  // ✅ UPDATED: Shipping Address Form State - Added email field
   const [shippingAddress, setShippingAddress] = useState({
     name: '',
+    email: '',
     phone: '',
     country: 'Indonesia',
     address: '',
@@ -661,14 +662,26 @@ const Checkout = () => {
     setAdditionalCartVoucherDiscount(0)
   }
 
-  // ✅ NEW: Midtrans Payment Handler
+  // ✅ NEW: Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // ✅ NEW: Midtrans Payment Handler with email validation
   const handlePay = async () => {
-    // Validasi required fields
-    const requiredFields = ['name', 'phone', 'address', 'zipCode', 'province', 'regency', 'district', 'subdistrict']
+    // ✅ UPDATED: Validasi required fields dengan email
+    const requiredFields = ['name', 'email', 'phone', 'address', 'zipCode', 'province', 'regency', 'district', 'subdistrict']
     const missingFields = requiredFields.filter(field => !shippingAddress[field])
     
     if (missingFields.length > 0) {
       alert('Please fill in all required shipping address fields')
+      return
+    }
+
+    // ✅ NEW: Validate email format
+    if (!validateEmail(shippingAddress.email)) {
+      alert('Please enter a valid email address')
       return
     }
     
@@ -710,15 +723,16 @@ const Checkout = () => {
 
       const readableAddress = getReadableAddress()
 
-      // Prepare checkout data untuk Midtrans
+      // ✅ UPDATED: Prepare checkout data dengan email field
       const checkoutData = {
         // Order Info
         order_number: orderNumber,
         created_at: currentDate,
         
-        // Shipping Address
+        // ✅ UPDATED: Shipping Address dengan email
         shippingAddress: {
           name: shippingAddress.name,
+          email: shippingAddress.email,
           phone: shippingAddress.phone,
           country: shippingAddress.country,
           address: shippingAddress.address,
@@ -944,6 +958,22 @@ const Checkout = () => {
                       />
                     </div>
                     
+                    {/* ✅ NEW: Email field */}
+                    <div className="form-group">
+                      <label className="form-label">
+                        Email<span className="required">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        className="form-input"
+                        value={shippingAddress.email}
+                        onChange={(e) => handleAddressChange('email', e.target.value)}
+                        placeholder="alamat@email.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row">
                     <div className="form-group">
                       <label className="form-label">
                         Nomor Telepon<span className="required">*</span>
