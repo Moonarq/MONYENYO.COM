@@ -911,10 +911,7 @@ const Checkout = () => {
         <meta name="description" content="Complete your purchase at Monyenyo" />
         <link rel="icon" href="/images/favicon_large.ico" type="image/x-icon" />
         {/* ✅ NEW: Load Midtrans Snap SDK */}
-        <script 
-          src="https://app.sandbox.midtrans.com/snap/snap.js" 
-          data-client-key="Mid-client-5P2SiGIqGXzKSACK"
-        ></script>
+        <script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-_PAqBcXrjHacb7gg"></script>
       </Helmet>
       
       <div className="checkout-page">
