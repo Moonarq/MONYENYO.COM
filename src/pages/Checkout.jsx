@@ -139,7 +139,7 @@ const Checkout = () => {
   const [addressData, setAddressData] = useState({ provinces: {} });
   const [addressLoading, setAddressLoading] = useState(true);
 
-  // ✅ NEW: JNE Services State
+  // ✅ FIXED: JNE Services State with better naming
   const [jneServices, setJneServices] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
   const [jneShippingCost, setJneShippingCost] = useState(0);
@@ -224,58 +224,99 @@ const Checkout = () => {
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
 
-  // ✅ NEW: Function to fetch JNE services
+  // ✅ FIXED: Get destination code from selected city with multiple fallbacks
+  const getDestinationCode = (provinceKey, cityKey) => {
+    try {
+      console.log('🔍 Getting destination code for:', { provinceKey, cityKey });
+      
+      if (!provinceKey || !cityKey) {
+        console.log('❌ Missing province or city key');
+        return null;
+      }
+      
+      const province = addressData.provinces[provinceKey];
+      if (!province) {
+        console.log('❌ Province not found:', provinceKey);
+        return null;
+      }
+      
+      const city = province.cities[cityKey];
+      if (!city) {
+        console.log('❌ City not found:', cityKey, 'Available cities:', Object.keys(province.cities));
+        return null;
+      }
+      
+      // Priority: jne_code > city_code > code > cityKey sebagai fallback terakhir
+      const destinationCode = city.jne_code || city.city_code || city.code || cityKey;
+      console.log('✅ Destination code found:', destinationCode, 'from city data:', city);
+      
+      return destinationCode;
+    } catch (error) {
+      console.error('💥 Error getting destination code:', error);
+      return null;
+    }
+  };
+
+  // ✅ FIXED: Calculate total weight from items dengan logic yang lebih akurat
+  const calculateTotalWeight = () => {
+    const totalQuantity = checkoutItems.reduce((sum, item) => sum + item.quantity, 0);
+    // Asumsi setiap item = 1kg, minimum 1kg untuk JNE
+    const weight = Math.max(1, totalQuantity);
+    console.log('📦 Calculated total weight:', weight, 'kg from', totalQuantity, 'items');
+    return weight;
+  };
+
+  // ✅ FIXED: Enhanced fetchJneServices dengan error handling dan logging yang lebih baik
   const fetchJneServices = async (destinationCode, weight = 1) => {
     if (!destinationCode) {
+      console.log('⚠️ No destination code provided, clearing JNE services');
       setJneServices([]);
+      setSelectedService(null);
+      setJneShippingCost(0);
       return;
     }
 
+    console.log('🚚 Fetching JNE services for:', { destinationCode, weight });
+    
     setIsLoadingJne(true);
     setJneError('');
     
     try {
-      const res = await fetch(`https://api.monyenyo.com/jne.php?thru=${destinationCode}&weight=${weight}`);
-      const data = await res.json();
+      // Gunakan URL API yang sesuai dengan jne.php Anda
+      const apiUrl = `https://api.monyenyo.com/jne.php?thru=${destinationCode}&weight=${weight}`;
+      console.log('📡 API URL:', apiUrl);
       
-      if (data.price && Array.isArray(data.price)) {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      
+      console.log('📊 JNE API Response:', data);
+      
+      // Check if response contains price data
+      if (data && data.price && Array.isArray(data.price)) {
         setJneServices(data.price);
-        console.log('JNE Services loaded:', data.price);
-      } else {
+        console.log('✅ JNE Services loaded successfully:', data.price.length, 'services');
+      } else if (data && data.error) {
+        // Handle API error
+        console.log('❌ JNE API Error:', data.error);
+        setJneError(data.error);
         setJneServices([]);
-        console.log('No JNE services available for this destination');
+      } else {
+        // No services available
+        console.log('⚠️ No JNE services available for destination:', destinationCode);
+        setJneServices([]);
       }
-    } catch (err) {
-      console.error("Gagal mengambil ongkir JNE:", err);
-      setJneError('Gagal memuat layanan pengiriman');
+    } catch (error) {
+      console.error("💥 Error fetching JNE services:", error);
+      setJneError('Gagal memuat layanan pengiriman JNE. Silakan coba lagi.');
       setJneServices([]);
     } finally {
       setIsLoadingJne(false);
     }
   };
 
-  // ✅ NEW: Get destination code from selected city
-  const getDestinationCode = (provinceKey, cityKey) => {
-    try {
-      const province = addressData.provinces[provinceKey];
-      if (province && province.cities[cityKey]) {
-        return province.cities[cityKey].jne_code || cityKey;
-      }
-      return null;
-    } catch (error) {
-      console.error('Error getting destination code:', error);
-      return null;
-    }
-  };
-
-  // ✅ NEW: Calculate total weight from items (assuming 1kg per item as default)
-  const calculateTotalWeight = () => {
-    const totalQuantity = checkoutItems.reduce((sum, item) => sum + item.quantity, 0);
-    return Math.max(1, totalQuantity); // Minimum 1kg
-  };
-
-  // ✅ NEW: Handle JNE service selection
+  // ✅ FIXED: Handle JNE service selection
   const handleJneServiceSelect = (service) => {
+    console.log('🎯 JNE Service selected:', service);
     setSelectedService(service);
     setJneShippingCost(parseInt(service.price) || 0);
     setSelectedShipping('jne'); // Set shipping method to JNE
@@ -295,21 +336,29 @@ const Checkout = () => {
     }
   }, [isBuyNow]);
 
-  // ✅ NEW: Fetch JNE services when city is selected
+  // ✅ CRITICAL: Main useEffect untuk fetch JNE services ketika alamat berubah
   useEffect(() => {
-    if (shippingAddress.province && shippingAddress.regency) {
+    // Pastikan province dan regency sudah dipilih dan addressData sudah dimuat
+    if (shippingAddress.province && shippingAddress.regency && !addressLoading) {
       const destinationCode = getDestinationCode(shippingAddress.province, shippingAddress.regency);
-      const weight = calculateTotalWeight();
       
       if (destinationCode) {
+        const weight = calculateTotalWeight();
+        console.log('🚀 Triggering JNE fetch with:', { destinationCode, weight });
         fetchJneServices(destinationCode, weight);
+      } else {
+        console.log('⚠️ No valid destination code, clearing JNE services');
+        setJneServices([]);
+        setSelectedService(null);
+        setJneShippingCost(0);
       }
     } else {
+      console.log('⏳ Waiting for complete address or address data loading...');
       setJneServices([]);
       setSelectedService(null);
       setJneShippingCost(0);
     }
-  }, [shippingAddress.province, shippingAddress.regency, checkoutItems]);
+  }, [shippingAddress.province, shippingAddress.regency, checkoutItems, addressLoading, addressData]);
 
   // ✅ FIXED: Fungsi untuk menghitung discount voucher dengan struktur data yang benar
   const calculateVoucherDiscount = (voucher, subtotal) => {
@@ -673,6 +722,7 @@ const Checkout = () => {
   }
 
   const handleAddressChange = (field, value) => {
+    console.log(`📍 Address field changed: ${field} = ${value}`);
     setShippingAddress(prev => ({
       ...prev,
       [field]: value
@@ -1253,62 +1303,137 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  {/* ✅ NEW: JNE Services Section */}
-                  {jneServices.length > 0 && (
-                    <div className="jne-services-section">
-                      <h5 style={{ margin: '12px 0 8px 0', fontSize: '14px', fontWeight: '600', color: '#333' }}>
-                        JNE Services:
-                      </h5>
-                      
-                      {isLoadingJne && (
-                        <div className="jne-loading">
-                          <span>Memuat layanan JNE...</span>
-                        </div>
-                      )}
-                      
-                      {jneError && (
-                        <div className="jne-error" style={{ color: '#ff6b6b', fontSize: '14px', margin: '8px 0' }}>
-                          {jneError}
-                        </div>
-                      )}
-                      
-                      {jneServices.map((service, idx) => (
-                        <div key={idx} className="shipping-option jne-option">
-                          <input 
-                            type="radio" 
-                            name="shipping" 
-                            value="jne"
-                            checked={selectedShipping === 'jne' && selectedService === service}
-                            onChange={() => handleJneServiceSelect(service)}
-                            disabled={hasFreeShippingVoucher()}
-                          />
-                          <div className="shipping-details">
-                            <label>
-                              {service.service_display} - {hasFreeShippingVoucher() ? 
-                                <span style={{ color: '#28a745' }}>Gratis dengan voucher</span> : 
-                                `Rp${parseInt(service.price).toLocaleString('id-ID')}`
-                              }
-                            </label>
-                            <p className="shipping-estimate">
-                              ETD: {service.etd_from || '?'} - {service.etd_thru || '?'} hari
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Show message if no JNE services available but city is selected */}
-                  {!isLoadingJne && jneServices.length === 0 && shippingAddress.regency && !jneError && (
-                    <div className="jne-unavailable" style={{ 
-                      color: '#666', 
+                  {/* ✅ ENHANCED: JNE Services Section with better UI and debugging */}
+                  <div className="jne-services-section">
+                    <h5 style={{ 
+                      margin: '12px 0 8px 0', 
                       fontSize: '14px', 
-                      margin: '8px 0',
-                      fontStyle: 'italic'
+                      fontWeight: '600', 
+                      color: '#333',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
                     }}>
-                      JNE services tidak tersedia untuk kota ini
-                    </div>
-                  )}
+                      JNE Services:
+                      {isLoadingJne && (
+                        <div className="jne-loading-spinner" style={{
+                          display: 'inline-block',
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid #f3f3f3',
+                          borderTop: '2px solid #3498db',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite'
+                        }} />
+                      )}
+                    </h5>
+                    
+                    {/* Debug Info - Remove in production */}
+                    {process.env.NODE_ENV === 'development' && (
+                      <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
+                        Debug: Province: {shippingAddress.province}, City: {shippingAddress.regency}, 
+                        Address Loading: {addressLoading.toString()}, 
+                        JNE Services: {jneServices.length}
+                      </div>
+                    )}
+                    
+                    {isLoadingJne && (
+                      <div className="jne-loading" style={{
+                        padding: '12px',
+                        backgroundColor: '#f8f9fa',
+                        border: '1px solid #e9ecef',
+                        borderRadius: '4px',
+                        margin: '8px 0',
+                        textAlign: 'center'
+                      }}>
+                        <span>⏳ Memuat layanan JNE...</span>
+                      </div>
+                    )}
+                    
+                    {jneError && (
+                      <div className="jne-error" style={{ 
+                        color: '#dc3545', 
+                        fontSize: '14px', 
+                        margin: '8px 0',
+                        padding: '8px 12px',
+                        backgroundColor: '#f8d7da',
+                        border: '1px solid #f5c6cb',
+                        borderRadius: '4px'
+                      }}>
+                        ⚠️ {jneError}
+                      </div>
+                    )}
+                    
+                    {!isLoadingJne && !jneError && jneServices.length > 0 && (
+                      <div className="jne-services-list">
+                        {jneServices.map((service, idx) => (
+                          <div key={idx} className="shipping-option jne-option" style={{
+                            border: selectedShipping === 'jne' && selectedService === service ? '2px solid #007bff' : '1px solid #e9ecef',
+                            borderRadius: '6px',
+                            padding: '12px',
+                            margin: '8px 0',
+                            backgroundColor: selectedShipping === 'jne' && selectedService === service ? '#f8f9ff' : 'white'
+                          }}>
+                            <input 
+                              type="radio" 
+                              name="shipping" 
+                              value="jne"
+                              checked={selectedShipping === 'jne' && selectedService === service}
+                              onChange={() => handleJneServiceSelect(service)}
+                              disabled={hasFreeShippingVoucher()}
+                            />
+                            <div className="shipping-details">
+                              <label style={{ fontWeight: '500', cursor: 'pointer' }}>
+                                🚚 {service.service_display} - {hasFreeShippingVoucher() ? 
+                                  <span style={{ color: '#28a745', fontWeight: 'bold' }}>Gratis dengan voucher ✨</span> : 
+                                  <span style={{ color: '#007bff', fontWeight: 'bold' }}>Rp{parseInt(service.price).toLocaleString('id-ID')}</span>
+                                }
+                              </label>
+                              <p className="shipping-estimate" style={{ 
+                                margin: '4px 0 0 20px', 
+                                fontSize: '13px', 
+                                color: '#6c757d' 
+                              }}>
+                                📅 Estimasi: {service.etd_from || '?'} - {service.etd_thru || '?'} hari kerja
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Show message when no JNE services available */}
+                    {!isLoadingJne && !jneError && jneServices.length === 0 && shippingAddress.regency && (
+                      <div className="jne-unavailable" style={{ 
+                        color: '#6c757d', 
+                        fontSize: '14px', 
+                        margin: '8px 0',
+                        padding: '12px',
+                        backgroundColor: '#f8f9fa',
+                        border: '1px solid #e9ecef',
+                        borderRadius: '4px',
+                        textAlign: 'center'
+                      }}>
+                        📦 JNE services belum tersedia untuk kota ini
+                      </div>
+                    )}
+
+                    {/* Show message when address is not complete */}
+                    {!shippingAddress.regency && (
+                      <div className="jne-waiting" style={{ 
+                        color: '#6c757d', 
+                        fontSize: '14px', 
+                        margin: '8px 0',
+                        padding: '12px',
+                        backgroundColor: '#f8f9fa',
+                        border: '1px solid #e9ecef',
+                        borderRadius: '4px',
+                        textAlign: 'center'
+                      }}>
+                        📍 Pilih kota terlebih dahulu untuk melihat layanan JNE
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Insurance Option */}
@@ -1343,36 +1468,6 @@ const Checkout = () => {
               <div className="payment-section">
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Metode Pembayaran</h4>
                 
-                <div className="payment-option" onClick={() => handlePaymentSelect('bca')}>
-                  <div className="payment-info">
-                    <div className="bank-logo bca-logo">
-                      <img src={bcaLogo} alt="BCA" style={{height: 30, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>BCA Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'bca'}
-                    readOnly
-                  />
-                </div>
-
-                <div className="payment-option" onClick={() => handlePaymentSelect('mandiri')}>
-                  <div className="payment-info">
-                    <div className="bank-logo mandiri-logo">
-                      <img src={mandiriLogo} alt="Mandiri" style={{height: 30, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>Mandiri Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'mandiri'}
-                    readOnly
-                  />
-                </div>
-
                 <div className="payment-option" onClick={() => handlePaymentSelect('bri')}>
                   <div className="payment-info">
                     <div className="bank-logo bri-logo">
@@ -1637,8 +1732,16 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+      
+      {/* ✅ ADD: CSS for loading spinner */}
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </>
   )
 }
 
-export default Checkout
+export default Checkout;
