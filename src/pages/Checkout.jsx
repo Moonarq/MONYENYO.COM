@@ -226,16 +226,21 @@ const Checkout = () => {
   })
 
   // ✅ FIXED: Get destination code from selected city with multiple fallbacks
- const getDestinationCode = (provinceKey, cityKey) => {
+ // ✅ FIXED: Get destination code from selected city with multiple fallbacks
+const getDestinationCode = (provinceKey, cityKey) => {
   try {
     console.log('🔍 Getting destination code for:', { provinceKey, cityKey });
+
+    if (!addressData || !addressData.provinces) {
+      console.log('❌ addressData belum siap');
+      return null;
+    }
 
     if (!provinceKey || !cityKey) {
       console.log('❌ Missing province or city key');
       return null;
     }
 
-    // Ambil ID kabupaten/kota
     const province = addressData.provinces[provinceKey];
     if (!province) {
       console.log('❌ Province not found:', provinceKey);
@@ -248,29 +253,32 @@ const Checkout = () => {
       return null;
     }
 
-    // Ambil kode dari jneCityMap.json
-    const jneCode = jneCityMap[city.id] || jneCityMap[cityKey];
-    if (!jneCode) {
+    if (!city.jne_code) {
       console.log('⚠️ JNE code not found for city:', city.name);
       return null;
     }
 
-    console.log('✅ Destination code found:', jneCode);
-    return jneCode;
+    console.log('✅ Destination code found:', city.jne_code);
+    return city.jne_code;
   } catch (error) {
     console.error('💥 Error getting destination code:', error);
     return null;
   }
 };
 
-  // ✅ FIXED: Calculate total weight from items dengan logic yang lebih akurat
-  const calculateTotalWeight = () => {
-    const totalQuantity = checkoutItems.reduce((sum, item) => sum + item.quantity, 0);
-    // Asumsi setiap item = 1kg, minimum 1kg untuk JNE
-    const weight = Math.max(1, totalQuantity);
-    console.log('📦 Calculated total weight:', weight, 'kg from', totalQuantity, 'items');
-    return weight;
-  };
+// ✅ FIXED: Calculate total weight from items dengan logic yang lebih aman
+const calculateTotalWeight = () => {
+  if (!checkoutItems || !Array.isArray(checkoutItems)) {
+    console.log('⚠️ checkoutItems belum ada, pakai default 1kg');
+    return 1;
+  }
+
+  const totalQuantity = checkoutItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  const weight = Math.max(1, totalQuantity);
+  console.log('📦 Calculated total weight:', weight, 'kg from', totalQuantity, 'items');
+  return weight;
+};
+
 
   // ✅ SUPER FIXED: Enhanced fetchJneServices dengan loading state yang PASTI tidak nyangkut
   const fetchJneServices = async (destinationCode, weight = 1) => {
