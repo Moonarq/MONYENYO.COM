@@ -1223,6 +1223,21 @@ const Checkout = () => {
                 <div className="shipping-section">
                   <h4 style={{ margin: '16px 0 8px 0', fontSize: '16px', fontWeight: '600' }}>Pilih Metode Pengiriman:</h4>
                   
+                  {/* Show instruction if address is not complete */}
+                  {(!shippingAddress.province || !shippingAddress.regency) && (
+                    <div className="shipping-instruction" style={{ 
+                      background: '#e3f2fd', 
+                      border: '1px solid #90caf9', 
+                      borderRadius: '8px', 
+                      padding: '12px', 
+                      margin: '8px 0',
+                      fontSize: '14px',
+                      color: '#1565c0'
+                    }}>
+                      📍 <strong>Lengkapi alamat pengiriman</strong> (Provinsi & Kota) untuk melihat opsi pengiriman JNE
+                    </div>
+                  )}
+                  
                   {/* Reguler Option */}
                   <div className="shipping-option">
                     <input 
@@ -1232,7 +1247,10 @@ const Checkout = () => {
                       checked={selectedShipping === 'reguler'}
                       onChange={(e) => setSelectedShipping(e.target.value)}
                     />
-                    <label>Reguler (Free)</label>
+                    <div className="shipping-details">
+                      <label>🚚 Reguler (Gratis)</label>
+                      <p className="shipping-estimate">Estimasi 3-7 hari kerja</p>
+                    </div>
                   </div>
                   
                   {/* Ninja Express Option */}
@@ -1247,30 +1265,50 @@ const Checkout = () => {
                     />
                     <div className="shipping-details">
                       <label>
-                        Ninja Xpress {hasFreeShippingVoucher() ? '(Gratis dengan voucher)' : `(Rp${shippingData.ninja.price.toLocaleString('id-ID')})`}
+                        🥷 Ninja Xpress {hasFreeShippingVoucher() ? '(Gratis dengan voucher)' : `(Rp${shippingData.ninja.price.toLocaleString('id-ID')})`}
                       </label>
-                      <p className="shipping-estimate">{shippingData.ninja.estimate}</p>
+                      <p className="shipping-estimate">Estimasi tiba besok - 2 hari kerja</p>
                     </div>
                   </div>
 
-                  {/* ✅ NEW: JNE Services Section */}
-                  {jneServices.length > 0 && (
+                  {/* Loading JNE Services */}
+                  {isLoadingJne && (
+                    <div className="jne-loading-section" style={{ 
+                      background: '#f8f9fa', 
+                      border: '1px solid #dee2e6', 
+                      borderRadius: '8px', 
+                      padding: '16px', 
+                      margin: '8px 0',
+                      textAlign: 'center'
+                    }}>
+                      <div className="jne-loading">
+                        <span>🔄 Memuat layanan JNE...</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* JNE Services Section */}
+                  {!isLoadingJne && jneServices.length > 0 && (
                     <div className="jne-services-section">
-                      <h5 style={{ margin: '12px 0 8px 0', fontSize: '14px', fontWeight: '600', color: '#333' }}>
-                        JNE Services:
-                      </h5>
-                      
-                      {isLoadingJne && (
-                        <div className="jne-loading">
-                          <span>Memuat layanan JNE...</span>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        marginBottom: '12px',
+                        padding: '8px 12px',
+                        background: '#e8f5e8',
+                        borderRadius: '6px',
+                        border: '1px solid #4caf50'
+                      }}>
+                        <span style={{ fontSize: '16px', marginRight: '8px' }}>📦</span>
+                        <div>
+                          <h5 style={{ margin: '0', fontSize: '14px', fontWeight: '600', color: '#2e7d32' }}>
+                            Layanan JNE Tersedia
+                          </h5>
+                          <small style={{ color: '#558b2f', fontSize: '12px' }}>
+                            Untuk {shippingAddress.regency ? addressData.provinces?.[shippingAddress.province]?.cities?.[shippingAddress.regency]?.name : 'kota ini'}
+                          </small>
                         </div>
-                      )}
-                      
-                      {jneError && (
-                        <div className="jne-error" style={{ color: '#ff6b6b', fontSize: '14px', margin: '8px 0' }}>
-                          {jneError}
-                        </div>
-                      )}
+                      </div>
                       
                       {jneServices.map((service, idx) => (
                         <div key={idx} className="shipping-option jne-option">
@@ -1284,13 +1322,13 @@ const Checkout = () => {
                           />
                           <div className="shipping-details">
                             <label>
-                              {service.service_display} - {hasFreeShippingVoucher() ? 
+                              🚛 JNE {service.service_display} - {hasFreeShippingVoucher() ? 
                                 <span style={{ color: '#28a745' }}>Gratis dengan voucher</span> : 
-                                `Rp${parseInt(service.price).toLocaleString('id-ID')}`
+                                <strong style={{ color: '#d32f2f' }}>Rp{parseInt(service.price).toLocaleString('id-ID')}</strong>
                               }
                             </label>
                             <p className="shipping-estimate">
-                              ETD: {service.etd_from || '?'} - {service.etd_thru || '?'} hari
+                              📅 Estimasi: {service.etd_from || '?'} - {service.etd_thru || '?'} hari kerja
                             </p>
                           </div>
                         </div>
@@ -1298,15 +1336,33 @@ const Checkout = () => {
                     </div>
                   )}
 
-                  {/* Show message if no JNE services available but city is selected */}
+                  {/* JNE Error */}
+                  {jneError && (
+                    <div className="jne-error" style={{ 
+                      background: '#ffebee', 
+                      border: '1px solid #ffcdd2', 
+                      borderRadius: '8px', 
+                      padding: '12px', 
+                      margin: '8px 0',
+                      color: '#c62828'
+                    }}>
+                      ⚠️ <strong>Error:</strong> {jneError}
+                    </div>
+                  )}
+
+                  {/* No JNE services available */}
                   {!isLoadingJne && jneServices.length === 0 && shippingAddress.regency && !jneError && (
                     <div className="jne-unavailable" style={{ 
-                      color: '#666', 
-                      fontSize: '14px', 
+                      background: '#fff3e0', 
+                      border: '1px solid #ffcc02', 
+                      borderRadius: '8px', 
+                      padding: '12px', 
                       margin: '8px 0',
-                      fontStyle: 'italic'
+                      color: '#ef6c00'
                     }}>
-                      JNE services tidak tersedia untuk kota ini
+                      📍 <strong>JNE tidak tersedia</strong> untuk kota {addressData.provinces?.[shippingAddress.province]?.cities?.[shippingAddress.regency]?.name || 'ini'}
+                      <br />
+                      <small>Silakan pilih metode pengiriman lain</small>
                     </div>
                   )}
                 </div>
