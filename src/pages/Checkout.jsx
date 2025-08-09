@@ -13,7 +13,7 @@ import { useNavbarScroll } from '../hooks/useNavbarScroll'
 import AdditionalVoucherSelector from '../components/common/AdditionalVoucherSelector'
 import './Checkout.css'
 import { API_ENDPOINTS, getImageUrl as getApiImageUrl } from '../config/api'
-import { jneCityMap } from '../data/jneCityMap';
+import jneCityMap from '../data/jneCityMap.json';
 
 // ✅ TAMBAH: Helper functions untuk mengelola menuVoucher di localStorage
 const getMenuVoucher = () => {
@@ -229,31 +229,34 @@ const Checkout = () => {
  const getDestinationCode = (provinceKey, cityKey) => {
   try {
     console.log('🔍 Getting destination code for:', { provinceKey, cityKey });
-    
+
     if (!provinceKey || !cityKey) {
       console.log('❌ Missing province or city key');
       return null;
     }
-    
+
+    // Ambil ID kabupaten/kota
     const province = addressData.provinces[provinceKey];
     if (!province) {
       console.log('❌ Province not found:', provinceKey);
       return null;
     }
-    
+
     const city = province.cities[cityKey];
     if (!city) {
-      console.log('❌ City not found:', cityKey, 'Available cities:', Object.keys(province.cities));
+      console.log('❌ City not found:', cityKey);
       return null;
     }
-    
-    if (!city.jne_code) {
+
+    // Ambil kode dari jneCityMap.json
+    const jneCode = jneCityMap[city.id] || jneCityMap[cityKey];
+    if (!jneCode) {
       console.log('⚠️ JNE code not found for city:', city.name);
       return null;
     }
-    
-    console.log('✅ Destination code found:', city.jne_code);
-    return city.jne_code;
+
+    console.log('✅ Destination code found:', jneCode);
+    return jneCode;
   } catch (error) {
     console.error('💥 Error getting destination code:', error);
     return null;
