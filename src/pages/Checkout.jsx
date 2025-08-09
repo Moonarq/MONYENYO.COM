@@ -226,68 +226,66 @@ const Checkout = () => {
   })
 
   // ✅ FIXED: Get destination code from selected city with multiple fallbacks
- // ✅ FIXED: Get destination code from selected city with multiple fallbacks
-const getDestinationCode = (provinceKey, cityKey) => {
-  try {
-    console.log('🔍 Getting destination code for:', { provinceKey, cityKey });
+  const getDestinationCode = (provinceKey, cityKey) => {
+    try {
+      console.log('🔍 Getting destination code for:', { provinceKey, cityKey });
 
-    if (!addressData || !addressData.provinces) {
-      console.log('❌ addressData belum siap');
+      if (!addressData || !addressData.provinces) {
+        console.log('❌ addressData belum siap');
+        return null;
+      }
+
+      if (!provinceKey || !cityKey) {
+        console.log('❌ Missing province or city key');
+        return null;
+      }
+
+      const province = addressData.provinces[provinceKey];
+      if (!province) {
+        console.log('❌ Province not found:', provinceKey);
+        return null;
+      }
+
+      const city = province.cities[cityKey];
+      if (!city) {
+        console.log('❌ City not found:', cityKey);
+        return null;
+      }
+
+      if (!city.jne_code) {
+        console.log('⚠️ JNE code not found for city:', city.name);
+        return null;
+      }
+
+      console.log('✅ Destination code found:', city.jne_code);
+      return city.jne_code;
+    } catch (error) {
+      console.error('💥 Error getting destination code:', error);
       return null;
     }
+  };
 
-    if (!provinceKey || !cityKey) {
-      console.log('❌ Missing province or city key');
-      return null;
+  // ✅ FIXED: Calculate total weight from items dengan logic yang lebih aman
+  const calculateTotalWeight = () => {
+    if (!checkoutItems || !Array.isArray(checkoutItems)) {
+      console.log('⚠️ checkoutItems belum ada, pakai default 1kg');
+      return 1;
     }
 
-    const province = addressData.provinces[provinceKey];
-    if (!province) {
-      console.log('❌ Province not found:', provinceKey);
-      return null;
-    }
+    const totalQuantity = checkoutItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    const weight = Math.max(1, totalQuantity);
+    console.log('📦 Calculated total weight:', weight, 'kg from', totalQuantity, 'items');
+    return weight;
+  };
 
-    const city = province.cities[cityKey];
-    if (!city) {
-      console.log('❌ City not found:', cityKey);
-      return null;
-    }
-
-    if (!city.jne_code) {
-      console.log('⚠️ JNE code not found for city:', city.name);
-      return null;
-    }
-
-    console.log('✅ Destination code found:', city.jne_code);
-    return city.jne_code;
-  } catch (error) {
-    console.error('💥 Error getting destination code:', error);
-    return null;
-  }
-};
-
-// ✅ FIXED: Calculate total weight from items dengan logic yang lebih aman
-const calculateTotalWeight = () => {
-  if (!checkoutItems || !Array.isArray(checkoutItems)) {
-    console.log('⚠️ checkoutItems belum ada, pakai default 1kg');
-    return 1;
-  }
-
-  const totalQuantity = checkoutItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
-  const weight = Math.max(1, totalQuantity);
-  console.log('📦 Calculated total weight:', weight, 'kg from', totalQuantity, 'items');
-  return weight;
-};
-
-
-  // ✅ SUPER FIXED: Enhanced fetchJneServices dengan loading state yang PASTI tidak nyangkut
+  // ✅ SUPER FIXED: Enhanced fetchJneServices dengan loading state yang PASTI tidak nyangkut dan handle null ETD
   const fetchJneServices = async (destinationCode, weight = 1) => {
     if (!destinationCode) {
       console.log('⚠️ No destination code provided, clearing JNE services');
       setJneServices([]);
       setSelectedService(null);
       setJneShippingCost(0);
-      setIsLoadingJne(false); // ✅ PENTING: Clear loading state
+      setIsLoadingJne(false);
       return;
     }
 
@@ -305,7 +303,6 @@ const calculateTotalWeight = () => {
     }, 15000);
     
     try {
-      // Gunakan URL API yang sesuai dengan jne.php Anda
       const apiUrl = `https://api.monyenyo.com/jne.php?thru=${destinationCode}&weight=${weight}`;
       console.log('📡 API URL:', apiUrl);
       
@@ -315,7 +312,6 @@ const calculateTotalWeight = () => {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        // ✅ TAMBAH: Request timeout
         signal: AbortSignal.timeout(10000) // 10 seconds timeout
       });
       
@@ -329,21 +325,38 @@ const calculateTotalWeight = () => {
       const data = await response.json();
       console.log('📊 JNE API Response:', data);
       
-      // ✅ STEP 2: Handle successful response
+      // ✅ STEP 2: Handle successful response dengan null ETD handling
       if (data && data.price && Array.isArray(data.price)) {
-        setJneServices(data.price);
-        setJneError(''); // Clear any previous errors
-        console.log('✅ JNE Services loaded successfully:', data.price.length, 'services');
+        // ✅ ENHANCED: Process services with null ETD handling
+        const processedServices = data.price.map(service => {
+          // Handle null/undefined ETD values
+          const etdFrom = service.etd_from || '?';
+          const etdThru = service.etd_thru || '?';
+          
+          return {
+            ...service,
+            etd_from: etdFrom,
+            etd_thru: etdThru,
+            // Create a user-friendly estimate text
+            estimateText: (etdFrom !== '?' && etdThru !== '?') 
+              ? `${etdFrom} - ${etdThru} hari kerja`
+              : 'Estimasi tidak tersedia'
+          };
+        });
+        
+        setJneServices(processedServices);
+        setJneError('');
+        console.log('✅ JNE Services loaded successfully:', processedServices.length, 'services');
       } else if (data && data.error) {
         // Handle API error
         console.log('❌ JNE API Error:', data.error);
         setJneError(data.error);
         setJneServices([]);
       } else {
-        // No services available
-        console.log('⚠️ No JNE services available for destination:', destinationCode);
+        // No services available or unexpected response format
+        console.warn('⚠️ Unexpected JNE API response format:', data);
         setJneServices([]);
-        setJneError('Tidak ada layanan JNE tersedia untuk tujuan ini');
+        setJneError('Format response JNE tidak sesuai. Silakan coba lagi.');
       }
       
     } catch (error) {
@@ -352,12 +365,18 @@ const calculateTotalWeight = () => {
       
       console.error("💥 Error fetching JNE services:", error);
       
-      // ✅ STEP 3: Handle specific error types
+      // ✅ STEP 3: Handle specific error types dengan detailed logging
       if (error.name === 'AbortError') {
+        console.error('🚨 JNE API Timeout - Request took too long');
         setJneError('Request timeout. Koneksi terlalu lambat, silakan coba lagi.');
       } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        console.error('🚨 JNE API Network Error - Cannot connect to server');
         setJneError('Tidak dapat terhubung ke server JNE. Periksa koneksi internet.');
+      } else if (error.message.includes('JSON')) {
+        console.error('🚨 JNE API JSON Parse Error - Invalid response format');
+        setJneError('Server JNE mengirim respons yang tidak valid. Silakan coba lagi.');
       } else {
+        console.error('🚨 JNE API Unknown Error:', error.message);
         setJneError('Gagal memuat layanan pengiriman JNE. Silakan coba lagi.');
       }
       
@@ -365,6 +384,7 @@ const calculateTotalWeight = () => {
       
     } finally {
       // ✅ STEP 4: SELALU matikan loading, tidak peduli apapun yang terjadi
+      clearTimeout(timeoutId); // Extra safety measure
       setIsLoadingJne(false);
       console.log('🏁 JNE fetch completed, loading state cleared');
     }
@@ -407,14 +427,14 @@ const calculateTotalWeight = () => {
         setJneServices([]);
         setSelectedService(null);
         setJneShippingCost(0);
-        setIsLoadingJne(false); // ✅ PENTING: Clear loading state
+        setIsLoadingJne(false);
       }
     } else {
       console.log('⏳ Waiting for complete address or address data loading...');
       setJneServices([]);
       setSelectedService(null);
       setJneShippingCost(0);
-      setIsLoadingJne(false); // ✅ PENTING: Clear loading state
+      setIsLoadingJne(false);
     }
   }, [shippingAddress.province, shippingAddress.regency, checkoutItems, addressLoading, addressData]);
 
@@ -1452,7 +1472,7 @@ const calculateTotalWeight = () => {
                                 fontSize: '13px', 
                                 color: '#6c757d' 
                               }}>
-                                📅 Estimasi: {service.etd_from || '?'} - {service.etd_thru || '?'} hari kerja
+                                📅 Estimasi: {service.estimateText}
                               </p>
                             </div>
                           </div>
