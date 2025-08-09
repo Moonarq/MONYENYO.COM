@@ -266,34 +266,59 @@ const Checkout = () => {
     return weight;
   };
 
-  // ✅ FIXED: Enhanced fetchJneServices dengan error handling dan logging yang lebih baik
+  // ✅ SUPER FIXED: Enhanced fetchJneServices dengan loading state yang PASTI tidak nyangkut
   const fetchJneServices = async (destinationCode, weight = 1) => {
     if (!destinationCode) {
       console.log('⚠️ No destination code provided, clearing JNE services');
       setJneServices([]);
       setSelectedService(null);
       setJneShippingCost(0);
+      setIsLoadingJne(false); // ✅ PENTING: Clear loading state
       return;
     }
 
     console.log('🚚 Fetching JNE services for:', { destinationCode, weight });
     
+    // ✅ STEP 1: Set loading state
     setIsLoadingJne(true);
     setJneError('');
+    
+    // ✅ TIMEOUT HANDLER: Auto-stop loading after 15 seconds
+    const timeoutId = setTimeout(() => {
+      console.log('⏰ JNE fetch timeout, stopping loading...');
+      setIsLoadingJne(false);
+      setJneError('Timeout: Gagal memuat layanan JNE. Silakan coba lagi.');
+    }, 15000);
     
     try {
       // Gunakan URL API yang sesuai dengan jne.php Anda
       const apiUrl = `https://api.monyenyo.com/jne.php?thru=${destinationCode}&weight=${weight}`;
       console.log('📡 API URL:', apiUrl);
       
-      const response = await fetch(apiUrl);
-      const data = await response.json();
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        // ✅ TAMBAH: Request timeout
+        signal: AbortSignal.timeout(10000) // 10 seconds timeout
+      });
       
+      // ✅ Clear timeout karena response sudah diterima
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
       console.log('📊 JNE API Response:', data);
       
-      // Check if response contains price data
+      // ✅ STEP 2: Handle successful response
       if (data && data.price && Array.isArray(data.price)) {
         setJneServices(data.price);
+        setJneError(''); // Clear any previous errors
         console.log('✅ JNE Services loaded successfully:', data.price.length, 'services');
       } else if (data && data.error) {
         // Handle API error
@@ -304,13 +329,30 @@ const Checkout = () => {
         // No services available
         console.log('⚠️ No JNE services available for destination:', destinationCode);
         setJneServices([]);
+        setJneError('Tidak ada layanan JNE tersedia untuk tujuan ini');
       }
+      
     } catch (error) {
+      // ✅ Clear timeout jika error terjadi
+      clearTimeout(timeoutId);
+      
       console.error("💥 Error fetching JNE services:", error);
-      setJneError('Gagal memuat layanan pengiriman JNE. Silakan coba lagi.');
+      
+      // ✅ STEP 3: Handle specific error types
+      if (error.name === 'AbortError') {
+        setJneError('Request timeout. Koneksi terlalu lambat, silakan coba lagi.');
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        setJneError('Tidak dapat terhubung ke server JNE. Periksa koneksi internet.');
+      } else {
+        setJneError('Gagal memuat layanan pengiriman JNE. Silakan coba lagi.');
+      }
+      
       setJneServices([]);
+      
     } finally {
+      // ✅ STEP 4: SELALU matikan loading, tidak peduli apapun yang terjadi
       setIsLoadingJne(false);
+      console.log('🏁 JNE fetch completed, loading state cleared');
     }
   };
 
@@ -351,12 +393,14 @@ const Checkout = () => {
         setJneServices([]);
         setSelectedService(null);
         setJneShippingCost(0);
+        setIsLoadingJne(false); // ✅ PENTING: Clear loading state
       }
     } else {
       console.log('⏳ Waiting for complete address or address data loading...');
       setJneServices([]);
       setSelectedService(null);
       setJneShippingCost(0);
+      setIsLoadingJne(false); // ✅ PENTING: Clear loading state
     }
   }, [shippingAddress.province, shippingAddress.regency, checkoutItems, addressLoading, addressData]);
 
