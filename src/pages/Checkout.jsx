@@ -139,11 +139,12 @@ const Checkout = () => {
   const [addressData, setAddressData] = useState({ provinces: {} });
   const [addressLoading, setAddressLoading] = useState(true);
 
-  // ✅ NEW: JNE Ongkir state
-  const [ongkirList, setOngkirList] = useState([]);
-  const [selectedOngkir, setSelectedOngkir] = useState(null);
-  const [ongkirLoading, setOngkirLoading] = useState(false);
-  const [ongkirError, setOngkirError] = useState(null);
+  // ✅ NEW: JNE Services State
+  const [jneServices, setJneServices] = useState([]);
+  const [selectedService, setSelectedService] = useState(null);
+  const [jneShippingCost, setJneShippingCost] = useState(0);
+  const [isLoadingJne, setIsLoadingJne] = useState(false);
+  const [jneError, setJneError] = useState('');
 
   // Load address data from JSON file on mount
   useEffect(() => {
@@ -217,80 +218,68 @@ const Checkout = () => {
   const [availableDistricts, setAvailableDistricts] = useState({})
   const [availableSubdistricts, setAvailableSubdistricts] = useState([])
 
-  // Shipping data
+  // ✅ UPDATED: Enhanced shipping data with JNE integration
   const [shippingData] = useState({
     reguler: { name: 'Reguler', price: 0 },
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
 
-  // ✅ NEW: Function to get JNE ongkir
-  const getOngkir = async (destinationCode = null, weight = 1) => {
-    if (!destinationCode && !shippingAddress.zipCode) {
-      console.log('No destination code or zip code available');
+  // ✅ NEW: Function to fetch JNE services
+  const fetchJneServices = async (destinationCode, weight = 1) => {
+    if (!destinationCode) {
+      setJneServices([]);
       return;
     }
 
-    setOngkirLoading(true);
-    setOngkirError(null);
-
+    setIsLoadingJne(true);
+    setJneError('');
+    
     try {
-      const res = await fetch("https://api.monyenyo.com/api/jne/tariff", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Accept": "application/json" 
-        },
-        body: JSON.stringify({
-          destination_code: destinationCode || shippingAddress.zipCode,
-          weight: weight // berat dalam kg
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
+      const res = await fetch(`https://api.monyenyo.com/jne.php?thru=${destinationCode}&weight=${weight}`);
       const data = await res.json();
       
       if (data.price && Array.isArray(data.price)) {
-        setOngkirList(data.price);
-        // Auto select first option if none selected
-        if (!selectedOngkir && data.price.length > 0) {
-          setSelectedOngkir(data.price[0]);
-        }
+        setJneServices(data.price);
+        console.log('JNE Services loaded:', data.price);
       } else {
-        console.warn('Invalid ongkir data format:', data);
-        setOngkirList([]);
+        setJneServices([]);
+        console.log('No JNE services available for this destination');
       }
-
     } catch (err) {
-      console.error('Error fetching ongkir:', err);
-      setOngkirError('Gagal memuat tarif pengiriman. Silakan coba lagi.');
-      setOngkirList([]);
+      console.error("Gagal mengambil ongkir JNE:", err);
+      setJneError('Gagal memuat layanan pengiriman');
+      setJneServices([]);
     } finally {
-      setOngkirLoading(false);
+      setIsLoadingJne(false);
     }
   };
 
-  // ✅ NEW: Calculate total item weight
+  // ✅ NEW: Get destination code from selected city
+  const getDestinationCode = (provinceKey, cityKey) => {
+    try {
+      const province = addressData.provinces[provinceKey];
+      if (province && province.cities[cityKey]) {
+        return province.cities[cityKey].jne_code || cityKey;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting destination code:', error);
+      return null;
+    }
+  };
+
+  // ✅ NEW: Calculate total weight from items (assuming 1kg per item as default)
   const calculateTotalWeight = () => {
-    // Assuming each item has a weight property, default to 0.5kg per item if not specified
-    return checkoutItems.reduce((total, item) => {
-      const itemWeight = item.weight || 0.5; // default 0.5kg per item
-      return total + (itemWeight * item.quantity);
-    }, 0);
+    const totalQuantity = checkoutItems.reduce((sum, item) => sum + item.quantity, 0);
+    return Math.max(1, totalQuantity); // Minimum 1kg
   };
 
-  // ✅ NEW: Get ongkir when address changes
-  useEffect(() => {
-    if (shippingAddress.zipCode && shippingAddress.zipCode.length >= 5) {
-      const weight = calculateTotalWeight();
-      getOngkir(shippingAddress.zipCode, Math.max(1, Math.ceil(weight))); // minimum 1kg
-    } else {
-      setOngkirList([]);
-      setSelectedOngkir(null);
-    }
-  }, [shippingAddress.zipCode, checkoutItems]);
+  // ✅ NEW: Handle JNE service selection
+  const handleJneServiceSelect = (service) => {
+    setSelectedService(service);
+    setJneShippingCost(parseInt(service.price) || 0);
+    setSelectedShipping('jne'); // Set shipping method to JNE
+  };
 
   // ✅ FIXED: Load menu voucher on component mount for Buy Now mode
   useEffect(() => {
@@ -305,6 +294,22 @@ const Checkout = () => {
       }
     }
   }, [isBuyNow]);
+
+  // ✅ NEW: Fetch JNE services when city is selected
+  useEffect(() => {
+    if (shippingAddress.province && shippingAddress.regency) {
+      const destinationCode = getDestinationCode(shippingAddress.province, shippingAddress.regency);
+      const weight = calculateTotalWeight();
+      
+      if (destinationCode) {
+        fetchJneServices(destinationCode, weight);
+      }
+    } else {
+      setJneServices([]);
+      setSelectedService(null);
+      setJneShippingCost(0);
+    }
+  }, [shippingAddress.province, shippingAddress.regency, checkoutItems]);
 
   // ✅ FIXED: Fungsi untuk menghitung discount voucher dengan struktur data yang benar
   const calculateVoucherDiscount = (voucher, subtotal) => {
@@ -357,9 +362,10 @@ const Checkout = () => {
         primaryVoucher,
         secondaryVoucher,
         additionalCartVoucher,
-        selectedOngkir,
         isBuyNow,
-        buyNowData
+        buyNowData,
+        selectedService,
+        jneShippingCost
       },
       returnPath: '/checkout'
     };
@@ -450,7 +456,12 @@ const Checkout = () => {
       setPrimaryVoucher(checkoutData.primaryVoucher || null);
       setSecondaryVoucher(checkoutData.secondaryVoucher || null);
       setAdditionalCartVoucher(checkoutData.additionalCartVoucher || null);
-      setSelectedOngkir(checkoutData.selectedOngkir || null);
+      
+      // Restore JNE service if available
+      if (checkoutData.selectedService) {
+        setSelectedService(checkoutData.selectedService);
+        setJneShippingCost(checkoutData.jneShippingCost || 0);
+      }
       
       // Clear state setelah restore untuk menghindari restore berulang
       window.history.replaceState({}, document.title);
@@ -600,7 +611,7 @@ const Checkout = () => {
     return existingVouchers
   }
 
-  // Check if free shipping voucher is applied
+  // ✅ UPDATED: Check if free shipping voucher is applied
   const hasFreeShippingVoucher = () => {
     if (isBuyNow) {
       return (primaryVoucher && primaryVoucher.type === 'free_shipping') ||
@@ -608,6 +619,22 @@ const Checkout = () => {
     } else {
       return (cartVoucher && cartVoucher.type === 'free_shipping') ||
              (additionalCartVoucher && additionalCartVoucher.type === 'free_shipping')
+    }
+  }
+
+  // ✅ UPDATED: Get shipping cost based on selected method
+  const getShippingCost = () => {
+    if (hasFreeShippingVoucher()) return 0;
+    
+    switch (selectedShipping) {
+      case 'reguler':
+        return 0;
+      case 'ninja':
+        return shippingData.ninja.price;
+      case 'jne':
+        return jneShippingCost;
+      default:
+        return 0;
     }
   }
 
@@ -632,21 +659,10 @@ const Checkout = () => {
     }
   }, [cart, navigate, isBuyNow])
 
-  // ✅ UPDATED: Calculate total with JNE ongkir
+  // ✅ UPDATED: Calculate total with JNE shipping cost
   const calculateTotal = () => {
     const { finalTotal } = calculateCheckoutTotals()
-    
-    let shippingCost = 0;
-    
-    if (hasFreeShippingVoucher()) {
-      shippingCost = 0; // Free shipping from voucher
-    } else if (selectedShipping === 'jne' && selectedOngkir) {
-      shippingCost = selectedOngkir.price; // JNE ongkir
-    } else if (selectedShipping === 'ninja') {
-      shippingCost = shippingData.ninja.price; // Ninja Xpress
-    }
-    // reguler shipping is free (0)
-    
+    const shippingCost = getShippingCost()
     const insurance = useInsurance ? calculateInsuranceCost() : 0
     
     return Math.max(0, finalTotal + shippingCost + insurance)
@@ -681,12 +697,6 @@ const Checkout = () => {
     
     const { removeItem } = useCart()
     removeItem(itemId)
-  }
-
-  // ✅ NEW: Handle ongkir selection
-  const handleOngkirSelect = (ongkir) => {
-    setSelectedOngkir(ongkir);
-    setSelectedShipping('jne'); // Auto set shipping method to JNE
   }
 
   // ✅ FIXED: Primary voucher handlers - gunakan discount yang diterima langsung dari API
@@ -818,27 +828,7 @@ const Checkout = () => {
 
       const readableAddress = getReadableAddress()
 
-      // ✅ UPDATED: Calculate shipping cost based on selected method
-      let shippingCost = 0;
-      let shippingMethod = selectedShipping;
-      let shippingService = '';
-      
-      if (hasFreeShippingVoucher()) {
-        shippingCost = 0;
-        shippingMethod = selectedShipping;
-        shippingService = selectedShipping === 'jne' && selectedOngkir ? selectedOngkir.service_display : selectedShipping;
-      } else if (selectedShipping === 'jne' && selectedOngkir) {
-        shippingCost = selectedOngkir.price;
-        shippingService = selectedOngkir.service_display;
-      } else if (selectedShipping === 'ninja') {
-        shippingCost = shippingData.ninja.price;
-        shippingService = shippingData.ninja.name;
-      } else {
-        shippingCost = 0; // reguler is free
-        shippingService = 'Reguler';
-      }
-
-      // ✅ UPDATED: Prepare checkout data dengan email field dan JNE ongkir
+      // ✅ UPDATED: Prepare checkout data dengan email field dan JNE service info
       const checkoutData = {
         // Order Info
         order_number: orderNumber,
@@ -861,15 +851,18 @@ const Checkout = () => {
         // Payment Method
         paymentMethod: selectedPayment,
         
-        // ✅ UPDATED: Shipping Info with JNE support
+        // ✅ UPDATED: Enhanced Shipping Info dengan JNE service
         shipping: {
-          method: shippingMethod,
-          service: shippingService,
-          cost: shippingCost,
+          method: selectedShipping,
+          cost: getShippingCost(),
           isFree: hasFreeShippingVoucher(),
-          estimate: selectedOngkir ? `${selectedOngkir.etd_from}-${selectedOngkir.etd_thru} hari` : 
-                   (selectedShipping === 'ninja' ? shippingData.ninja.estimate : ''),
-          weight: calculateTotalWeight()
+          jneService: selectedService ? {
+            service_code: selectedService.service_code,
+            service_display: selectedService.service_display,
+            price: selectedService.price,
+            etd_from: selectedService.etd_from,
+            etd_thru: selectedService.etd_thru
+          } : null
         },
         
         // Insurance
@@ -884,8 +877,7 @@ const Checkout = () => {
           name: item.name,
           price: item.price,
           quantity: item.quantity,
-          sku: item.sku || null,
-          weight: item.weight || 0.5
+          sku: item.sku || null
         })),
         
         // Vouchers
@@ -897,12 +889,12 @@ const Checkout = () => {
           additional: additionalCartVoucher
         },
         
-        // Totals
+        // ✅ UPDATED: Totals dengan JNE shipping cost
         totals: {
           subtotalBeforeVoucher: calculateCheckoutTotals().subtotalBeforeVoucher,
           totalVoucherDiscount: calculateCheckoutTotals().totalVoucherDiscount,
           finalTotal: calculateCheckoutTotals().finalTotal,
-          shippingCost: shippingCost,
+          shippingCost: getShippingCost(),
           insuranceCost: useInsurance ? calculateInsuranceCost() : 0,
           grandTotal: calculateTotal()
         },
@@ -1201,7 +1193,6 @@ const Checkout = () => {
                     <div className="product-details">
                       <h4>{item.name}</h4>
                       {item.sku && <p className="product-variant">SKU: {item.sku}</p>}
-                      <p className="product-weight">Berat: {(item.weight || 0.5) * item.quantity} kg</p>
                     </div>
                     <div className="product-price">
                       <div className="price-section">
@@ -1228,11 +1219,9 @@ const Checkout = () => {
                   </div>
                 ))}
 
-                {/* ✅ UPDATED: Enhanced Shipping Options with JNE Integration */}
+                {/* ✅ UPDATED: Enhanced Shipping Options with JNE services */}
                 <div className="shipping-section">
-                  <h4 style={{ margin: '16px 0 12px 0', fontSize: '14px', fontWeight: 'bold' }}>
-                    Pilih Metode Pengiriman
-                  </h4>
+                  <h4 style={{ margin: '16px 0 8px 0', fontSize: '16px', fontWeight: '600' }}>Pilih Metode Pengiriman:</h4>
                   
                   {/* Reguler Option */}
                   <div className="shipping-option">
@@ -1243,7 +1232,7 @@ const Checkout = () => {
                       checked={selectedShipping === 'reguler'}
                       onChange={(e) => setSelectedShipping(e.target.value)}
                     />
-                    <label>Reguler (Gratis)</label>
+                    <label>Reguler (Free)</label>
                   </div>
                   
                   {/* Ninja Express Option */}
@@ -1264,56 +1253,62 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  {/* ✅ NEW: JNE Shipping Options */}
-                  {ongkirList.length > 0 && (
-                    <div className="jne-shipping-section">
-                      <h5 style={{ margin: '16px 0 8px 0', fontSize: '13px', color: '#666' }}>
-                        JNE Express {ongkirLoading && '(Loading...)'}
-                        {ongkirError && <span style={{color: '#e74c3c'}}> - {ongkirError}</span>}
+                  {/* ✅ NEW: JNE Services Section */}
+                  {jneServices.length > 0 && (
+                    <div className="jne-services-section">
+                      <h5 style={{ margin: '12px 0 8px 0', fontSize: '14px', fontWeight: '600', color: '#333' }}>
+                        JNE Services:
                       </h5>
                       
-                      {ongkirLoading ? (
-                        <div className="shipping-loading">
-                          <p>Memuat tarif pengiriman JNE...</p>
-                        </div>
-                      ) : (
-                        <div className="jne-options">
-                          {ongkirList.map((item, idx) => (
-                            <div key={idx} className="shipping-option jne-option">
-                              <input 
-                                type="radio" 
-                                name="shipping" 
-                                value={`jne-${idx}`}
-                                checked={selectedShipping === 'jne' && selectedOngkir === item}
-                                onChange={() => handleOngkirSelect(item)}
-                                disabled={hasFreeShippingVoucher()}
-                              />
-                              <div className="shipping-details">
-                                <label>
-                                  JNE {item.service_display} {hasFreeShippingVoucher() ? '(Gratis dengan voucher)' : `- Rp${item.price.toLocaleString('id-ID')}`}
-                                </label>
-                                <p className="shipping-estimate">
-                                  Estimasi: {item.etd_from}-{item.etd_thru} hari
-                                </p>
-                              </div>
-                            </div>
-                          ))}
+                      {isLoadingJne && (
+                        <div className="jne-loading">
+                          <span>Memuat layanan JNE...</span>
                         </div>
                       )}
+                      
+                      {jneError && (
+                        <div className="jne-error" style={{ color: '#ff6b6b', fontSize: '14px', margin: '8px 0' }}>
+                          {jneError}
+                        </div>
+                      )}
+                      
+                      {jneServices.map((service, idx) => (
+                        <div key={idx} className="shipping-option jne-option">
+                          <input 
+                            type="radio" 
+                            name="shipping" 
+                            value="jne"
+                            checked={selectedShipping === 'jne' && selectedService === service}
+                            onChange={() => handleJneServiceSelect(service)}
+                            disabled={hasFreeShippingVoucher()}
+                          />
+                          <div className="shipping-details">
+                            <label>
+                              {service.service_display} - {hasFreeShippingVoucher() ? 
+                                <span style={{ color: '#28a745' }}>Gratis dengan voucher</span> : 
+                                `Rp${parseInt(service.price).toLocaleString('id-ID')}`
+                              }
+                            </label>
+                            <p className="shipping-estimate">
+                              ETD: {service.etd_from || '?'} - {service.etd_thru || '?'} hari
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
 
-                  {/* Weight Info */}
-                  <div className="weight-info" style={{ 
-                    marginTop: '12px', 
-                    padding: '8px 12px', 
-                    backgroundColor: '#f8f9fa', 
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    color: '#666' 
-                  }}>
-                    Total berat: {calculateTotalWeight()} kg
-                  </div>
+                  {/* Show message if no JNE services available but city is selected */}
+                  {!isLoadingJne && jneServices.length === 0 && shippingAddress.regency && !jneError && (
+                    <div className="jne-unavailable" style={{ 
+                      color: '#666', 
+                      fontSize: '14px', 
+                      margin: '8px 0',
+                      fontStyle: 'italic'
+                    }}>
+                      JNE services tidak tersedia untuk kota ini
+                    </div>
+                  )}
                 </div>
 
                 {/* Insurance Option */}
@@ -1508,7 +1503,7 @@ const Checkout = () => {
                 </div>
               )}
 
-              {/* Price Summary */}
+              {/* ✅ UPDATED: Price Summary with JNE shipping cost */}
               <div className="price-summary">
                 <h4>Cek ringkasan transaksimu, yuk</h4>
                 
@@ -1584,23 +1579,12 @@ const Checkout = () => {
                   </div>
                 </div>
                 
-                {/* ✅ UPDATED: Enhanced shipping cost display with JNE support */}
                 <div className="price-row">
                   <span>
                     Total Ongkos Kirim
-                    {selectedShipping === 'jne' && selectedOngkir && (
+                    {selectedShipping === 'jne' && selectedService && (
                       <small style={{display: 'block', color: '#666', fontSize: '12px'}}>
-                        JNE {selectedOngkir.service_display}
-                      </small>
-                    )}
-                    {selectedShipping === 'ninja' && (
-                      <small style={{display: 'block', color: '#666', fontSize: '12px'}}>
-                        Ninja Xpress
-                      </small>
-                    )}
-                    {selectedShipping === 'reguler' && (
-                      <small style={{display: 'block', color: '#666', fontSize: '12px'}}>
-                        Reguler
+                        {selectedService.service_display}
                       </small>
                     )}
                   </span>
@@ -1608,20 +1592,12 @@ const Checkout = () => {
                     {hasFreeShippingVoucher() ? (
                       <>
                         <span className="original-price" style={{textDecoration: 'line-through', marginRight: '8px'}}>
-                          Rp{(() => {
-                            if (selectedShipping === 'jne' && selectedOngkir) return selectedOngkir.price.toLocaleString('id-ID');
-                            if (selectedShipping === 'ninja') return shippingData.ninja.price.toLocaleString('id-ID');
-                            return '0';
-                          })()}
+                          Rp{getShippingCost().toLocaleString('id-ID')}
                         </span>
                         <span style={{color: '#28a745'}}>Gratis</span>
                       </>
                     ) : (
-                      `Rp${(() => {
-                        if (selectedShipping === 'jne' && selectedOngkir) return selectedOngkir.price.toLocaleString('id-ID');
-                        if (selectedShipping === 'ninja') return shippingData.ninja.price.toLocaleString('id-ID');
-                        return '0';
-                      })()}`
+                      `Rp${getShippingCost().toLocaleString('id-ID')}`
                     )}
                   </span>
                 </div>
