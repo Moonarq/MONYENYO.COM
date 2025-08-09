@@ -385,32 +385,30 @@ const Checkout = () => {
   }, [isBuyNow]);
 
   // ✅ CRITICAL: Main useEffect untuk fetch JNE services ketika alamat berubah
- const lastDestinationCode = useRef(null);
-
-useEffect(() => {
-  if (shippingAddress.province && shippingAddress.regency && !addressLoading) {
-    const destinationCode = getDestinationCode(shippingAddress.province, shippingAddress.regency);
-    
-    if (destinationCode && destinationCode !== lastDestinationCode.current) {
-      lastDestinationCode.current = destinationCode; // simpan code terakhir
-      const weight = calculateTotalWeight();
-      console.log('🚀 Triggering JNE fetch with:', { destinationCode, weight });
-      fetchJneServices(destinationCode, weight);
-    } else if (!destinationCode) {
-      console.log('⚠️ No valid destination code, clearing JNE services');
+  useEffect(() => {
+    // Pastikan province dan regency sudah dipilih dan addressData sudah dimuat
+    if (shippingAddress.province && shippingAddress.regency && !addressLoading) {
+      const destinationCode = getDestinationCode(shippingAddress.province, shippingAddress.regency);
+      
+      if (destinationCode) {
+        const weight = calculateTotalWeight();
+        console.log('🚀 Triggering JNE fetch with:', { destinationCode, weight });
+        fetchJneServices(destinationCode, weight);
+      } else {
+        console.log('⚠️ No valid destination code, clearing JNE services');
+        setJneServices([]);
+        setSelectedService(null);
+        setJneShippingCost(0);
+        setIsLoadingJne(false); // ✅ PENTING: Clear loading state
+      }
+    } else {
+      console.log('⏳ Waiting for complete address or address data loading...');
       setJneServices([]);
       setSelectedService(null);
       setJneShippingCost(0);
-      setIsLoadingJne(false);
+      setIsLoadingJne(false); // ✅ PENTING: Clear loading state
     }
-  } else {
-    console.log('⏳ Waiting for complete address or address data loading...');
-    setJneServices([]);
-    setSelectedService(null);
-    setJneShippingCost(0);
-    setIsLoadingJne(false);
-  }
-}, [shippingAddress.province, shippingAddress.regency, addressLoading]);
+  }, [shippingAddress.province, shippingAddress.regency, checkoutItems, addressLoading, addressData]);
 
   // ✅ FIXED: Fungsi untuk menghitung discount voucher dengan struktur data yang benar
   const calculateVoucherDiscount = (voucher, subtotal) => {
