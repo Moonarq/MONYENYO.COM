@@ -226,37 +226,39 @@ const Checkout = () => {
   })
 
   // ✅ FIXED: Get destination code from selected city with multiple fallbacks
-  const getDestinationCode = (provinceKey, cityKey) => {
-    try {
-      console.log('🔍 Getting destination code for:', { provinceKey, cityKey });
-      
-      if (!provinceKey || !cityKey) {
-        console.log('❌ Missing province or city key');
-        return null;
-      }
-      
-      const province = addressData.provinces[provinceKey];
-      if (!province) {
-        console.log('❌ Province not found:', provinceKey);
-        return null;
-      }
-      
-      const city = province.cities[cityKey];
-      if (!city) {
-        console.log('❌ City not found:', cityKey, 'Available cities:', Object.keys(province.cities));
-        return null;
-      }
-      
-      // Priority: jne_code > city_code > code > cityKey sebagai fallback terakhir
-      const destinationCode = city.jne_code || city.city_code || city.code || cityKey;
-      console.log('✅ Destination code found:', destinationCode, 'from city data:', city);
-      
-      return destinationCode;
-    } catch (error) {
-      console.error('💥 Error getting destination code:', error);
+ const getDestinationCode = (provinceKey, cityKey) => {
+  try {
+    console.log('🔍 Getting destination code for:', { provinceKey, cityKey });
+    
+    if (!provinceKey || !cityKey) {
+      console.log('❌ Missing province or city key');
       return null;
     }
-  };
+    
+    const province = addressData.provinces[provinceKey];
+    if (!province) {
+      console.log('❌ Province not found:', provinceKey);
+      return null;
+    }
+    
+    const city = province.cities[cityKey];
+    if (!city) {
+      console.log('❌ City not found:', cityKey, 'Available cities:', Object.keys(province.cities));
+      return null;
+    }
+    
+    if (!city.jne_code) {
+      console.log('⚠️ JNE code not found for city:', city.name);
+      return null;
+    }
+    
+    console.log('✅ Destination code found:', city.jne_code);
+    return city.jne_code;
+  } catch (error) {
+    console.error('💥 Error getting destination code:', error);
+    return null;
+  }
+};
 
   // ✅ FIXED: Calculate total weight from items dengan logic yang lebih akurat
   const calculateTotalWeight = () => {
