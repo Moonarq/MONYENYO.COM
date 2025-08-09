@@ -229,37 +229,31 @@ const Checkout = () => {
  const getDestinationCode = (provinceKey, cityKey) => {
   try {
     console.log('🔍 Getting destination code for:', { provinceKey, cityKey });
-
+    
     if (!provinceKey || !cityKey) {
       console.log('❌ Missing province or city key');
       return null;
     }
-
-    // Ambil dari mapping JNE
-    if (jneCityMap[cityKey]) {
-      console.log('✅ Destination code from jneCityMap:', jneCityMap[cityKey]);
-      return jneCityMap[cityKey];
-    }
-
-    // Kalau tidak ada di mapping, fallback ke addressData lama
+    
     const province = addressData.provinces[provinceKey];
     if (!province) {
       console.log('❌ Province not found:', provinceKey);
       return null;
     }
-
+    
     const city = province.cities[cityKey];
     if (!city) {
       console.log('❌ City not found:', cityKey, 'Available cities:', Object.keys(province.cities));
       return null;
     }
-
-    // Fallback terakhir
-    const destinationCode = city.jne_code || city.city_code || city.code || cityKey;
-    console.log('✅ Destination code fallback:', destinationCode, 'from city data:', city);
-
-    return destinationCode;
-
+    
+    if (!city.jne_code) {
+      console.log('⚠️ JNE code not found for city:', city.name);
+      return null;
+    }
+    
+    console.log('✅ Destination code found:', city.jne_code);
+    return city.jne_code;
   } catch (error) {
     console.error('💥 Error getting destination code:', error);
     return null;
