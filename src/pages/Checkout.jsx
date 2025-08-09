@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import bcaLogo from '../assets/images/bca.png';
 import mandiriLogo from '../assets/images/mandiri.png';
@@ -15,7 +15,7 @@ import './Checkout.css'
 import { API_ENDPOINTS, getImageUrl as getApiImageUrl } from '../config/api'
 import jneCityMap from '../data/jneCityMap.json';
 
-// ✅ TAMBAH: Helper functions untuk mengelola menuVoucher di localStorage
+// ✅ Helper functions untuk mengelola menuVoucher di localStorage
 const getMenuVoucher = () => {
   try {
     const menuVoucher = localStorage.getItem('menuVoucher');
@@ -140,12 +140,16 @@ const Checkout = () => {
   const [addressData, setAddressData] = useState({ provinces: {} });
   const [addressLoading, setAddressLoading] = useState(true);
 
-  // ✅ FIXED: JNE Services State with better naming
+  // ✅ FIXED: JNE Services State with better naming and refs for preventing infinite loops
   const [jneServices, setJneServices] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
   const [jneShippingCost, setJneShippingCost] = useState(0);
   const [isLoadingJne, setIsLoadingJne] = useState(false);
   const [jneError, setJneError] = useState('');
+  
+  // ✅ NEW: Refs to prevent infinite loops
+  const currentRequestRef = useRef(null);
+  const lastRequestParamsRef = useRef(null);
 
   // Load address data from JSON file on mount
   useEffect(() => {
@@ -278,33 +282,60 @@ const Checkout = () => {
     return weight;
   };
 
-  // ✅ SUPER FIXED: Enhanced fetchJneServices dengan loading state yang PASTI tidak nyangkut dan handle null ETD
+  // ✅ COMPLETELY FIXED: Enhanced fetchJneServices dengan proper error handling dan anti infinite loop
   const fetchJneServices = async (destinationCode, weight = 1) => {
+    // Create unique request params for comparison
+    const requestParams = `${destinationCode}-${weight}`;
+    
+    // Check if this is the same request as the last one
+    if (lastRequestParamsRef.current === requestParams) {
+      console.log('🚫 Skipping duplicate JNE request:', requestParams);
+      return;
+    }
+    
+    // Cancel previous request if still running
+    if (currentRequestRef.current) {
+      currentRequestRef.current.cancelled = true;
+      console.log('🚫 Cancelling previous JNE request');
+    }
+
     if (!destinationCode) {
       console.log('⚠️ No destination code provided, clearing JNE services');
       setJneServices([]);
       setSelectedService(null);
       setJneShippingCost(0);
       setIsLoadingJne(false);
+      lastRequestParamsRef.current = null;
       return;
     }
 
     console.log('🚚 Fetching JNE services for:', { destinationCode, weight });
     
-    // ✅ STEP 1: Set loading state
+    // Create request object to track cancellation
+    const currentRequest = { cancelled: false };
+    currentRequestRef.current = currentRequest;
+    lastRequestParamsRef.current = requestParams;
+    
+    // Set loading state
     setIsLoadingJne(true);
     setJneError('');
     
-    // ✅ TIMEOUT HANDLER: Auto-stop loading after 15 seconds
+    // Auto-timeout handler
     const timeoutId = setTimeout(() => {
-      console.log('⏰ JNE fetch timeout, stopping loading...');
-      setIsLoadingJne(false);
-      setJneError('Timeout: Gagal memuat layanan JNE. Silakan coba lagi.');
+      if (!currentRequest.cancelled) {
+        console.log('⏰ JNE fetch timeout, stopping loading...');
+        setIsLoadingJne(false);
+        setJneError('Request timeout. Silakan coba lagi.');
+        currentRequestRef.current = null;
+      }
     }, 15000);
     
     try {
       const apiUrl = `https://api.monyenyo.com/jne.php?thru=${destinationCode}&weight=${weight}`;
       console.log('📡 API URL:', apiUrl);
+      
+      const controller = new AbortController();
+      const timeoutSignal = setTimeout(() => controller.abort(), 12000);
       
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -312,11 +343,17 @@ const Checkout = () => {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        signal: AbortSignal.timeout(10000) // 10 seconds timeout
+        signal: controller.signal
       });
       
-      // ✅ Clear timeout karena response sudah diterima
+      clearTimeout(timeoutSignal);
       clearTimeout(timeoutId);
+      
+      // Check if request was cancelled
+      if (currentRequest.cancelled) {
+        console.log('🚫 JNE request was cancelled');
+        return;
+      }
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -325,20 +362,26 @@ const Checkout = () => {
       const data = await response.json();
       console.log('📊 JNE API Response:', data);
       
-      // ✅ STEP 2: Handle successful response dengan null ETD handling
-      if (data && data.price && Array.isArray(data.price)) {
-        // ✅ ENHANCED: Process services with null ETD handling
+      // Check again if request was cancelled before processing
+      if (currentRequest.cancelled) {
+        console.log('🚫 JNE request was cancelled during processing');
+        return;
+      }
+      
+      // Handle successful response dengan null ETD handling
+      if (data && data.price && Array.isArray(data.price) && data.price.length > 0) {
+        // Process services with null ETD handling
         const processedServices = data.price.map(service => {
-          // Handle null/undefined ETD values
-          const etdFrom = service.etd_from || '?';
-          const etdThru = service.etd_thru || '?';
+          // ✅ FIXED: Handle null/undefined ETD values properly
+          const etdFrom = service.etd_from ?? '?';
+          const etdThru = service.etd_thru ?? '?';
           
           return {
             ...service,
             etd_from: etdFrom,
             etd_thru: etdThru,
             // Create a user-friendly estimate text
-            estimateText: (etdFrom !== '?' && etdThru !== '?') 
+            estimateText: (etdFrom !== '?' && etdThru !== '?' && etdFrom !== null && etdThru !== null) 
               ? `${etdFrom} - ${etdThru} hari kerja`
               : 'Estimasi tidak tersedia'
           };
@@ -350,22 +393,28 @@ const Checkout = () => {
       } else if (data && data.error) {
         // Handle API error
         console.log('❌ JNE API Error:', data.error);
-        setJneError(data.error);
+        setJneError(`API Error: ${data.error}`);
         setJneServices([]);
       } else {
         // No services available or unexpected response format
-        console.warn('⚠️ Unexpected JNE API response format:', data);
+        console.warn('⚠️ No JNE services available or unexpected response format:', data);
         setJneServices([]);
-        setJneError('Format response JNE tidak sesuai. Silakan coba lagi.');
+        setJneError('Tidak ada layanan JNE tersedia untuk lokasi ini.');
       }
       
     } catch (error) {
-      // ✅ Clear timeout jika error terjadi
+      // Clear timeout jika error terjadi
       clearTimeout(timeoutId);
+      
+      // Don't handle error if request was cancelled
+      if (currentRequest.cancelled) {
+        console.log('🚫 JNE request was cancelled during error handling');
+        return;
+      }
       
       console.error("💥 Error fetching JNE services:", error);
       
-      // ✅ STEP 3: Handle specific error types dengan detailed logging
+      // Handle specific error types dengan detailed logging
       if (error.name === 'AbortError') {
         console.error('🚨 JNE API Timeout - Request took too long');
         setJneError('Request timeout. Koneksi terlalu lambat, silakan coba lagi.');
@@ -383,10 +432,16 @@ const Checkout = () => {
       setJneServices([]);
       
     } finally {
-      // ✅ STEP 4: SELALU matikan loading, tidak peduli apapun yang terjadi
-      clearTimeout(timeoutId); // Extra safety measure
-      setIsLoadingJne(false);
-      console.log('🏁 JNE fetch completed, loading state cleared');
+      // Only clear loading if this request wasn't cancelled
+      if (!currentRequest.cancelled) {
+        setIsLoadingJne(false);
+        console.log('🏁 JNE fetch completed, loading state cleared');
+      }
+      
+      // Clean up current request reference
+      if (currentRequestRef.current === currentRequest) {
+        currentRequestRef.current = null;
+      }
     }
   };
 
@@ -412,31 +467,42 @@ const Checkout = () => {
     }
   }, [isBuyNow]);
 
-  // ✅ CRITICAL: Main useEffect untuk fetch JNE services ketika alamat berubah
+  // ✅ COMPLETELY FIXED: Main useEffect untuk fetch JNE services dengan anti infinite loop
   useEffect(() => {
-    // Pastikan province dan regency sudah dipilih dan addressData sudah dimuat
-    if (shippingAddress.province && shippingAddress.regency && !addressLoading) {
-      const destinationCode = getDestinationCode(shippingAddress.province, shippingAddress.regency);
-      
-      if (destinationCode) {
-        const weight = calculateTotalWeight();
-        console.log('🚀 Triggering JNE fetch with:', { destinationCode, weight });
-        fetchJneServices(destinationCode, weight);
+    // Debounce function to prevent too frequent calls
+    const timeoutId = setTimeout(() => {
+      // Pastikan province dan regency sudah dipilih dan addressData sudah dimuat
+      if (shippingAddress.province && shippingAddress.regency && !addressLoading && addressData.provinces) {
+        const destinationCode = getDestinationCode(shippingAddress.province, shippingAddress.regency);
+        
+        if (destinationCode) {
+          const weight = calculateTotalWeight();
+          console.log('🚀 Triggering JNE fetch with:', { destinationCode, weight });
+          fetchJneServices(destinationCode, weight);
+        } else {
+          console.log('⚠️ No valid destination code, clearing JNE services');
+          setJneServices([]);
+          setSelectedService(null);
+          setJneShippingCost(0);
+          setIsLoadingJne(false);
+          lastRequestParamsRef.current = null;
+        }
       } else {
-        console.log('⚠️ No valid destination code, clearing JNE services');
+        console.log('⏳ Waiting for complete address or address data loading...');
+        // Clear services when address is incomplete
         setJneServices([]);
         setSelectedService(null);
         setJneShippingCost(0);
         setIsLoadingJne(false);
+        lastRequestParamsRef.current = null;
       }
-    } else {
-      console.log('⏳ Waiting for complete address or address data loading...');
-      setJneServices([]);
-      setSelectedService(null);
-      setJneShippingCost(0);
-      setIsLoadingJne(false);
-    }
-  }, [shippingAddress.province, shippingAddress.regency, checkoutItems, addressLoading, addressData]);
+    }, 500); // 500ms debounce
+
+    // Cleanup timeout on unmount or dependency change
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [shippingAddress.province, shippingAddress.regency, addressLoading]); // ✅ REMOVED problematic dependencies
 
   // ✅ FIXED: Fungsi untuk menghitung discount voucher dengan struktur data yang benar
   const calculateVoucherDiscount = (voucher, subtotal) => {
