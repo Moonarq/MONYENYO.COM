@@ -1799,7 +1799,7 @@ const Checkout = () => {
               <div className="payment-option" onClick={() => handlePaymentSelect('niaga')}>
                   <div className="payment-info">
                     <div className="bank-logo niaga-logo">
-                      <img src={niagaLogo} alt="Niaga" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
+                      <img src={niagaLogo} alt="Niaga" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
                     </div>
                     <span>CIMB Virtual Account</span>
                   </div>
