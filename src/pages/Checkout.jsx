@@ -1555,7 +1555,7 @@ const Checkout = () => {
                         borderRadius: '4px',
                         textAlign: 'center'
                       }}>
-                        📦 JNE services belum tersedia untuk kota ini
+                         JNE services belum tersedia untuk kota ini
                       </div>
                     )}
 
