@@ -1557,7 +1557,7 @@ const Checkout = () => {
                               <label style={{ fontWeight: '500', cursor: 'pointer' }}>
                                 {service.service_display} - {hasFreeShippingVoucher() ? 
                                   <span style={{ color: '#28a745', fontWeight: 'bold' }}>Gratis dengan voucher ✨</span> : 
-                                  <span style={{ color: '#007bff', fontWeight: 'bold' }}>Rp{parseInt(service.price).toLocaleString('id-ID')}</span>
+                                  <span style={{ color: '#000000ff', fontWeight: 'bold' }}>Rp{parseInt(service.price).toLocaleString('id-ID')}</span>
                                 }
                               </label>
                               <p className="shipping-estimate" style={{ 
@@ -1565,7 +1565,7 @@ const Checkout = () => {
                                 fontSize: '13px', 
                                 color: '#6c757d' 
                               }}>
-                                📅 Estimasi: {service.estimateText}
+                               Estimasi: {service.estimateText}
                               </p>
                             </div>
                           </div>
