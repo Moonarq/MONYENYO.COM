@@ -3,10 +3,9 @@ import axios from 'axios'
 import bcaLogo from '../assets/images/bca.png';
 import mandiriLogo from '../assets/images/mandiri.png';
 import gopayLogo from '../assets/images/gopay.png';
-import alfamartLogo from '../assets/images/alfamart.png';
+import cimbLogo from '../assets/images/cimb.png';
 import briLogo from '../assets/images/bri.png';
 import bniLogo from '../assets/images/bni.png';
-import cimbLogo from '../assets/images/cimb.png';
 import permataLogo from '../assets/images/permata.png';
 import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../hooks/useLanguage'
@@ -1796,6 +1795,21 @@ const Checkout = () => {
               <div className="payment-section">
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Metode Pembayaran</h4>
 
+         
+              <div className="payment-option" onClick={() => handlePaymentSelect('cimb')}>
+                  <div className="payment-info">
+                    <div className="bank-logo cimb-logo">
+                      <img src={cimbLogo} alt="CIMB" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
+                    </div>
+                    <span>CIMB Virtual Account</span>
+                  </div>
+                  <input 
+                    type="radio" 
+                    name="payment" 
+                    checked={selectedPayment === 'cimb'}
+                    readOnly
+                  />
+                </div>
                    
               <div className="payment-option" onClick={() => handlePaymentSelect('permata')}>
                   <div className="payment-info">
