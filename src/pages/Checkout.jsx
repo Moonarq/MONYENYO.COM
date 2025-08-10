@@ -906,7 +906,7 @@ const Checkout = () => {
   }
 
   const handleAddressChange = (field, value) => {
-    console.log(`📍 Address field changed: ${field} = ${value}`);
+    console.log(` Address field changed: ${field} = ${value}`);
     setShippingAddress(prev => ({
       ...prev,
       [field]: value
@@ -1571,7 +1571,7 @@ const Checkout = () => {
                         borderRadius: '4px',
                         textAlign: 'center'
                       }}>
-                        📍 Pilih kota terlebih dahulu untuk melihat layanan JNE
+                         Pilih kota terlebih dahulu untuk melihat layanan JNE
                       </div>
                     )}
                   </div>
