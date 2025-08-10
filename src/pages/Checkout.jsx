@@ -1814,7 +1814,7 @@ const Checkout = () => {
               <div className="payment-option" onClick={() => handlePaymentSelect('permata')}>
                   <div className="payment-info">
                     <div className="bank-logo permata-logo">
-                      <img src={permataLogo} alt="Permata" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
+                      <img src={permataLogo} alt="Permata" style={{height: 30, width: 'auto', objectFit: 'contain'}} />
                     </div>
                     <span>Permata Virtual Account</span>
                   </div>
