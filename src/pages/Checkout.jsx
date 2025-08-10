@@ -3,10 +3,10 @@ import axios from 'axios'
 import bcaLogo from '../assets/images/bca.png';
 import mandiriLogo from '../assets/images/mandiri.png';
 import gopayLogo from '../assets/images/gopay.png';
-import cimbLogo from '../assets/images/cimb.png';
 import briLogo from '../assets/images/bri.png';
 import bniLogo from '../assets/images/bni.png';
 import permataLogo from '../assets/images/permata.png';
+import niagaLogo from '../assets/images/niaga.png';
 import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../contexts/CartContext'
@@ -1796,17 +1796,17 @@ const Checkout = () => {
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Metode Pembayaran</h4>
 
          
-              <div className="payment-option" onClick={() => handlePaymentSelect('cimb')}>
+              <div className="payment-option" onClick={() => handlePaymentSelect('niaga')}>
                   <div className="payment-info">
-                    <div className="bank-logo cimb-logo">
-                      <img src={cimbLogo} alt="CIMB" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
+                    <div className="bank-logo niaga-logo">
+                      <img src={niagaLogo} alt="Niaga" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
                     </div>
                     <span>CIMB Virtual Account</span>
                   </div>
                   <input 
                     type="radio" 
                     name="payment" 
-                    checked={selectedPayment === 'cimb'}
+                    checked={selectedPayment === 'niaga'}
                     readOnly
                   />
                 </div>
