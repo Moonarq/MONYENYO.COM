@@ -1439,36 +1439,6 @@ const Checkout = () => {
                 <div className="shipping-section">
                   <h4 style={{ margin: '16px 0 8px 0', fontSize: '16px', fontWeight: '600' }}>Pilih Metode Pengiriman:</h4>
                   
-                  {/* Reguler Option */}
-                  <div className="shipping-option">
-                    <input 
-                      type="radio" 
-                      name="shipping" 
-                      value="reguler"
-                      checked={selectedShipping === 'reguler'}
-                      onChange={(e) => setSelectedShipping(e.target.value)}
-                    />
-                    <label>Reguler (Free)</label>
-                  </div>
-                  
-                  {/* Ninja Express Option */}
-                  <div className="shipping-option">
-                    <input 
-                      type="radio" 
-                      name="shipping" 
-                      value="ninja"
-                      checked={selectedShipping === 'ninja'}
-                      onChange={(e) => setSelectedShipping(e.target.value)}
-                      disabled={hasFreeShippingVoucher()}
-                    />
-                    <div className="shipping-details">
-                      <label>
-                        Ninja Xpress {hasFreeShippingVoucher() ? '(Gratis dengan voucher)' : `(Rp${shippingData.ninja.price.toLocaleString('id-ID')})`}
-                      </label>
-                      <p className="shipping-estimate">{shippingData.ninja.estimate}</p>
-                    </div>
-                  </div>
-
                   {/* ✅ Enhanced JNE Services Section with better error messaging */}
                   <div className="jne-services-section">
                     <h5 style={{ 
