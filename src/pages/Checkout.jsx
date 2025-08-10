@@ -1092,7 +1092,7 @@ const Checkout = () => {
     }
   }
 
-  // ✅ Enhanced Midtrans Payment Handler dengan JNE data integration
+  // ✅ COMPLETE FIXED handlePay function
   const handlePay = async () => {
     // ✅ Enhanced validation with shipping check
     if (!validateCheckoutData()) {
@@ -1118,8 +1118,8 @@ const Checkout = () => {
       // Get readable names for address fields
       const readableAddress = getReadableLocationNames()
 
-      // ✅ ENHANCED: Prepare comprehensive checkout data yang sesuai dengan DataPembeli model
-      const checkoutData = {
+      // ✅ PREPARE COMPLETE ORDER DATA sesuai dengan backend expectations
+      const completeOrderData = {
         // Order Info
         order_number: orderNumber,
         created_at: currentDate,
@@ -1217,9 +1217,9 @@ const Checkout = () => {
         admin_notes: null
       }
 
-      console.log('📦 Sending comprehensive checkout data to backend:', checkoutData)
+      console.log('📦 Sending comprehensive order data to backend:', completeOrderData)
 
-      // ✅ ENHANCED: Request Midtrans token dengan data lengkap untuk DataPembeli
+      // ✅ ENHANCED: Request Midtrans token dengan complete order data
       const res = await fetch('https://api.monyenyo.com/api/midtrans/token', {
         method: 'POST',
         headers: {
@@ -1230,9 +1230,13 @@ const Checkout = () => {
           'X-Order-Type': isBuyNow ? 'buy-now' : 'cart'
         },
         body: JSON.stringify({
-          // Data untuk Midtrans payment
+          // ✅ CRITICAL: Include order_number for proper backend processing
+          order_number: orderNumber,
           order_id: orderNumber,
+          
+          // Data untuk Midtrans payment
           gross_amount: calculateTotal(),
+          
           customer_details: {
             first_name: shippingAddress.name,
             last_name: '',
@@ -1259,6 +1263,7 @@ const Checkout = () => {
               country_code: 'IDN'
             }
           },
+          
           item_details: [
             // Items
             ...checkoutItems.map((item, index) => ({
@@ -1287,8 +1292,9 @@ const Checkout = () => {
               category: 'insurance'
             }] : [])
           ],
-          // ✅ CRITICAL: Sertakan data lengkap untuk disimpan ke DataPembeli
-          order_data: checkoutData
+          
+          // ✅ CRITICAL: Sertakan complete order data untuk disimpan ke DataPembeli
+          order_data: completeOrderData
         })
       });
 
@@ -1331,7 +1337,7 @@ const Checkout = () => {
                     etd_thru: selectedService.etd_thru
                   } : null
                 },
-                checkoutData: checkoutData 
+                checkoutData: completeOrderData 
               } 
             });
           },
@@ -1354,7 +1360,7 @@ const Checkout = () => {
                     etd_thru: selectedService.etd_thru
                   } : null
                 },
-                checkoutData: checkoutData 
+                checkoutData: completeOrderData 
               } 
             });
           },
@@ -2099,4 +2105,3 @@ const Checkout = () => {
 }
 
 export default Checkout;
-                    
