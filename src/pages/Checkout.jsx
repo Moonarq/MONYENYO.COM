@@ -1501,7 +1501,7 @@ const Checkout = () => {
                     />
                   </div>
 
-                  <div className="form-row form-row-three">
+                   <div className="form-row form-row-three">
                     <div className="form-group">
                       <label className="form-label">
                         Kode Pos<span className="required">*</span>
@@ -1514,6 +1514,37 @@ const Checkout = () => {
                         placeholder="Kode pos"
                       />
                     </div>
+                    
+                    <EnhancedSelect
+                      value={shippingAddress.province}
+                      onChange={(value) => handleAddressChange('province', value)}
+                      options={getProvinceOptions()}
+                      placeholder="Pilih Provinsi"
+                      label="Provinsi"
+                      required={true}
+                    />
+                    
+                    <EnhancedSelect
+                      value={shippingAddress.regency}
+                      onChange={(value) => handleAddressChange('regency', value)}
+                      options={getCityOptions()}
+                      placeholder="Pilih Kota"
+                      label="Kota"
+                      disabled={!shippingAddress.province}
+                      required={true}
+                    />
+                  </div>
+
+                  <div className="form-row">
+                    <EnhancedSelect
+                      value={shippingAddress.district}
+                      onChange={(value) => handleAddressChange('district', value)}
+                      options={getDistrictOptions()}
+                      placeholder="Pilih Kecamatan"
+                      label="Kecamatan"
+                      disabled={!shippingAddress.regency}
+                      required={true}
+                    />
                     
                     <EnhancedSelect
                       value={shippingAddress.subdistrict}
@@ -2068,3 +2099,4 @@ const Checkout = () => {
 }
 
 export default Checkout;
+                    
