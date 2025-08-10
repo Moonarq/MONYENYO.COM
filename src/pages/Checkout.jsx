@@ -1890,15 +1890,10 @@ const Checkout = () => {
                         {selectedService.service_display}
                       </small>
                     )}
-                    {/* ✅ Shipping validation indicator */}
-                    {jneServices.length > 0 && !selectedService && (
-                      <small style={{display: 'block', color: '#dc3545', fontSize: '11px'}}>
-                        ⚠ Belum dipilih
-                      </small>
-                    )}
+                   
                     {isLoadingJne && (
                       <small style={{display: 'block', color: '#6c757d', fontSize: '11px'}}>
-                        ⏳ Memuat...
+                         Memuat...
                       </small>
                     )}
                   </span>
@@ -1945,20 +1940,7 @@ const Checkout = () => {
                    'Bayar Sekarang'}
                 </button>
                 
-                {/* ✅ Validation warnings */}
-                {jneServices.length > 0 && !selectedService && (
-                  <div style={{ 
-                    color: '#dc3545', 
-                    fontSize: '12px', 
-                    textAlign: 'center',
-                    marginTop: '8px',
-                    padding: '4px 8px',
-                    backgroundColor: '#f8d7da',
-                    borderRadius: '4px'
-                  }}>
-                    ⚠️ Silakan pilih layanan pengiriman JNE terlebih dahulu
-                  </div>
-                )}
+              
                 
                 {isLoadingJne && (
                   <div style={{ 
