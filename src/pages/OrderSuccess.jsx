@@ -7,20 +7,113 @@ const OrderSuccess = () => {
   const navigate = useNavigate()
   const [copied, setCopied] = useState(false)
   
-  // Get data from checkout redirect
+  // ✅ FIXED: Better data extraction with safer fallbacks
   const orderData = location.state?.orderData
   const checkoutData = location.state?.checkoutData
 
-  // Redirect if no order data
+  // ✅ Enhanced debug logging
   useEffect(() => {
-    if (!orderData || !checkoutData) {
-      navigate('/', { replace: true })
+    console.log('OrderSuccess - Full location.state:', location.state)
+    console.log('OrderSuccess - orderData:', orderData)
+    console.log('OrderSuccess - checkoutData:', checkoutData)
+    
+    // Log specific fields that might be missing
+    if (orderData) {
+      console.log('OrderSuccess - orderData.va_number:', orderData.va_number)
+      console.log('OrderSuccess - orderData.grand_total:', orderData.grand_total)
     }
-  }, [orderData, checkoutData, navigate])
+    
+    if (checkoutData) {
+      console.log('OrderSuccess - checkoutData.items:', checkoutData.items)
+      console.log('OrderSuccess - checkoutData.totals:', checkoutData.totals)
+    }
+  }, [orderData, checkoutData, location.state])
 
-  if (!orderData || !checkoutData) {
-    return null
+  // ✅ FIXED: More lenient validation - only redirect if absolutely no data
+  useEffect(() => {
+    // Give some time for state to settle before checking
+    const timeoutId = setTimeout(() => {
+      if (!location.state || (!orderData && !checkoutData)) {
+        console.warn('Missing all order and checkout data, redirecting to home')
+        navigate('/', { replace: true })
+      } else if (!orderData) {
+        console.warn('Missing orderData but checkoutData exists, continuing...')
+      } else if (!checkoutData) {
+        console.warn('Missing checkoutData but orderData exists, continuing...')
+      }
+    }, 100) // Small delay to allow state to settle
+
+    return () => clearTimeout(timeoutId)
+  }, [orderData, checkoutData, navigate, location.state])
+
+  // ✅ FIXED: Better loading state - show loading for longer while we have partial data
+  if (!location.state) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f8f9fa'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '18px', marginBottom: '10px' }}>Loading...</div>
+          <div style={{ fontSize: '14px', color: '#666' }}>Memuat data pesanan...</div>
+        </div>
+      </div>
+    )
   }
+
+  // ✅ ENHANCED: Much safer data access with comprehensive fallbacks
+  const safeOrderData = {
+    order_number: orderData?.order_number || 'N/A',
+    grand_total: orderData?.grand_total || checkoutData?.totals?.grandTotal || 0,
+    status: orderData?.status || 'pending',
+    created_at: orderData?.created_at || new Date().toISOString(),
+    va_number: orderData?.va_number || null,
+    name: orderData?.name || checkoutData?.shippingAddress?.name || 'N/A',
+    phone: orderData?.phone || checkoutData?.shippingAddress?.phone || 'N/A',
+    address: orderData?.address || checkoutData?.shippingAddress?.address || 'N/A',
+    district: orderData?.district || checkoutData?.shippingAddress?.district || 'N/A',
+    regency: orderData?.regency || checkoutData?.shippingAddress?.regency || 'N/A',
+    province: orderData?.province || checkoutData?.shippingAddress?.province || 'N/A',
+    zip_code: orderData?.zip_code || checkoutData?.shippingAddress?.zipCode || 'N/A',
+    jne_service: orderData?.jne_service || null
+  }
+
+  const safeCheckoutData = {
+    items: checkoutData?.items || [],
+    totals: {
+      subtotalBeforeVoucher: checkoutData?.totals?.subtotalBeforeVoucher || 0,
+      totalVoucherDiscount: checkoutData?.totals?.totalVoucherDiscount || 0,
+      shippingCost: checkoutData?.totals?.shippingCost || 0,
+      finalTotal: checkoutData?.totals?.finalTotal || 0,
+      grandTotal: checkoutData?.totals?.grandTotal || safeOrderData.grand_total || 0
+    },
+    shippingAddress: {
+      name: checkoutData?.shippingAddress?.name || safeOrderData.name || 'N/A',
+      email: checkoutData?.shippingAddress?.email || 'N/A',
+      phone: checkoutData?.shippingAddress?.phone || safeOrderData.phone || 'N/A',
+      address: checkoutData?.shippingAddress?.address || safeOrderData.address || 'N/A',
+      district: checkoutData?.shippingAddress?.district || safeOrderData.district || 'N/A',
+      regency: checkoutData?.shippingAddress?.regency || safeOrderData.regency || 'N/A',
+      province: checkoutData?.shippingAddress?.province || safeOrderData.province || 'N/A',
+      zipCode: checkoutData?.shippingAddress?.zipCode || safeOrderData.zip_code || 'N/A'
+    },
+    paymentMethod: checkoutData?.paymentMethod || 'bca',
+    useInsurance: checkoutData?.useInsurance ?? false,
+    insuranceCost: checkoutData?.insuranceCost || 0,
+    selectedShipping: checkoutData?.selectedShipping || 'reguler',
+    selectedService: checkoutData?.selectedService || safeOrderData.jne_service || null,
+    notes: checkoutData?.notes || null,
+    vouchers: checkoutData?.vouchers || {}
+  }
+
+  // ✅ Enhanced debug logging for processed data
+  useEffect(() => {
+    console.log('OrderSuccess - Processed safeOrderData:', safeOrderData)
+    console.log('OrderSuccess - Processed safeCheckoutData:', safeCheckoutData)
+  }, [])
 
   // Payment method names mapping
   const paymentMethodNames = {
@@ -28,17 +121,38 @@ const OrderSuccess = () => {
     mandiri: 'Mandiri Virtual Account', 
     bri: 'BRI Virtual Account',
     alfamart: 'Alfamart / Alfamidi / Lawson',
-    gopay: 'GoPay'
+    gopay: 'GoPay',
+    ovo: 'OVO',
+    dana: 'DANA'
   }
 
   // Copy VA number to clipboard
   const copyVANumber = async () => {
     try {
-      await navigator.clipboard.writeText(orderData.va_number)
+      if (!safeOrderData.va_number) {
+        console.warn('No VA number to copy')
+        return
+      }
+      await navigator.clipboard.writeText(safeOrderData.va_number)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
       console.error('Failed to copy: ', err)
+      // Fallback untuk browser yang tidak support clipboard API
+      try {
+        const textArea = document.createElement('textarea')
+        textArea.value = safeOrderData.va_number
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      } catch (fallbackErr) {
+        console.error('Fallback copy also failed:', fallbackErr)
+        // Show manual copy instruction
+        alert(`Silakan salin nomor VA secara manual: ${safeOrderData.va_number}`)
+      }
     }
   }
 
@@ -105,11 +219,12 @@ const OrderSuccess = () => {
   }
 
   const formatCurrency = (amount) => {
+    const numAmount = typeof amount === 'number' ? amount : parseFloat(amount || 0)
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
       minimumFractionDigits: 0
-    }).format(amount)
+    }).format(numAmount)
   }
 
   // Check if mobile screen
@@ -123,6 +238,7 @@ const OrderSuccess = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // ✅ ENHANCED: Better responsive styling
   const containerStyle = {
     minHeight: '100vh',
     backgroundColor: '#f8f9fa',
@@ -196,6 +312,20 @@ const OrderSuccess = () => {
             <p style={{ margin: '0', color: '#666', fontSize: '0.95rem' }}>
               Silakan selesaikan pembayaran dalam 24 jam
             </p>
+            {/* ✅ Show order number prominently */}
+            <p style={{ 
+              margin: '0.5rem 0 0', 
+              color: '#333', 
+              fontSize: '0.9rem',
+              fontFamily: 'monospace',
+              fontWeight: '600',
+              backgroundColor: '#f8f9fa',
+              padding: '0.5rem',
+              borderRadius: '4px',
+              display: 'inline-block'
+            }}>
+              Order: {safeOrderData.order_number}
+            </p>
           </div>
 
           <div style={isMobile ? mobileStackStyle : desktopGridStyle}>
@@ -211,69 +341,87 @@ const OrderSuccess = () => {
                   Metode Pembayaran
                 </div>
                 <div style={{ fontSize: '0.95rem', fontWeight: '500', color: '#333' }}>
-                  {paymentMethodNames[checkoutData.paymentMethod]}
+                  {paymentMethodNames[safeCheckoutData.paymentMethod] || 'Unknown Payment Method'}
                 </div>
               </div>
 
-              <div style={{ marginBottom: '1.25rem' }}>
-                <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.4rem' }}>
-                  {checkoutData.paymentMethod === 'alfamart' ? 'Kode Pembayaran' : 'Nomor Virtual Account'}
-                </div>
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '0.75rem', 
-                  padding: '0.75rem', 
-                  backgroundColor: '#f8f9fa', 
-                  borderRadius: '6px',
-                  border: '1px solid #e9ecef',
-                  ...(isMobile && {
-                    flexDirection: 'column',
-                    alignItems: 'stretch',
-                    gap: '0.75rem'
-                  })
-                }}>
-                  <span style={{ 
-                    fontFamily: 'monospace', 
-                    fontSize: isMobile ? '0.95rem' : '1rem', 
-                    fontWeight: '600', 
-                    flex: 1,
-                    color: '#333',
+              {/* ✅ FIXED: Better VA number handling */}
+              {safeOrderData.va_number && (
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.4rem' }}>
+                    {safeCheckoutData.paymentMethod === 'alfamart' ? 'Kode Pembayaran' : 'Nomor Virtual Account'}
+                  </div>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.75rem', 
+                    padding: '0.75rem', 
+                    backgroundColor: '#f8f9fa', 
+                    borderRadius: '6px',
+                    border: '1px solid #e9ecef',
                     ...(isMobile && {
-                      textAlign: 'center',
-                      wordBreak: 'break-all'
+                      flexDirection: 'column',
+                      alignItems: 'stretch',
+                      gap: '0.75rem'
                     })
                   }}>
-                    {orderData.va_number}
-                  </span>
-                  <button 
-                    onClick={copyVANumber}
-                    style={{
-                      padding: '0.4rem 0.8rem',
-                      backgroundColor: copied ? '#28a745' : '#212529',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      fontSize: '0.8rem',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s',
+                    <span style={{ 
+                      fontFamily: 'monospace', 
+                      fontSize: isMobile ? '0.95rem' : '1rem', 
+                      fontWeight: '600', 
+                      flex: 1,
+                      color: '#333',
                       ...(isMobile && {
-                        alignSelf: 'center',
-                        width: 'fit-content'
+                        textAlign: 'center',
+                        wordBreak: 'break-all'
                       })
-                    }}
-                  >
-                    {copied ? '✔ Tersalin' : 'Salin'}
+                    }}>
+                      {safeOrderData.va_number}
+                    </span>
+                    <button 
+                      onClick={copyVANumber}
+                      style={{
+                        padding: '0.4rem 0.8rem',
+                        backgroundColor: copied ? '#28a745' : '#212529',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s',
+                        ...(isMobile && {
+                          alignSelf: 'center',
+                          width: 'fit-content'
+                        })
+                      }}
+                    >
+                      {copied ? '✔ Tersalin' : 'Salin'}
                     </button>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* ✅ Show message if no VA number yet */}
+              {!safeOrderData.va_number && (
+                <div style={{
+                  marginBottom: '1.25rem',
+                  padding: '1rem',
+                  backgroundColor: '#fff3cd',
+                  borderRadius: '6px',
+                  border: '1px solid #ffeaa7'
+                }}>
+                  <div style={{ fontSize: '0.85rem', color: '#856404' }}>
+                    Nomor pembayaran sedang diproses dan akan dikirim via email/SMS dalam beberapa menit.
+                  </div>
+                </div>
+              )}
 
               <div style={{ marginBottom: '1.25rem' }}>
                 <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.4rem' }}>
                   Total Pembayaran
                 </div>
                 <div style={{ fontSize: isMobile ? '1.25rem' : '1.4rem', fontWeight: '700', color: '#28a745' }}>
-                  {formatCurrency(orderData.grand_total)}
+                  {formatCurrency(safeOrderData.grand_total)}
                 </div>
               </div>
 
@@ -297,26 +445,26 @@ const OrderSuccess = () => {
                   Cara Pembayaran
                 </h4>
                 
-             <ul style={{
-                marginBottom: '1rem',
-                padding: '1rem',
-                backgroundColor: '#f9f9f9',
-                borderRadius: '12px',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-                listStyleType: 'disc',
-                paddingLeft: '1.25rem'
-              }}>
-                {getPaymentInstructions(checkoutData.paymentMethod).map((instruction, index) => (
-                  <li key={index} style={{
-                    color: '#444',
-                    fontSize: isMobile ? '0.85rem' : '0.95rem',
-                    lineHeight: '1.6',
-                    marginBottom: '0.75rem'
-                  }}>
-                    {instruction}
-                  </li>
-                ))}
-              </ul>
+                <ul style={{
+                  marginBottom: '1rem',
+                  padding: '1rem',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                  listStyleType: 'disc',
+                  paddingLeft: '1.25rem'
+                }}>
+                  {getPaymentInstructions(safeCheckoutData.paymentMethod).map((instruction, index) => (
+                    <li key={index} style={{
+                      color: '#444',
+                      fontSize: isMobile ? '0.85rem' : '0.95rem',
+                      lineHeight: '1.6',
+                      marginBottom: '0.75rem'
+                    }}>
+                      {instruction}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
 
@@ -334,66 +482,105 @@ const OrderSuccess = () => {
                     fontFamily: 'monospace', 
                     fontSize: isMobile ? '0.8rem' : '0.9rem' 
                   }}>
-                    {orderData.order_number}
+                    {safeOrderData.order_number}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: '#666', fontSize: isMobile ? '0.8rem' : '0.9rem' }}>Jumlah Item</span>
-                  <span style={{ fontSize: isMobile ? '0.8rem' : '0.9rem' }}>{checkoutData.items.length} produk</span>
+                  <span style={{ fontSize: isMobile ? '0.8rem' : '0.9rem' }}>
+                    {safeCheckoutData.items.length} produk
+                  </span>
                 </div>
               </div>
 
+              {/* ✅ FIXED: Better item display with fallback */}
               <div style={{ borderTop: '1px solid #e9ecef', paddingTop: '1rem' }}>
-                {checkoutData.items.map((item, index) => (
-                  <div key={index} style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: isMobile ? 'flex-start' : 'flex-start',
-                    padding: '0.75rem 0',
-                    borderBottom: index < checkoutData.items.length - 1 ? '1px solid #f8f9fa' : 'none',
-                    ...(isMobile && {
-                      flexDirection: 'column',
-                      gap: '0.5rem'
-                    })
-                  }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: '500', marginBottom: '0.25rem', fontSize: '0.9rem' }}>{item.name}</div>
-                      {item.sku && <div style={{ fontSize: '0.8rem', color: '#666' }}>SKU: {item.sku}</div>}
-                    </div>
-                    <div style={{ 
-                      marginLeft: isMobile ? '0' : '1rem', 
-                      textAlign: 'right', 
-                      minWidth: '80px',
+                {safeCheckoutData.items.length > 0 ? (
+                  safeCheckoutData.items.map((item, index) => (
+                    <div key={index} style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: isMobile ? 'flex-start' : 'flex-start',
+                      padding: '0.75rem 0',
+                      borderBottom: index < safeCheckoutData.items.length - 1 ? '1px solid #f8f9fa' : 'none',
                       ...(isMobile && {
-                        alignSelf: 'flex-end'
+                        flexDirection: 'column',
+                        gap: '0.5rem'
                       })
                     }}>
-                      <div style={{ fontSize: '0.8rem', color: '#666' }}>×{item.quantity}</div>
-                      <div style={{ fontWeight: '600', fontSize: isMobile ? '0.85rem' : '0.9rem' }}>
-                        {formatCurrency(item.price * item.quantity)}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: '500', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
+                          {item.name || 'Produk'}
+                        </div>
+                        {item.sku && <div style={{ fontSize: '0.8rem', color: '#666' }}>SKU: {item.sku}</div>}
+                      </div>
+                      <div style={{ 
+                        marginLeft: isMobile ? '0' : '1rem', 
+                        textAlign: 'right', 
+                        minWidth: '80px',
+                        ...(isMobile && {
+                          alignSelf: 'flex-end'
+                        })
+                      }}>
+                        <div style={{ fontSize: '0.8rem', color: '#666' }}>×{item.quantity || 1}</div>
+                        <div style={{ fontWeight: '600', fontSize: isMobile ? '0.85rem' : '0.9rem' }}>
+                          {formatCurrency((item.price || 0) * (item.quantity || 1))}
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div style={{ 
+                    textAlign: 'center', 
+                    color: '#666', 
+                    fontSize: '0.9rem',
+                    padding: '1rem'
+                  }}>
+                    Detail item sedang dimuat...
                   </div>
-                ))}
+                )}
               </div>
 
+              {/* ✅ ENHANCED: Better totals display */}
               <div style={{ borderTop: '1px solid #e9ecef', paddingTop: '1rem', marginTop: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
                   <span style={{ fontSize: '0.9rem' }}>Subtotal</span>
-                  <span style={{ fontSize: '0.9rem' }}>{formatCurrency(checkoutData.totals.subtotalBeforeVoucher)}</span>
+                  <span style={{ fontSize: '0.9rem' }}>
+                    {formatCurrency(safeCheckoutData.totals.subtotalBeforeVoucher)}
+                  </span>
                 </div>
                 
-                {checkoutData.totals.totalVoucherDiscount > 0 && (
+                {safeCheckoutData.totals.totalVoucherDiscount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', color: '#28a745' }}>
                     <span style={{ fontSize: '0.9rem' }}>Diskon Voucher</span>
-                    <span style={{ fontSize: '0.9rem' }}>-{formatCurrency(checkoutData.totals.totalVoucherDiscount)}</span>
+                    <span style={{ fontSize: '0.9rem' }}>
+                      -{formatCurrency(safeCheckoutData.totals.totalVoucherDiscount)}
+                    </span>
                   </div>
                 )}
 
-                {checkoutData.totals.shippingCost > 0 && (
+                {safeCheckoutData.totals.shippingCost > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                    <span style={{ fontSize: '0.9rem' }}>Ongkos Kirim</span>
-                    <span style={{ fontSize: '0.9rem' }}>{formatCurrency(checkoutData.totals.shippingCost)}</span>
+                    <span style={{ fontSize: '0.9rem' }}>
+                      Ongkos Kirim
+                      {safeCheckoutData.selectedService && (
+                        <div style={{ fontSize: '0.75rem', color: '#666' }}>
+                          {safeCheckoutData.selectedService.service_display}
+                        </div>
+                      )}
+                    </span>
+                    <span style={{ fontSize: '0.9rem' }}>
+                      {formatCurrency(safeCheckoutData.totals.shippingCost)}
+                    </span>
+                  </div>
+                )}
+
+                {safeCheckoutData.useInsurance && safeCheckoutData.insuranceCost > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                    <span style={{ fontSize: '0.9rem' }}>Asuransi</span>
+                    <span style={{ fontSize: '0.9rem' }}>
+                      {formatCurrency(safeCheckoutData.insuranceCost)}
+                    </span>
                   </div>
                 )}
 
@@ -407,7 +594,7 @@ const OrderSuccess = () => {
                   marginTop: '0.6rem'
                 }}>
                   <span>Total</span>
-                  <span>{formatCurrency(orderData.grand_total)}</span>
+                  <span>{formatCurrency(safeOrderData.grand_total)}</span>
                 </div>
               </div>
 
@@ -417,93 +604,118 @@ const OrderSuccess = () => {
                   Alamat Pengiriman
                 </h4>
                 <div style={{ fontSize: '0.9rem', lineHeight: '1.4', color: '#555' }}>
-                  <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>{checkoutData.shippingAddress.name}</div>
-                  <div style={{ marginBottom: '0.25rem' }}>{checkoutData.shippingAddress.phone}</div>
+                  <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>
+                    {safeCheckoutData.shippingAddress.name}
+                  </div>
+                  {safeCheckoutData.shippingAddress.phone && (
+                    <div style={{ marginBottom: '0.25rem' }}>
+                      {safeCheckoutData.shippingAddress.phone}
+                    </div>
+                  )}
                   <div>
-                    {checkoutData.shippingAddress.address}<br />
-                    {checkoutData.shippingAddress.district}, {checkoutData.shippingAddress.regency}<br />
-                    {checkoutData.shippingAddress.province} {checkoutData.shippingAddress.zipCode}
+                    {safeCheckoutData.shippingAddress.address}<br />
+                    {safeCheckoutData.shippingAddress.district}, {safeCheckoutData.shippingAddress.regency}<br />
+                    {safeCheckoutData.shippingAddress.province} {safeCheckoutData.shippingAddress.zipCode}
                   </div>
                 </div>
               </div>
+
+              {/* ✅ Show notes if any */}
+              {safeCheckoutData.notes && (
+                <div style={{ marginTop: '1.5rem' }}>
+                  <h4 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: '600', color: '#333' }}>
+                    Catatan
+                  </h4>
+                  <div style={{ 
+                    fontSize: '0.9rem', 
+                    lineHeight: '1.4', 
+                    color: '#555',
+                    backgroundColor: '#f8f9fa',
+                    padding: '0.75rem',
+                    borderRadius: '6px',
+                    fontStyle: 'italic'
+                  }}>
+                    "{safeCheckoutData.notes}"
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>
 
           {/* Action Buttons */}
-        <div style={{ 
-  display: 'flex', 
-  gap: '1rem', 
-  justifyContent: 'center',
-  marginTop: isMobile ? '1.5rem' : '2rem',
-  flexWrap: 'wrap',
-  flexDirection: isMobile ? 'column' : 'row',
-}}>
-  {/* Tombol Lanjut Belanja */}
-  <button 
-    onClick={() => navigate('/menu')}
-    style={{
-      padding: '0.75rem 2rem',
-      backgroundColor: '#7a3e14',
-      color: '#fff',
-      border: '1px solid #7a3e14',
-      borderRadius: '8px',
-      fontSize: isMobile ? '0.9rem' : '0.95rem',
-      fontWeight: 600,
-      cursor: 'pointer',
-      minWidth: '140px',
-      width: isMobile ? '100%' : 'auto',
-      transition: 'all 0.25s ease-in-out',
-      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-    }}
-    onMouseEnter={(e) => {
-      e.target.style.backgroundColor = '#5f2d0f';
-      e.target.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
-      e.target.style.transform = 'translateY(-1px)';
-    }}
-    onMouseLeave={(e) => {
-      e.target.style.backgroundColor = '#7a3e14';
-      e.target.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
-      e.target.style.transform = 'translateY(0)';
-    }}
-  >
-    Lanjut Belanja
-  </button>
+          <div style={{ 
+            display: 'flex', 
+            gap: '1rem', 
+            justifyContent: 'center',
+            marginTop: isMobile ? '1.5rem' : '2rem',
+            flexWrap: 'wrap',
+            flexDirection: isMobile ? 'column' : 'row',
+          }}>
+            {/* Tombol Lanjut Belanja */}
+            <button 
+              onClick={() => navigate('/menu')}
+              style={{
+                padding: '0.75rem 2rem',
+                backgroundColor: '#7a3e14',
+                color: '#fff',
+                border: '1px solid #7a3e14',
+                borderRadius: '8px',
+                fontSize: isMobile ? '0.9rem' : '0.95rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                minWidth: '140px',
+                width: isMobile ? '100%' : 'auto',
+                transition: 'all 0.25s ease-in-out',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#5f2d0f';
+                e.target.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#7a3e14';
+                e.target.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
+                e.target.style.transform = 'translateY(0)';
+              }}
+            >
+              Lanjut Belanja
+            </button>
 
-  {/* Tombol Lacak Pesanan */}
-  <button 
-    onClick={() => alert('Fitur tracking akan segera hadir!')}
-    style={{
-      padding: '0.75rem 2rem',
-      backgroundColor: '#ffffff',
-      color: '#7a3e14',
-      border: '1.5px solid #7a3e14',
-      borderRadius: '8px',
-      fontSize: isMobile ? '0.9rem' : '0.95rem',
-      fontWeight: 600,
-      cursor: 'pointer',
-      minWidth: '140px',
-      width: isMobile ? '100%' : 'auto',
-      transition: 'all 0.25s ease-in-out',
-      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
-    }}
-    onMouseEnter={(e) => {
-      e.target.style.backgroundColor = '#7a3e14';
-      e.target.style.color = '#ffffff';
-      e.target.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
-      e.target.style.transform = 'translateY(-1px)';
-    }}
-    onMouseLeave={(e) => {
-      e.target.style.backgroundColor = '#ffffff';
-      e.target.style.color = '#7a3e14';
-      e.target.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.08)';
-      e.target.style.transform = 'translateY(0)';
-    }}
-  >
-    Lacak Pesanan
-  </button>
-</div>
-
+            {/* Tombol Lacak Pesanan */}
+            <button 
+              onClick={() => alert('Fitur tracking akan segera hadir!')}
+              style={{
+                padding: '0.75rem 2rem',
+                backgroundColor: '#ffffff',
+                color: '#7a3e14',
+                border: '1.5px solid #7a3e14',
+                borderRadius: '8px',
+                fontSize: isMobile ? '0.9rem' : '0.95rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                minWidth: '140px',
+                width: isMobile ? '100%' : 'auto',
+                transition: 'all 0.25s ease-in-out',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#7a3e14';
+                e.target.style.color = '#ffffff';
+                e.target.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#ffffff';
+                e.target.style.color = '#7a3e14';
+                e.target.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.08)';
+                e.target.style.transform = 'translateY(0)';
+              }}
+            >
+              Lacak Pesanan
+            </button>
+          </div>
 
         </div>
       </div>
