@@ -1793,21 +1793,7 @@ const Checkout = () => {
               <div className="payment-section">
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Metode Pembayaran</h4>
                 
-                <div className="payment-option" onClick={() => handlePaymentSelect('bni')}>
-                  <div className="payment-info">
-                    <div className="bank-logo bni-logo">
-                      <img src={bniLogo} alt="BNI" style={{height: 30, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>BNI Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'bni'}
-                    readOnly
-                  />
-                </div>
-
+              
                 <div className="payment-option" onClick={() => handlePaymentSelect('mandiri')}>
                   <div className="payment-info">
                     <div className="bank-logo mandiri-logo">
@@ -1822,7 +1808,6 @@ const Checkout = () => {
                     readOnly
                   />
                 </div>
-
                 <div className="payment-option" onClick={() => handlePaymentSelect('bri')}>
                   <div className="payment-info">
                     <div className="bank-logo bri-logo">
