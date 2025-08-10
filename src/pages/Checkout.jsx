@@ -1915,12 +1915,7 @@ const Checkout = () => {
                   <span>Total Asuransi Pengiriman</span>
                   <span>Rp{(useInsurance ? calculateInsuranceCost() : 0).toLocaleString('id-ID')}</span>
                 </div>
-                
-                <div className="price-row expandable">
-                  <span>Total Lainnya ˅</span>
-                  <span></span>
-                </div>
-                
+
                 <div className="total-row">
                   <strong>Total Tagihan</strong>
                   <strong>Rp{calculateTotal().toLocaleString('id-ID')}</strong>
