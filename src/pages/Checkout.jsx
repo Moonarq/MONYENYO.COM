@@ -306,7 +306,7 @@ const Checkout = () => {
       return;
     }
 
-    console.log('🚚 Fetching JNE services for:', { destinationCode, weight });
+    console.log(' Fetching JNE services for:', { destinationCode, weight });
     
     const currentRequest = { cancelled: false };
     currentRequestRef.current = currentRequest;
@@ -1555,7 +1555,7 @@ const Checkout = () => {
                             />
                             <div className="shipping-details">
                               <label style={{ fontWeight: '500', cursor: 'pointer' }}>
-                                🚚 {service.service_display} - {hasFreeShippingVoucher() ? 
+                                {service.service_display} - {hasFreeShippingVoucher() ? 
                                   <span style={{ color: '#28a745', fontWeight: 'bold' }}>Gratis dengan voucher ✨</span> : 
                                   <span style={{ color: '#007bff', fontWeight: 'bold' }}>Rp{parseInt(service.price).toLocaleString('id-ID')}</span>
                                 }
