@@ -6,6 +6,8 @@ import gopayLogo from '../assets/images/gopay.png';
 import alfamartLogo from '../assets/images/alfamart.png';
 import briLogo from '../assets/images/bri.png';
 import bniLogo from '../assets/images/bni.png';
+import cimbLogo from '../assets/images/cimb.png';
+import permataLogo from '../assets/images/permata.png';
 import { Helmet } from 'react-helmet-async'
 import { useLanguage } from '../hooks/useLanguage'
 import { useCart } from '../contexts/CartContext'
@@ -1793,6 +1795,22 @@ const Checkout = () => {
               {/* Payment Methods */}
               <div className="payment-section">
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Metode Pembayaran</h4>
+
+                   
+              <div className="payment-option" onClick={() => handlePaymentSelect('permata')}>
+                  <div className="payment-info">
+                    <div className="bank-logo permata-logo">
+                      <img src={permataLogo} alt="Permata" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
+                    </div>
+                    <span>Permata Virtual Account</span>
+                  </div>
+                  <input 
+                    type="radio" 
+                    name="payment" 
+                    checked={selectedPayment === 'permata'}
+                    readOnly
+                  />
+                </div>
                 
               <div className="payment-option" onClick={() => handlePaymentSelect('bni')}>
                   <div className="payment-info">
@@ -1838,20 +1856,6 @@ const Checkout = () => {
                   />
                 </div>
 
-                <div className="payment-option" onClick={() => handlePaymentSelect('alfamart')}>
-                  <div className="payment-info">
-                    <div className="bank-logo alfamart-logo">
-                      <img src={alfamartLogo} alt="Alfamart" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>Alfamart / Alfamidi / Lawson</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'alfamart'}
-                    readOnly
-                  />
-                </div>
 
                 <div className="payment-option" onClick={() => handlePaymentSelect('gopay')}>
                   <div className="payment-info">
