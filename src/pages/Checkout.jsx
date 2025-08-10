@@ -1797,7 +1797,7 @@ const Checkout = () => {
               <div className="payment-option" onClick={() => handlePaymentSelect('bni')}>
                   <div className="payment-info">
                     <div className="bank-logo bni-logo">
-                      <img src={bniLogo} alt="BNI" style={{height: 30, width: 'auto', objectFit: 'contain'}} />
+                      <img src={bniLogo} alt="BNI" style={{height: 40, width: 'auto', objectFit: 'contain'}} />
                     </div>
                     <span>BNI Virtual Account</span>
                   </div>
