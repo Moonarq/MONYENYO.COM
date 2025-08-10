@@ -1524,13 +1524,7 @@ const Checkout = () => {
                           animation: 'spin 1s linear infinite'
                         }} />
                       )}
-                      {/* ✅ Validation indicator */}
-                      {jneServices.length > 0 && selectedService && (
-                        <span style={{ color: '#28a745', fontSize: '12px' }}>✓ Dipilih</span>
-                      )}
-                      {jneServices.length > 0 && !selectedService && (
-                        <span style={{ color: '#dc3545', fontSize: '12px' }}>⚠ Belum dipilih</span>
-                      )}
+                 
                     </h5>
                     
                     {/* Debug Info - Remove in production */}
@@ -1551,7 +1545,7 @@ const Checkout = () => {
                         margin: '8px 0',
                         textAlign: 'center'
                       }}>
-                        <span>⏳ Memuat layanan JNE...</span>
+                        <span> Memuat layanan JNE...</span>
                       </div>
                     )}
                     
@@ -1568,7 +1562,7 @@ const Checkout = () => {
                         ⚠️ {jneError}
                         {jneError.includes('CORS') && (
                           <div style={{ fontSize: '12px', marginTop: '4px' }}>
-                            💡 Tips: Coba refresh halaman atau gunakan browser yang berbeda
+                             Tips: Coba refresh halaman atau gunakan browser yang berbeda
                           </div>
                         )}
                       </div>
@@ -1576,20 +1570,7 @@ const Checkout = () => {
                     
                     {!isLoadingJne && !jneError && jneServices.length > 0 && (
                       <>
-                        {/* ✅ Selection prompt */}
-                        {!selectedService && (
-                          <div style={{ 
-                            color: '#dc3545', 
-                            fontSize: '14px', 
-                            margin: '8px 0',
-                            padding: '8px 12px',
-                            backgroundColor: '#fff3cd',
-                            border: '1px solid #ffeeba',
-                            borderRadius: '4px'
-                          }}>
-                            ⚠️ Silakan pilih salah satu layanan JNE di bawah ini untuk melanjutkan
-                          </div>
-                        )}
+                        
                         
                         <div className="jne-services-list">
                           {jneServices.map((service, idx) => (
