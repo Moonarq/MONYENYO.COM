@@ -1077,7 +1077,22 @@ const Checkout = () => {
     return true
   }
 
-  // ✅ Midtrans Payment Handler with enhanced validation
+  // ✅ Helper function untuk mengkonversi nama kunci menjadi nama lengkap
+  const getReadableLocationNames = () => {
+    const province = addressData.provinces[shippingAddress.province]?.name || shippingAddress.province
+    const city = province && addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.name || shippingAddress.regency
+    const district = city && addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.districts[shippingAddress.district]?.name || shippingAddress.district
+    const subdistrict = shippingAddress.subdistrict
+
+    return {
+      province,
+      city,
+      district,
+      subdistrict
+    }
+  }
+
+  // ✅ Enhanced Midtrans Payment Handler dengan JNE data integration
   const handlePay = async () => {
     // ✅ Enhanced validation with shipping check
     if (!validateCheckoutData()) {
@@ -1101,111 +1116,187 @@ const Checkout = () => {
       const currentDate = new Date().toISOString()
 
       // Get readable names for address fields
-      const getReadableAddress = () => {
-        const province = addressData.provinces[shippingAddress.province]?.name || shippingAddress.province
-        const city = province ? addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.name || shippingAddress.regency : shippingAddress.regency
-        const district = city ? addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.districts[shippingAddress.district]?.name || shippingAddress.district : shippingAddress.district
-        const subdistrict = shippingAddress.subdistrict
+      const readableAddress = getReadableLocationNames()
 
-        return {
-          province,
-          city,
-          district,
-          subdistrict
-        }
-      }
-
-      const readableAddress = getReadableAddress()
-
-      // ✅ Prepare checkout data dengan email field dan JNE service info
+      // ✅ ENHANCED: Prepare comprehensive checkout data yang sesuai dengan DataPembeli model
       const checkoutData = {
         // Order Info
         order_number: orderNumber,
         created_at: currentDate,
         
-        // ✅ Shipping Address dengan email
-        shippingAddress: {
-          name: shippingAddress.name,
-          email: shippingAddress.email,
-          phone: shippingAddress.phone,
-          country: shippingAddress.country,
-          address: shippingAddress.address,
-          zipCode: shippingAddress.zipCode,
-          province: readableAddress.province,
-          regency: readableAddress.city,
-          district: readableAddress.district,
-          subdistrict: readableAddress.subdistrict
-        },
+        // ✅ Customer Information (sesuai dengan fillable fields)
+        name: shippingAddress.name,
+        email: shippingAddress.email,
+        phone: shippingAddress.phone,
+        country: shippingAddress.country,
+        address: shippingAddress.address,
+        zip_code: shippingAddress.zipCode,
         
-        // Payment Method
-        paymentMethod: selectedPayment,
+        // ✅ Location dengan nama yang readable
+        province: readableAddress.province,
+        regency: readableAddress.city,
+        district: readableAddress.district,
+        subdistrict: readableAddress.subdistrict,
         
-        // ✅ Enhanced Shipping Info dengan JNE service
-        shipping: {
-          method: selectedShipping,
-          cost: getShippingCost(),
-          isFree: hasFreeShippingVoucher(),
-          jneService: selectedService ? {
-            service_code: selectedService.service_code,
-            service_display: selectedService.service_display,
-            price: selectedService.price,
-            etd_from: selectedService.etd_from,
-            etd_thru: selectedService.etd_thru
-          } : null
-        },
+        // ✅ Payment & Shipping Methods
+        payment_method: selectedPayment,
+        shipping_method: selectedShipping,
+        shipping_cost: getShippingCost(),
+        is_shipping_free: hasFreeShippingVoucher(),
         
-        // Insurance
-        insurance: {
-          selected: useInsurance,
-          cost: useInsurance ? calculateInsuranceCost() : 0
-        },
+        // ✅ JNE Service Details (akan null jika bukan JNE)
+        jne_service_code: selectedService?.service_code || null,
+        jne_service_display: selectedService?.service_display || null,
+        jne_price: selectedService ? parseInt(selectedService.price) : null,
+        jne_etd_from: selectedService?.etd_from || null,
+        jne_etd_thru: selectedService?.etd_thru || null,
         
-        // Items
+        // ✅ Insurance
+        use_insurance: useInsurance,
+        insurance_cost: useInsurance ? calculateInsuranceCost() : 0,
+        
+        // ✅ Notes
+        notes: notes || null,
+        
+        // ✅ Items (as JSON array sesuai dengan cast di model)
         items: checkoutItems.map(item => ({
           id: item.id,
           name: item.name,
-          price: item.price,
-          quantity: item.quantity,
+          price: parseFloat(item.price),
+          quantity: parseInt(item.quantity),
           sku: item.sku || null
         })),
         
-        // Vouchers
+        // ✅ Vouchers (as JSON object sesuai dengan cast di model)
         vouchers: isBuyNow ? {
-          primary: primaryVoucher,
-          secondary: secondaryVoucher
+          type: 'buy_now',
+          primary: primaryVoucher ? {
+            id: primaryVoucher.id,
+            name: primaryVoucher.name,
+            type: primaryVoucher.type,
+            value: primaryVoucher.value,
+            discount_amount: primaryVoucherDiscount
+          } : null,
+          secondary: secondaryVoucher ? {
+            id: secondaryVoucher.id,
+            name: secondaryVoucher.name,
+            type: secondaryVoucher.type,
+            value: secondaryVoucher.value,
+            discount_amount: secondaryVoucherDiscount
+          } : null
         } : {
-          cart: cartVoucher,
-          additional: additionalCartVoucher
+          type: 'cart',
+          cart_voucher: cartVoucher ? {
+            id: cartVoucher.id,
+            name: cartVoucher.name,
+            type: cartVoucher.type,
+            value: cartVoucher.value,
+            discount_amount: cartVoucherDiscount
+          } : null,
+          additional_voucher: additionalCartVoucher ? {
+            id: additionalCartVoucher.id,
+            name: additionalCartVoucher.name,
+            type: additionalCartVoucher.type,
+            value: additionalCartVoucher.value,
+            discount_amount: additionalCartVoucherDiscount
+          } : null
         },
         
-        // ✅ Totals dengan JNE shipping cost
-        totals: {
-          subtotalBeforeVoucher: calculateCheckoutTotals().subtotalBeforeVoucher,
-          totalVoucherDiscount: calculateCheckoutTotals().totalVoucherDiscount,
-          finalTotal: calculateCheckoutTotals().finalTotal,
-          shippingCost: getShippingCost(),
-          insuranceCost: useInsurance ? calculateInsuranceCost() : 0,
-          grandTotal: calculateTotal()
-        },
+        // ✅ Financial Totals (sesuai dengan cast decimal di model)
+        subtotal_before_voucher: parseFloat(calculateCheckoutTotals().subtotalBeforeVoucher),
+        total_voucher_discount: parseFloat(calculateCheckoutTotals().totalVoucherDiscount),
+        final_total: parseFloat(calculateCheckoutTotals().finalTotal),
+        total_items: parseInt(calculateCheckoutTotals().totalItems),
+        grand_total: parseFloat(calculateTotal()),
         
-        // Additional Info
-        notes: notes || '',
-        isBuyNow: isBuyNow
+        // ✅ Order Status & Type
+        status: 'pending', // Default status
+        is_buy_now: isBuyNow,
+        
+        // ✅ Admin notes (null by default, bisa diisi admin nanti)
+        admin_notes: null
       }
 
-      console.log('Sending checkout data to Midtrans:', checkoutData)
+      console.log('📦 Sending comprehensive checkout data to backend:', checkoutData)
 
-      // Request Midtrans token dengan data checkout
-     const res = await fetch('https://api.monyenyo.com/api/midtrans/token', {
+      // ✅ ENHANCED: Request Midtrans token dengan data lengkap untuk DataPembeli
+      const res = await fetch('https://api.monyenyo.com/api/midtrans/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          // Tambahkan header untuk debugging jika diperlukan
+          'X-Request-Source': 'checkout-frontend',
+          'X-Order-Type': isBuyNow ? 'buy-now' : 'cart'
         },
-        body: JSON.stringify(checkoutData)
+        body: JSON.stringify({
+          // Data untuk Midtrans payment
+          order_id: orderNumber,
+          gross_amount: calculateTotal(),
+          customer_details: {
+            first_name: shippingAddress.name,
+            last_name: '',
+            email: shippingAddress.email,
+            phone: shippingAddress.phone,
+            billing_address: {
+              first_name: shippingAddress.name,
+              last_name: '',
+              email: shippingAddress.email,
+              phone: shippingAddress.phone,
+              address: shippingAddress.address,
+              city: readableAddress.city,
+              postal_code: shippingAddress.zipCode,
+              country_code: 'IDN'
+            },
+            shipping_address: {
+              first_name: shippingAddress.name,
+              last_name: '',
+              email: shippingAddress.email,
+              phone: shippingAddress.phone,
+              address: shippingAddress.address,
+              city: readableAddress.city,
+              postal_code: shippingAddress.zipCode,
+              country_code: 'IDN'
+            }
+          },
+          item_details: [
+            // Items
+            ...checkoutItems.map((item, index) => ({
+              id: `item-${item.id}`,
+              price: parseInt(item.price),
+              quantity: parseInt(item.quantity),
+              name: item.name,
+              category: 'food'
+            })),
+            // Shipping cost sebagai item jika ada
+            ...(getShippingCost() > 0 ? [{
+              id: 'shipping-cost',
+              price: parseInt(getShippingCost()),
+              quantity: 1,
+              name: selectedShipping === 'jne' && selectedService ? 
+                `JNE ${selectedService.service_display}` : 
+                `Ongkos Kirim ${selectedShipping}`,
+              category: 'shipping'
+            }] : []),
+            // Insurance sebagai item jika ada
+            ...(useInsurance ? [{
+              id: 'insurance-cost',
+              price: parseInt(calculateInsuranceCost()),
+              quantity: 1,
+              name: 'Asuransi Pengiriman',
+              category: 'insurance'
+            }] : [])
+          ],
+          // ✅ CRITICAL: Sertakan data lengkap untuk disimpan ke DataPembeli
+          order_data: checkoutData
+        })
       });
 
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || `HTTP Error: ${res.status}`)
+      }
 
       if (data.token) {
         // Pastikan Midtrans Snap SDK sudah dimuat
@@ -1216,10 +1307,12 @@ const Checkout = () => {
 
         window.snap.pay(data.token, {
           onSuccess: function(result) {
-            console.log('Pembayaran sukses:', result);
+            console.log('✅ Pembayaran sukses:', result);
             
+            // Clear cart jika bukan buy now
             if (!isBuyNow) {
-              // Clear cart logic here if needed
+              // Cart clearing logic bisa ditambahkan disini jika diperlukan
+              console.log('Cart checkout completed successfully');
             }
             
             navigate('/order-success', { 
@@ -1229,14 +1322,21 @@ const Checkout = () => {
                   grand_total: calculateTotal(),
                   status: 'paid',
                   created_at: currentDate,
-                  payment_result: result
+                  payment_result: result,
+                  jne_service: selectedService ? {
+                    service_code: selectedService.service_code,
+                    service_display: selectedService.service_display,
+                    price: selectedService.price,
+                    etd_from: selectedService.etd_from,
+                    etd_thru: selectedService.etd_thru
+                  } : null
                 },
                 checkoutData: checkoutData 
               } 
             });
           },
           onPending: function(result) {
-            console.log('Menunggu pembayaran:', result);
+            console.log('⏳ Menunggu pembayaran:', result);
             
             navigate('/order-success', { 
               state: { 
@@ -1245,18 +1345,25 @@ const Checkout = () => {
                   grand_total: calculateTotal(),
                   status: 'pending_payment',
                   created_at: currentDate,
-                  payment_result: result
+                  payment_result: result,
+                  jne_service: selectedService ? {
+                    service_code: selectedService.service_code,
+                    service_display: selectedService.service_display,
+                    price: selectedService.price,
+                    etd_from: selectedService.etd_from,
+                    etd_thru: selectedService.etd_thru
+                  } : null
                 },
                 checkoutData: checkoutData 
               } 
             });
           },
           onError: function(result) {
-            console.error('Pembayaran error:', result);
+            console.error('❌ Pembayaran error:', result);
             alert('Terjadi kesalahan saat proses pembayaran. Silakan coba lagi.');
           },
           onClose: function() {
-            console.log('Kamu menutup popup tanpa menyelesaikan pembayaran');
+            console.log('👤 User menutup popup tanpa menyelesaikan pembayaran');
           }
         });
       } else {
@@ -1264,7 +1371,7 @@ const Checkout = () => {
       }
 
     } catch (error) {
-      console.error('Error saat proses pembayaran:', error);
+      console.error('💥 Error saat proses pembayaran:', error);
       
       let errorMessage = 'Terjadi kesalahan saat proses pembayaran. Silakan coba lagi.'
       
@@ -1280,6 +1387,8 @@ const Checkout = () => {
         }
       } else if (error.request) {
         errorMessage = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'
+      } else if (error.message) {
+        errorMessage = error.message
       }
       
       alert(errorMessage)
@@ -1291,6 +1400,7 @@ const Checkout = () => {
     }
   }
 
+  // Deprecated function untuk backward compatibility
   const handleCheckout = async () => {
     console.warn('handleCheckout is deprecated, use handlePay instead')
     await handlePay()
@@ -1404,37 +1514,6 @@ const Checkout = () => {
                         placeholder="Kode pos"
                       />
                     </div>
-                    
-                    <EnhancedSelect
-                      value={shippingAddress.province}
-                      onChange={(value) => handleAddressChange('province', value)}
-                      options={getProvinceOptions()}
-                      placeholder="Pilih Provinsi"
-                      label="Provinsi"
-                      required={true}
-                    />
-                    
-                    <EnhancedSelect
-                      value={shippingAddress.regency}
-                      onChange={(value) => handleAddressChange('regency', value)}
-                      options={getCityOptions()}
-                      placeholder="Pilih Kota"
-                      label="Kota"
-                      disabled={!shippingAddress.province}
-                      required={true}
-                    />
-                  </div>
-
-                  <div className="form-row">
-                    <EnhancedSelect
-                      value={shippingAddress.district}
-                      onChange={(value) => handleAddressChange('district', value)}
-                      options={getDistrictOptions()}
-                      placeholder="Pilih Kecamatan"
-                      label="Kecamatan"
-                      disabled={!shippingAddress.regency}
-                      required={true}
-                    />
                     
                     <EnhancedSelect
                       value={shippingAddress.subdistrict}
