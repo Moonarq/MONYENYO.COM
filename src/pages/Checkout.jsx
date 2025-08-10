@@ -306,7 +306,7 @@ const Checkout = () => {
       return;
     }
 
-    console.log(' Fetching JNE services for:', { destinationCode, weight });
+    console.log('🚀 Fetching JNE services for:', { destinationCode, weight });
     
     const currentRequest = { cancelled: false };
     currentRequestRef.current = currentRequest;
@@ -906,7 +906,7 @@ const Checkout = () => {
   }
 
   const handleAddressChange = (field, value) => {
-    console.log(` Address field changed: ${field} = ${value}`);
+    console.log(`📝 Address field changed: ${field} = ${value}`);
     setShippingAddress(prev => ({
       ...prev,
       [field]: value
@@ -1000,25 +1000,87 @@ const Checkout = () => {
     return emailRegex.test(email);
   }
 
-  // ✅ Midtrans Payment Handler with email validation
-  const handlePay = async () => {
-    // ✅ Validasi required fields dengan email
+  // ✅ Enhanced validation function with shipping validation
+  const validateCheckoutData = () => {
+    // Basic field validation
     const requiredFields = ['name', 'email', 'phone', 'address', 'zipCode', 'province', 'regency', 'district', 'subdistrict']
     const missingFields = requiredFields.filter(field => !shippingAddress[field])
     
     if (missingFields.length > 0) {
-      alert('Please fill in all required shipping address fields')
-      return
+      const missingFieldNames = missingFields.map(field => {
+        switch(field) {
+          case 'name': return 'Nama'
+          case 'email': return 'Email'
+          case 'phone': return 'Nomor Telepon'
+          case 'address': return 'Alamat'
+          case 'zipCode': return 'Kode Pos'
+          case 'province': return 'Provinsi'
+          case 'regency': return 'Kota'
+          case 'district': return 'Kecamatan'
+          case 'subdistrict': return 'Kelurahan'
+          default: return field
+        }
+      })
+      alert(`Harap lengkapi field berikut: ${missingFieldNames.join(', ')}`)
+      return false
     }
 
-    // ✅ Validate email format
+    // Email validation
     if (!validateEmail(shippingAddress.email)) {
-      alert('Please enter a valid email address')
-      return
+      alert('Format email tidak valid')
+      return false
     }
     
+    // Payment method validation
     if (!selectedPayment) {
-      alert('Please select a payment method')
+      alert('Silakan pilih metode pembayaran')
+      return false
+    }
+
+    // ✅ ENHANCED SHIPPING VALIDATION
+    // Check if JNE services are available and loaded
+    if (jneServices.length === 0 && !isLoadingJne && !jneError) {
+      alert('Layanan pengiriman JNE tidak tersedia untuk lokasi ini. Silakan pilih lokasi lain atau refresh halaman.')
+      return false
+    }
+
+    // Check if JNE is still loading
+    if (isLoadingJne) {
+      alert('Sedang memuat layanan pengiriman JNE. Mohon tunggu sebentar.')
+      return false
+    }
+
+    // Check if there's JNE error
+    if (jneError && jneServices.length === 0) {
+      alert(`Gagal memuat layanan pengiriman: ${jneError}. Silakan refresh halaman atau coba lagi.`)
+      return false
+    }
+
+    // Check if user has selected a JNE service when JNE services are available
+    if (jneServices.length > 0 && (!selectedService || selectedShipping !== 'jne')) {
+      alert('Silakan pilih salah satu layanan pengiriman JNE yang tersedia.')
+      return false
+    }
+
+    // Check if selected service is still valid
+    if (selectedService && selectedShipping === 'jne') {
+      const isServiceValid = jneServices.some(service => 
+        service.service_code === selectedService.service_code
+      )
+      
+      if (!isServiceValid) {
+        alert('Layanan pengiriman yang dipilih sudah tidak valid. Silakan pilih ulang.')
+        return false
+      }
+    }
+
+    return true
+  }
+
+  // ✅ Midtrans Payment Handler with enhanced validation
+  const handlePay = async () => {
+    // ✅ Enhanced validation with shipping check
+    if (!validateCheckoutData()) {
       return
     }
 
@@ -1439,7 +1501,7 @@ const Checkout = () => {
                 <div className="shipping-section">
                   <h4 style={{ margin: '16px 0 8px 0', fontSize: '16px', fontWeight: '600' }}>Pilih Metode Pengiriman:</h4>
                   
-                  {/* ✅ Enhanced JNE Services Section with better error messaging */}
+                  {/* ✅ Enhanced JNE Services Section with better error messaging and validation indicators */}
                   <div className="jne-services-section">
                     <h5 style={{ 
                       margin: '12px 0 8px 0', 
@@ -1461,6 +1523,13 @@ const Checkout = () => {
                           borderRadius: '50%',
                           animation: 'spin 1s linear infinite'
                         }} />
+                      )}
+                      {/* ✅ Validation indicator */}
+                      {jneServices.length > 0 && selectedService && (
+                        <span style={{ color: '#28a745', fontSize: '12px' }}>✓ Dipilih</span>
+                      )}
+                      {jneServices.length > 0 && !selectedService && (
+                        <span style={{ color: '#dc3545', fontSize: '12px' }}>⚠ Belum dipilih</span>
                       )}
                     </h5>
                     
@@ -1506,41 +1575,59 @@ const Checkout = () => {
                     )}
                     
                     {!isLoadingJne && !jneError && jneServices.length > 0 && (
-                      <div className="jne-services-list">
-                        {jneServices.map((service, idx) => (
-                          <div key={idx} className="shipping-option jne-option" style={{
-                            border: selectedShipping === 'jne' && selectedService === service ? '2px solid #007bff' : '1px solid #e9ecef',
-                            borderRadius: '6px',
-                            padding: '12px',
+                      <>
+                        {/* ✅ Selection prompt */}
+                        {!selectedService && (
+                          <div style={{ 
+                            color: '#dc3545', 
+                            fontSize: '14px', 
                             margin: '8px 0',
-                            backgroundColor: selectedShipping === 'jne' && selectedService === service ? '#f8f9ff' : 'white'
+                            padding: '8px 12px',
+                            backgroundColor: '#fff3cd',
+                            border: '1px solid #ffeeba',
+                            borderRadius: '4px'
                           }}>
-                            <input 
-                              type="radio" 
-                              name="shipping" 
-                              value="jne"
-                              checked={selectedShipping === 'jne' && selectedService === service}
-                              onChange={() => handleJneServiceSelect(service)}
-                              disabled={hasFreeShippingVoucher()}
-                            />
-                            <div className="shipping-details">
-                              <label style={{ fontWeight: '500', cursor: 'pointer' }}>
-                                {service.service_display} - {hasFreeShippingVoucher() ? 
-                                  <span style={{ color: '#28a745', fontWeight: 'bold' }}>Gratis dengan voucher ✨</span> : 
-                                  <span style={{ color: '#000000ff', fontWeight: 'bold' }}>Rp{parseInt(service.price).toLocaleString('id-ID')}</span>
-                                }
-                              </label>
-                              <p className="shipping-estimate" style={{ 
-                                margin: '4px 0 0 20px', 
-                                fontSize: '13px', 
-                                color: '#6c757d' 
-                              }}>
-                               Estimasi: {service.estimateText}
-                              </p>
-                            </div>
+                            ⚠️ Silakan pilih salah satu layanan JNE di bawah ini untuk melanjutkan
                           </div>
-                        ))}
-                      </div>
+                        )}
+                        
+                        <div className="jne-services-list">
+                          {jneServices.map((service, idx) => (
+                            <div key={idx} className="shipping-option jne-option" style={{
+                              border: selectedShipping === 'jne' && selectedService === service ? '2px solid #007bff' : '1px solid #e9ecef',
+                              borderRadius: '6px',
+                              padding: '12px',
+                              margin: '8px 0',
+                              backgroundColor: selectedShipping === 'jne' && selectedService === service ? '#f8f9ff' : 'white',
+                              cursor: 'pointer'
+                            }}>
+                              <input 
+                                type="radio" 
+                                name="shipping" 
+                                value="jne"
+                                checked={selectedShipping === 'jne' && selectedService === service}
+                                onChange={() => handleJneServiceSelect(service)}
+                                disabled={hasFreeShippingVoucher()}
+                              />
+                              <div className="shipping-details">
+                                <label style={{ fontWeight: '500', cursor: 'pointer' }}>
+                                  {service.service_display} - {hasFreeShippingVoucher() ? 
+                                    <span style={{ color: '#28a745', fontWeight: 'bold' }}>Gratis dengan voucher ✨</span> : 
+                                    <span style={{ color: '#000000ff', fontWeight: 'bold' }}>Rp{parseInt(service.price).toLocaleString('id-ID')}</span>
+                                  }
+                                </label>
+                                <p className="shipping-estimate" style={{ 
+                                  margin: '4px 0 0 20px', 
+                                  fontSize: '13px', 
+                                  color: '#6c757d' 
+                                }}>
+                                 Estimasi: {service.estimateText}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
                     )}
 
                     {/* Show message when no JNE services available */}
@@ -1738,7 +1825,7 @@ const Checkout = () => {
                 </div>
               )}
 
-              {/* ✅ Price Summary with JNE shipping cost */}
+              {/* ✅ Price Summary with JNE shipping cost and validation status */}
               <div className="price-summary">
                 <h4>Cek ringkasan transaksimu, yuk</h4>
                 
@@ -1822,6 +1909,17 @@ const Checkout = () => {
                         {selectedService.service_display}
                       </small>
                     )}
+                    {/* ✅ Shipping validation indicator */}
+                    {jneServices.length > 0 && !selectedService && (
+                      <small style={{display: 'block', color: '#dc3545', fontSize: '11px'}}>
+                        ⚠ Belum dipilih
+                      </small>
+                    )}
+                    {isLoadingJne && (
+                      <small style={{display: 'block', color: '#6c757d', fontSize: '11px'}}>
+                        ⏳ Memuat...
+                      </small>
+                    )}
                   </span>
                   <span>
                     {hasFreeShippingVoucher() ? (
@@ -1852,10 +1950,45 @@ const Checkout = () => {
                   <strong>Rp{calculateTotal().toLocaleString('id-ID')}</strong>
                 </div>
                 
-                {/* ✅ Button calls handlePay */}
-                <button className="pay-button" onClick={handlePay}>
-                  Bayar Sekarang
+                {/* ✅ Enhanced Pay Button with validation status */}
+                <button 
+                  className="pay-button" 
+                  onClick={handlePay}
+                  style={{
+                    opacity: (jneServices.length > 0 && !selectedService) || isLoadingJne ? 0.7 : 1,
+                    cursor: (jneServices.length > 0 && !selectedService) || isLoadingJne ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {isLoadingJne ? 'Memuat Ongkir...' : 
+                   (jneServices.length > 0 && !selectedService) ? 'Pilih Ongkir Dulu' : 
+                   'Bayar Sekarang'}
                 </button>
+                
+                {/* ✅ Validation warnings */}
+                {jneServices.length > 0 && !selectedService && (
+                  <div style={{ 
+                    color: '#dc3545', 
+                    fontSize: '12px', 
+                    textAlign: 'center',
+                    marginTop: '8px',
+                    padding: '4px 8px',
+                    backgroundColor: '#f8d7da',
+                    borderRadius: '4px'
+                  }}>
+                    ⚠️ Silakan pilih layanan pengiriman JNE terlebih dahulu
+                  </div>
+                )}
+                
+                {isLoadingJne && (
+                  <div style={{ 
+                    color: '#6c757d', 
+                    fontSize: '12px', 
+                    textAlign: 'center',
+                    marginTop: '8px'
+                  }}>
+                    Sedang memuat layanan pengiriman...
+                  </div>
+                )}
                 
                 <p className="payment-note">
                   Dengan melanjutkan pembayaran, kamu menyetujui S&K
@@ -1878,6 +2011,19 @@ const Checkout = () => {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        
+        .jne-option {
+          transition: all 0.2s ease;
+        }
+        
+        .jne-option:hover {
+          background-color: #f8f9fa !important;
+        }
+        
+        .pay-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
       `}</style>
     </>
