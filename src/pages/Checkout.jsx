@@ -1693,7 +1693,7 @@ const Checkout = () => {
                         <div className="jne-services-list">
                           {jneServices.map((service, idx) => (
                             <div key={idx} className="shipping-option jne-option" style={{
-                              border: selectedShipping === 'jne' && selectedService === service ? '2px solid #007bff' : '1px solid #e9ecef',
+                              border: selectedShipping === 'jne' && selectedService === service ? '2px solid #070707ff' : '1px solid #e9ecef',
                               borderRadius: '6px',
                               padding: '12px',
                               margin: '8px 0',
