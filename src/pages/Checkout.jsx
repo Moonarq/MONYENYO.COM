@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import bcaLogo from '../assets/images/bca.png';
+import codLogo from '../assets/images/cod.png';
 import mandiriLogo from '../assets/images/mandiri.png';
 import gopayLogo from '../assets/images/gopay.png';
 import briLogo from '../assets/images/bri.png';
@@ -1796,6 +1796,22 @@ const Checkout = () => {
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Metode Pembayaran</h4>
 
          
+
+         <div className="payment-option" onClick={() => handlePaymentSelect('cod')}>
+                  <div className="payment-info">
+                    <div className="bank-logo cod-logo">
+                      <img src={codLogo} alt="COD" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
+                    </div>
+                    <span>Cash On Delivery</span>
+                  </div>
+                  <input 
+                    type="radio" 
+                    name="payment" 
+                    checked={selectedPayment === 'COD'}
+                    readOnly
+                  />
+                </div>
+
               <div className="payment-option" onClick={() => handlePaymentSelect('niaga')}>
                   <div className="payment-info">
                     <div className="bank-logo niaga-logo">
@@ -1806,7 +1822,7 @@ const Checkout = () => {
                   <input 
                     type="radio" 
                     name="payment" 
-                    checked={selectedPayment === 'niaga'}
+                    checked={selectedPayment === 'CIMB NIAGA'}
                     readOnly
                   />
                 </div>
