@@ -1797,7 +1797,7 @@ const Checkout = () => {
 
          
 
-         {/* <div className="payment-option" onClick={() => handlePaymentSelect('cod')}>
+         <div className="payment-option" onClick={() => handlePaymentSelect('cod')}>
                   <div className="payment-info">
                     <div className="bank-logo cod-logo">
                       <img src={codLogo} alt="COD" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
@@ -1826,7 +1826,7 @@ const Checkout = () => {
                     readOnly
                   />
                 </div>
-                    */}
+                   
               <div className="payment-option" onClick={() => handlePaymentSelect('permata')}>
                   <div className="payment-info">
                     <div className="bank-logo permata-logo">
