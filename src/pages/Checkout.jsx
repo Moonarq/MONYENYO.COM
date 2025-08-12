@@ -1988,6 +1988,23 @@ const Checkout = () => {
                     readOnly
                   />
                 </div>
+
+
+                <div className="payment-option" onClick={() => handlePaymentSelect('gopay')}>
+                  <div className="payment-info">
+                    <div className="bank-logo gopay-logo">
+                      <img src={gopayLogo} alt="GoPay" style={{height: 44, width: 'auto', objectFit: 'contain'}} />
+                    </div>
+                    <span>GoPay</span>
+                  </div>
+                  <input 
+                    type="radio" 
+                    name="payment" 
+                    checked={selectedPayment === 'gopay'}
+                    readOnly
+                  />
+                </div>
+
                 <div className="payment-option" onClick={() => handlePaymentSelect('cod')}>
                   <div className="payment-info">
                     <div className="bank-logo cod-logo">
@@ -1998,7 +2015,7 @@ const Checkout = () => {
                   <input 
                     type="radio" 
                     name="payment" 
-                    checked={selectedPayment === 'gopay'}
+                    checked={selectedPayment === 'cod'}
                     readOnly
                   />
                 </div>
