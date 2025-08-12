@@ -1915,10 +1915,10 @@ const Checkout = () => {
               <div className="payment-section">
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Metode Pembayaran</h4>
 
-                 <div className="payment-option" onClick={() => handlePaymentSelect('niaga')}>
+                 <div className="payment-option" onClick={() => handlePaymentSelect('CIMB NIAGA')}>
                   <div className="payment-info">
                     <div className="bank-logo niaga-logo">
-                      <img src={niagaLogo} alt="Niaga" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
+                      <img src={niagaLogo} alt="CIMB NIAGA" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
                     </div>
                     <span>CIMB Virtual Account</span>
                   </div>
