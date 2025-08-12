@@ -1039,40 +1039,42 @@ const Checkout = () => {
       return false
     }
 
-    // ✅ ENHANCED SHIPPING VALIDATION
-    // Check if JNE services are available and loaded
-    if (jneServices.length === 0 && !isLoadingJne && !jneError) {
-      alert('Layanan pengiriman JNE tidak tersedia untuk lokasi ini. Silakan pilih lokasi lain atau refresh halaman.')
-      return false
-    }
-
-    // Check if JNE is still loading
-    if (isLoadingJne) {
-      alert('Sedang memuat layanan pengiriman JNE. Mohon tunggu sebentar.')
-      return false
-    }
-
-    // Check if there's JNE error
-    if (jneError && jneServices.length === 0) {
-      alert(`Gagal memuat layanan pengiriman: ${jneError}. Silakan refresh halaman atau coba lagi.`)
-      return false
-    }
-
-    // Check if user has selected a JNE service when JNE services are available
-    if (jneServices.length > 0 && (!selectedService || selectedShipping !== 'jne')) {
-      alert('Silakan pilih salah satu layanan pengiriman JNE yang tersedia.')
-      return false
-    }
-
-    // Check if selected service is still valid
-    if (selectedService && selectedShipping === 'jne') {
-      const isServiceValid = jneServices.some(service => 
-        service.service_code === selectedService.service_code
-      )
-      
-      if (!isServiceValid) {
-        alert('Layanan pengiriman yang dipilih sudah tidak valid. Silakan pilih ulang.')
+    // ✅ ENHANCED SHIPPING VALIDATION - Skip for COD
+    if (selectedPayment !== 'cod') {
+      // Check if JNE services are available and loaded
+      if (jneServices.length === 0 && !isLoadingJne && !jneError) {
+        alert('Layanan pengiriman JNE tidak tersedia untuk lokasi ini. Silakan pilih lokasi lain atau refresh halaman.')
         return false
+      }
+
+      // Check if JNE is still loading
+      if (isLoadingJne) {
+        alert('Sedang memuat layanan pengiriman JNE. Mohon tunggu sebentar.')
+        return false
+      }
+
+      // Check if there's JNE error
+      if (jneError && jneServices.length === 0) {
+        alert(`Gagal memuat layanan pengiriman: ${jneError}. Silakan refresh halaman atau coba lagi.`)
+        return false
+      }
+
+      // Check if user has selected a JNE service when JNE services are available
+      if (jneServices.length > 0 && (!selectedService || selectedShipping !== 'jne')) {
+        alert('Silakan pilih salah satu layanan pengiriman JNE yang tersedia.')
+        return false
+      }
+
+      // Check if selected service is still valid
+      if (selectedService && selectedShipping === 'jne') {
+        const isServiceValid = jneServices.some(service => 
+          service.service_code === selectedService.service_code
+        )
+        
+        if (!isServiceValid) {
+          alert('Layanan pengiriman yang dipilih sudah tidak valid. Silakan pilih ulang.')
+          return false
+        }
       }
     }
 
@@ -1094,7 +1096,7 @@ const Checkout = () => {
     }
   }
 
-  // ✅ COMPLETE FIXED handlePay function
+  // ✅ COMPLETE FIXED handlePay function with COD support
   const handlePay = async () => {
     // ✅ Enhanced validation with shipping check
     if (!validateCheckoutData()) {
@@ -1119,6 +1121,9 @@ const Checkout = () => {
 
       // Get readable names for address fields
       const readableAddress = getReadableLocationNames()
+
+      // ✅ Check if payment method is COD
+      const isCOD = selectedPayment === 'cod'
 
       // ✅ PREPARE COMPLETE ORDER DATA sesuai dengan backend expectations
       const completeOrderData = {
@@ -1212,7 +1217,7 @@ const Checkout = () => {
         grand_total: parseFloat(calculateTotal()),
         
         // ✅ Order Status & Type
-        status: 'pending', // Default status
+        status: isCOD ? 'paid' : 'pending', // COD langsung paid
         is_buy_now: isBuyNow,
         
         // ✅ Admin notes (null by default, bisa diisi admin nanti)
@@ -1220,6 +1225,100 @@ const Checkout = () => {
       }
 
       console.log('📦 Sending comprehensive order data to backend:', completeOrderData)
+
+      // ✅ COD Logic - Skip Midtrans and go directly to checkout API
+      if (isCOD) {
+        console.log('💰 COD Payment - Processing directly without Midtrans')
+        
+        const checkoutPayload = {
+          shippingAddress: shippingAddress,
+          paymentMethod: selectedPayment,
+          shipping: {
+            method: selectedShipping,
+            cost: getShippingCost(),
+            isFree: hasFreeShippingVoucher(),
+            jneService: selectedService ? {
+              service_code: selectedService.service_code,
+              service_display: selectedService.service_display,
+              price: parseInt(selectedService.price),
+              etd_from: selectedService.etd_from,
+              etd_thru: selectedService.etd_thru
+            } : null
+          },
+          insurance: {
+            selected: useInsurance,
+            cost: useInsurance ? calculateInsuranceCost() : 0
+          },
+          items: checkoutItems,
+          vouchers: isBuyNow ? {
+            type: 'buy_now',
+            primary: primaryVoucher,
+            secondary: secondaryVoucher
+          } : {
+            type: 'cart',
+            cart_voucher: cartVoucher,
+            additional_voucher: additionalCartVoucher
+          },
+          totals: {
+            subtotalBeforeVoucher: calculateCheckoutTotals().subtotalBeforeVoucher,
+            totalVoucherDiscount: calculateCheckoutTotals().totalVoucherDiscount,
+            finalTotal: calculateCheckoutTotals().finalTotal,
+            grandTotal: calculateTotal()
+          },
+          isBuyNow: isBuyNow,
+          notes: notes
+        }
+
+        // Send COD order directly to checkout endpoint
+        const codResponse = await fetch('https://api.monyenyo.com/api/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Request-Source': 'checkout-frontend-cod',
+            'X-Order-Type': isCOD ? 'cod' : (isBuyNow ? 'buy-now' : 'cart')
+          },
+          body: JSON.stringify(checkoutPayload)
+        })
+
+        const codData = await codResponse.json()
+
+        if (!codResponse.ok) {
+          throw new Error(codData.message || `COD Checkout Error: ${codResponse.status}`)
+        }
+
+        if (codData.success) {
+          console.log('✅ COD Order berhasil disimpan:', codData.data)
+          
+          // Clear cart jika bukan buy now
+          if (!isBuyNow) {
+            console.log('COD Cart checkout completed successfully')
+          }
+          
+          // Navigate langsung ke order success untuk COD
+          navigate('/order-success', { 
+            state: { 
+              orderData: {
+                order_number: codData.data.order_number,
+                grand_total: codData.data.grand_total,
+                status: 'paid', // COD langsung paid
+                payment_method: 'cod',
+                created_at: currentDate,
+                no_resi: codData.data.no_resi,
+                is_cod: true,
+                jne_service: codData.data.jne_service
+              },
+              checkoutData: completeOrderData 
+            } 
+          })
+          return // Exit function untuk COD
+        } else {
+          throw new Error(codData.message || 'COD order gagal disimpan')
+        }
+      }
+
+      // ✅ NON-COD Logic - Continue with Midtrans
+      console.log('💳 Non-COD Payment - Processing with Midtrans')
 
       // ✅ ENHANCED: Request Midtrans token dengan complete order data
       const res = await fetch('https://api.monyenyo.com/api/midtrans/token', {
@@ -1432,8 +1531,10 @@ const Checkout = () => {
         <title>Checkout - Monyenyo</title>
         <meta name="description" content="Complete your purchase at Monyenyo" />
         <link rel="icon" href="/images/favicon_large.ico" type="image/x-icon" />
-        {/* ✅ Load Midtrans Snap SDK */}
-        <script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-_PAqBcXrjHacb7gg"></script>
+        {/* ✅ Load Midtrans Snap SDK only for non-COD */}
+        {selectedPayment !== 'cod' && (
+          <script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-_PAqBcXrjHacb7gg"></script>
+        )}
       </Helmet>
       
       <div className="checkout-page">
@@ -1615,11 +1716,18 @@ const Checkout = () => {
                   </div>
                 ))}
 
-                {/* ✅ Enhanced Shipping Options with JNE services */}
+                {/* ✅ Enhanced Shipping Options with JNE services - Skip validation for COD */}
                 <div className="shipping-section">
-                  <h4 style={{ margin: '16px 0 8px 0', fontSize: '16px', fontWeight: '600' }}>Pilih Metode Pengiriman:</h4>
+                  <h4 style={{ margin: '16px 0 8px 0', fontSize: '16px', fontWeight: '600' }}>
+                    Pilih Metode Pengiriman:
+                    {selectedPayment === 'cod' && (
+                      <small style={{ display: 'block', color: '#28a745', fontSize: '12px', fontWeight: 'normal' }}>
+                        ✨ COD: Validasi pengiriman otomatis dilewati
+                      </small>
+                    )}
+                  </h4>
                   
-                  {/* ✅ Enhanced JNE Services Section with better error messaging and validation indicators */}
+                  {/* ✅ Enhanced JNE Services Section with COD bypass */}
                   <div className="jne-services-section">
                     <h5 style={{ 
                       margin: '12px 0 8px 0', 
@@ -1631,7 +1739,7 @@ const Checkout = () => {
                       gap: '8px'
                     }}>
                       JNE Services:
-                      {isLoadingJne && (
+                      {selectedPayment !== 'cod' && isLoadingJne && (
                         <div className="jne-loading-spinner" style={{
                           display: 'inline-block',
                           width: '16px',
@@ -1642,11 +1750,10 @@ const Checkout = () => {
                           animation: 'spin 1s linear infinite'
                         }} />
                       )}
-                 
                     </h5>
                     
                     {/* Debug Info - Remove in production */}
-                    {process.env.NODE_ENV === 'development' && (
+                    {process.env.NODE_ENV === 'development' && selectedPayment !== 'cod' && (
                       <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
                         Debug: Province: {shippingAddress.province}, City: {shippingAddress.regency}, 
                         Address Loading: {addressLoading.toString()}, 
@@ -1654,7 +1761,7 @@ const Checkout = () => {
                       </div>
                     )}
                     
-                    {isLoadingJne && (
+                    {selectedPayment !== 'cod' && isLoadingJne && (
                       <div className="jne-loading" style={{
                         padding: '12px',
                         backgroundColor: '#f8f9fa',
@@ -1663,11 +1770,11 @@ const Checkout = () => {
                         margin: '8px 0',
                         textAlign: 'center'
                       }}>
-                        <span> Memuat layanan JNE...</span>
+                        <span>🔄 Memuat layanan JNE...</span>
                       </div>
                     )}
                     
-                    {jneError && (
+                    {selectedPayment !== 'cod' && jneError && (
                       <div className="jne-error" style={{ 
                         color: '#dc3545', 
                         fontSize: '14px', 
@@ -1680,16 +1787,29 @@ const Checkout = () => {
                         ⚠️ {jneError}
                         {jneError.includes('CORS') && (
                           <div style={{ fontSize: '12px', marginTop: '4px' }}>
-                             Tips: Coba refresh halaman atau gunakan browser yang berbeda
+                            💡 Tips: Coba refresh halaman atau gunakan browser yang berbeda
                           </div>
                         )}
                       </div>
                     )}
                     
-                    {!isLoadingJne && !jneError && jneServices.length > 0 && (
+                    {/* COD Bypass Message */}
+                    {selectedPayment === 'cod' && (
+                      <div className="cod-bypass-message" style={{
+                        padding: '12px',
+                        backgroundColor: '#d4edda',
+                        border: '1px solid #c3e6cb',
+                        borderRadius: '4px',
+                        margin: '8px 0',
+                        textAlign: 'center',
+                        color: '#155724'
+                      }}>
+                        💰 <strong>Cash On Delivery</strong> - Pengiriman akan diatur secara manual
+                      </div>
+                    )}
+                    
+                    {selectedPayment !== 'cod' && !isLoadingJne && !jneError && jneServices.length > 0 && (
                       <>
-                        
-                        
                         <div className="jne-services-list">
                           {jneServices.map((service, idx) => (
                             <div key={idx} className="shipping-option jne-option" style={{
@@ -1729,8 +1849,8 @@ const Checkout = () => {
                       </>
                     )}
 
-                    {/* Show message when no JNE services available */}
-                    {!isLoadingJne && !jneError && jneServices.length === 0 && shippingAddress.regency && (
+                    {/* Show message when no JNE services available (non-COD only) */}
+                    {selectedPayment !== 'cod' && !isLoadingJne && !jneError && jneServices.length === 0 && shippingAddress.regency && (
                       <div className="jne-unavailable" style={{ 
                         color: '#6c757d', 
                         fontSize: '14px', 
@@ -1741,12 +1861,12 @@ const Checkout = () => {
                         borderRadius: '4px',
                         textAlign: 'center'
                       }}>
-                         JNE services belum tersedia untuk kota ini
+                        📦 JNE services belum tersedia untuk kota ini
                       </div>
                     )}
 
-                    {/* Show message when address is not complete */}
-                    {!shippingAddress.regency && (
+                    {/* Show message when address is not complete (non-COD only) */}
+                    {selectedPayment !== 'cod' && !shippingAddress.regency && (
                       <div className="jne-waiting" style={{ 
                         color: '#6c757d', 
                         fontSize: '14px', 
@@ -1757,7 +1877,7 @@ const Checkout = () => {
                         borderRadius: '4px',
                         textAlign: 'center'
                       }}>
-                         Pilih kota terlebih dahulu untuk melihat layanan JNE
+                        📍 Pilih kota terlebih dahulu untuk melihat layanan JNE
                       </div>
                     )}
                   </div>
@@ -1795,104 +1915,12 @@ const Checkout = () => {
               <div className="payment-section">
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Metode Pembayaran</h4>
 
-         
-
-         <div className="payment-option" onClick={() => handlePaymentSelect('cod')}>
+                <div className="payment-option" onClick={() => handlePaymentSelect('cod')}>
                   <div className="payment-info">
                     <div className="bank-logo cod-logo">
                       <img src={codLogo} alt="COD" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
                     </div>
                     <span>Cash On Delivery</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'COD'}
-                    readOnly
-                  />
-                </div>
-
-              <div className="payment-option" onClick={() => handlePaymentSelect('niaga')}>
-                  <div className="payment-info">
-                    <div className="bank-logo niaga-logo">
-                      <img src={niagaLogo} alt="Niaga" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>CIMB Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'CIMB NIAGA'}
-                    readOnly
-                  />
-                </div>
-                   
-              <div className="payment-option" onClick={() => handlePaymentSelect('permata')}>
-                  <div className="payment-info">
-                    <div className="bank-logo permata-logo">
-                      <img src={permataLogo} alt="Permata" style={{height: 30, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>Permata Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'permata'}
-                    readOnly
-                  />
-                </div>
-                
-              <div className="payment-option" onClick={() => handlePaymentSelect('bni')}>
-                  <div className="payment-info">
-                    <div className="bank-logo bni-logo">
-                      <img src={bniLogo} alt="BNI" style={{height: 40, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>BNI Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'bni'}
-                    readOnly
-                  />
-                </div>
-
-                <div className="payment-option" onClick={() => handlePaymentSelect('mandiri')}>
-                  <div className="payment-info">
-                    <div className="bank-logo mandiri-logo">
-                      <img src={mandiriLogo} alt="Mandiri" style={{height: 30, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>Mandiri Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'mandiri'}
-                    readOnly
-                  />
-                </div>
-                <div className="payment-option" onClick={() => handlePaymentSelect('bri')}>
-                  <div className="payment-info">
-                    <div className="bank-logo bri-logo">
-                        <img src={briLogo} alt="BRI" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>BRI Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'bri'}
-                    readOnly
-                  />
-                </div>
-
-
-                <div className="payment-option" onClick={() => handlePaymentSelect('gopay')}>
-                  <div className="payment-info">
-                    <div className="bank-logo gopay-logo">
-                      <img src={gopayLogo} alt="GoPay" style={{height: 44, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>GoPay</span>
                   </div>
                   <input 
                     type="radio" 
@@ -1986,7 +2014,7 @@ const Checkout = () => {
                 </div>
               )}
 
-              {/* ✅ Price Summary with JNE shipping cost and validation status */}
+              {/* ✅ Price Summary with COD support and JNE shipping cost validation status */}
               <div className="price-summary">
                 <h4>Cek ringkasan transaksimu, yuk</h4>
                 
@@ -2070,10 +2098,14 @@ const Checkout = () => {
                         {selectedService.service_display}
                       </small>
                     )}
-                   
-                    {isLoadingJne && (
+                    {selectedPayment === 'cod' && (
+                      <small style={{display: 'block', color: '#28a745', fontSize: '12px'}}>
+                        COD - Diatur manual
+                      </small>
+                    )}
+                    {selectedPayment !== 'cod' && isLoadingJne && (
                       <small style={{display: 'block', color: '#6c757d', fontSize: '11px'}}>
-                         Memuat...
+                        🔄 Memuat...
                       </small>
                     )}
                   </span>
@@ -2101,23 +2133,23 @@ const Checkout = () => {
                   <strong>Rp{calculateTotal().toLocaleString('id-ID')}</strong>
                 </div>
                 
-                {/* ✅ Enhanced Pay Button with validation status */}
+                {/* ✅ Enhanced Pay Button with COD support and validation status */}
                 <button 
                   className="pay-button" 
                   onClick={handlePay}
                   style={{
-                    opacity: (jneServices.length > 0 && !selectedService) || isLoadingJne ? 0.7 : 1,
-                    cursor: (jneServices.length > 0 && !selectedService) || isLoadingJne ? 'not-allowed' : 'pointer'
+                    opacity: (selectedPayment !== 'cod' && ((jneServices.length > 0 && !selectedService) || isLoadingJne)) ? 0.7 : 1,
+                    cursor: (selectedPayment !== 'cod' && ((jneServices.length > 0 && !selectedService) || isLoadingJne)) ? 'not-allowed' : 'pointer',
+                    backgroundColor: selectedPayment === 'cod' ? '#28a745' : undefined
                   }}
                 >
-                  {isLoadingJne ? 'Memuat Ongkir...' : 
+                  {selectedPayment === 'cod' ? 'Konfirmasi Pesanan COD' :
+                   isLoadingJne ? 'Memuat Ongkir...' : 
                    (jneServices.length > 0 && !selectedService) ? 'Pilih Ongkir Dulu' : 
                    'Bayar Sekarang'}
                 </button>
                 
-              
-                
-                {isLoadingJne && (
+                {selectedPayment !== 'cod' && isLoadingJne && (
                   <div style={{ 
                     color: '#6c757d', 
                     fontSize: '12px', 
@@ -2162,6 +2194,24 @@ const Checkout = () => {
         .pay-button:disabled {
           opacity: 0.6;
           cursor: not-allowed;
+        }
+        
+        .payment-option {
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        
+        .payment-option:hover {
+          background-color: #f8f9fa;
+        }
+        
+        .cod-bypass-message {
+          animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
       `}</style>
     </>
