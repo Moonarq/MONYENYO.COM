@@ -1083,10 +1083,24 @@ const Checkout = () => {
 
   // ✅ Helper function untuk mengkonversi nama kunci menjadi nama lengkap
   const getReadableLocationNames = () => {
+    console.log('🔍 Address Data Check:', {
+      hasAddressData: !!addressData.provinces,
+      provinceCount: Object.keys(addressData.provinces || {}).length,
+      shippingAddress: shippingAddress,
+      province: shippingAddress.province,
+      regency: shippingAddress.regency,
+      district: shippingAddress.district
+    })
+
     const province = addressData.provinces[shippingAddress.province]?.name || shippingAddress.province
-    const city = province && addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.name || shippingAddress.regency
-    const district = city && addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.districts[shippingAddress.district]?.name || shippingAddress.district
+    const city = addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.name || shippingAddress.regency
+    const district = addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.districts[shippingAddress.district]?.name || shippingAddress.district
     const subdistrict = shippingAddress.subdistrict
+
+    console.log('🏠 Location Names:', {
+      original: { province: shippingAddress.province, regency: shippingAddress.regency, district: shippingAddress.district },
+      converted: { province, city, district, subdistrict }
+    })
 
     return {
       province,
