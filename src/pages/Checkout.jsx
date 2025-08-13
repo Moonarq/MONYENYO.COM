@@ -1083,25 +1083,10 @@ const Checkout = () => {
 
   // ✅ Helper function untuk mengkonversi nama kunci menjadi nama lengkap
   const getReadableLocationNames = () => {
-    console.log('🔍 Address Data Check:', {
-      hasAddressData: !!addressData.provinces,
-      provinceCount: Object.keys(addressData.provinces || {}).length,
-      shippingAddress: shippingAddress,
-      province: shippingAddress.province,
-      regency: shippingAddress.regency,
-      district: shippingAddress.district
-    })
-
-    // ✅ FIXED: Hapus kondisi && yang menyebabkan fallback ke ID
-    const province = addressData.provinces?.[shippingAddress.province]?.name || shippingAddress.province
-    const city = addressData.provinces?.[shippingAddress.province]?.cities?.[shippingAddress.regency]?.name || shippingAddress.regency
-    const district = addressData.provinces?.[shippingAddress.province]?.cities?.[shippingAddress.regency]?.districts?.[shippingAddress.district]?.name || shippingAddress.district
+    const province = addressData.provinces[shippingAddress.province]?.name || shippingAddress.province
+    const city = province && addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.name || shippingAddress.regency
+    const district = city && addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.districts[shippingAddress.district]?.name || shippingAddress.district
     const subdistrict = shippingAddress.subdistrict
-
-    console.log('🏠 Location Names:', {
-      original: { province: shippingAddress.province, regency: shippingAddress.regency, district: shippingAddress.district },
-      converted: { province, city, district, subdistrict }
-    })
 
     return {
       province,
@@ -1115,12 +1100,6 @@ const Checkout = () => {
   const handlePay = async () => {
     // ✅ Enhanced validation with shipping check
     if (!validateCheckoutData()) {
-      return
-    }
-
-    // ✅ Wait for address data to load if still loading
-    if (addressLoading) {
-      alert('Mohon tunggu data alamat sedang dimuat...')
       return
     }
 
@@ -1251,8 +1230,21 @@ const Checkout = () => {
       if (isCOD) {
         console.log('💰 COD Payment - Processing directly without Midtrans')
         
+        // ✅ FIXED: Use correct nested structure with converted address names
         const checkoutPayload = {
-          shippingAddress: shippingAddress,
+          shippingAddress: {
+            name: shippingAddress.name,
+            email: shippingAddress.email,
+            phone: shippingAddress.phone,
+            country: shippingAddress.country,
+            address: shippingAddress.address,
+            zipCode: shippingAddress.zipCode,
+            // ✅ Use converted names instead of IDs
+            province: readableAddress.province,
+            regency: readableAddress.city,
+            district: readableAddress.district,
+            subdistrict: readableAddress.subdistrict
+          },
           paymentMethod: selectedPayment,
           shipping: {
             method: selectedShipping,
@@ -1289,6 +1281,8 @@ const Checkout = () => {
           isBuyNow: isBuyNow,
           notes: notes
         }
+
+        console.log('📦 Sending COD order data to backend:', checkoutPayload)
 
         // Send COD order directly to checkout endpoint
         const codResponse = await fetch('https://api.monyenyo.com/api/checkout', {
