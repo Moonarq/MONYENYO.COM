@@ -72,12 +72,14 @@ const OrderSuccess = () => {
     created_at: orderData?.created_at || new Date().toISOString(),
     va_number: orderData?.va_number || null,
     name: orderData?.name || checkoutData?.shippingAddress?.name || 'N/A',
+    email: orderData?.email || checkoutData?.shippingAddress?.email || 'N/A',
     phone: orderData?.phone || checkoutData?.shippingAddress?.phone || 'N/A',
     address: orderData?.address || checkoutData?.shippingAddress?.address || 'N/A',
     district: orderData?.district || checkoutData?.shippingAddress?.district || 'N/A',
     regency: orderData?.regency || checkoutData?.shippingAddress?.regency || 'N/A',
     province: orderData?.province || checkoutData?.shippingAddress?.province || 'N/A',
     zip_code: orderData?.zip_code || checkoutData?.shippingAddress?.zipCode || 'N/A',
+    subdistrict: orderData?.subdistrict || checkoutData?.shippingAddress?.subdistrict || 'N/A',
     jne_service: orderData?.jne_service || null
   }
 
@@ -91,14 +93,15 @@ const OrderSuccess = () => {
       grandTotal: checkoutData?.totals?.grandTotal || safeOrderData.grand_total || 0
     },
     shippingAddress: {
-      name: checkoutData?.shippingAddress?.name || safeOrderData.name || 'N/A',
-      email: checkoutData?.shippingAddress?.email || 'N/A',
-      phone: checkoutData?.shippingAddress?.phone || safeOrderData.phone || 'N/A',
-      address: checkoutData?.shippingAddress?.address || safeOrderData.address || 'N/A',
-      district: checkoutData?.shippingAddress?.district || safeOrderData.district || 'N/A',
-      regency: checkoutData?.shippingAddress?.regency || safeOrderData.regency || 'N/A',
-      province: checkoutData?.shippingAddress?.province || safeOrderData.province || 'N/A',
-      zipCode: checkoutData?.shippingAddress?.zipCode || safeOrderData.zip_code || 'N/A'
+      name: orderData?.name || checkoutData?.shippingAddress?.name || 'N/A',
+      email: orderData?.email || checkoutData?.shippingAddress?.email || 'N/A',
+      phone: orderData?.phone || checkoutData?.shippingAddress?.phone || 'N/A',
+      address: orderData?.address || checkoutData?.shippingAddress?.address || 'N/A',
+      district: orderData?.district || checkoutData?.shippingAddress?.district || 'N/A',
+      regency: orderData?.regency || checkoutData?.shippingAddress?.regency || 'N/A',
+      province: orderData?.province || checkoutData?.shippingAddress?.province || 'N/A',
+      zipCode: orderData?.zip_code || checkoutData?.shippingAddress?.zipCode || 'N/A',
+      subdistrict: orderData?.subdistrict || checkoutData?.shippingAddress?.subdistrict || 'N/A'
     },
     paymentMethod: checkoutData?.paymentMethod || orderData?.payment_method || 'Unknown',
     useInsurance: checkoutData?.useInsurance ?? false,
@@ -728,8 +731,9 @@ const OrderSuccess = () => {
                   )}
                   <div>
                     {safeCheckoutData.shippingAddress.address}<br />
-                    {safeCheckoutData.shippingAddress.district}, {safeCheckoutData.shippingAddress.regency}<br />
-                    {safeCheckoutData.shippingAddress.province} {safeCheckoutData.shippingAddress.zipCode}
+                    {safeCheckoutData.shippingAddress.subdistrict && `${safeCheckoutData.shippingAddress.subdistrict}, `}
+                    {safeCheckoutData.shippingAddress.district}<br />
+                    {safeCheckoutData.shippingAddress.regency}, {safeCheckoutData.shippingAddress.province} {safeCheckoutData.shippingAddress.zipCode}
                   </div>
                 </div>
               </div>

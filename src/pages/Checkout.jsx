@@ -1321,7 +1321,17 @@ const Checkout = () => {
                 created_at: currentDate,
                 no_resi: codData.data.no_resi,
                 is_cod: true,
-                jne_service: codData.data.jne_service
+                jne_service: codData.data.jne_service,
+                // ✅ Tambahkan field alamat dari database
+                name: readableLocationNames.name,
+                email: readableLocationNames.email,
+                phone: readableLocationNames.phone,
+                address: readableLocationNames.address,
+                district: readableLocationNames.district,
+                regency: readableLocationNames.regency,
+                province: readableLocationNames.province,
+                zip_code: readableLocationNames.zipCode,
+                subdistrict: readableLocationNames.subdistrict
               },
               checkoutData: completeOrderData 
             } 
@@ -1451,7 +1461,17 @@ const Checkout = () => {
                     price: selectedService.price,
                     etd_from: selectedService.etd_from,
                     etd_thru: selectedService.etd_thru
-                  } : null
+                  } : null,
+                  // ✅ Tambahkan field alamat dari form input
+                  name: readableLocationNames.name,
+                  email: readableLocationNames.email,
+                  phone: readableLocationNames.phone,
+                  address: readableLocationNames.address,
+                  district: readableLocationNames.district,
+                  regency: readableLocationNames.regency,
+                  province: readableLocationNames.province,
+                  zip_code: readableLocationNames.zipCode,
+                  subdistrict: readableLocationNames.subdistrict
                 },
                 checkoutData: completeOrderData 
               } 
@@ -1474,7 +1494,17 @@ const Checkout = () => {
                     price: selectedService.price,
                     etd_from: selectedService.etd_from,
                     etd_thru: selectedService.etd_thru
-                  } : null
+                  } : null,
+                  // ✅ Tambahkan field alamat dari form input
+                  name: readableLocationNames.name,
+                  email: readableLocationNames.email,
+                  phone: readableLocationNames.phone,
+                  address: readableLocationNames.address,
+                  district: readableLocationNames.district,
+                  regency: readableLocationNames.regency,
+                  province: readableLocationNames.province,
+                  zip_code: readableLocationNames.zipCode,
+                  subdistrict: readableLocationNames.subdistrict
                 },
                 checkoutData: completeOrderData 
               } 
