@@ -1915,7 +1915,67 @@ const Checkout = () => {
               <div className="payment-section">
                 <h4 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#333' }}>Pilih Metode Pembayaran</h4>
 
-                 <div className="payment-option" onClick={() => handlePaymentSelect('CIMB NIAGA')}>
+                <div className="payment-option" onClick={() => handlePaymentSelect('cod')}>
+                  <div className="payment-info">
+                    <div className="bank-logo cod-logo">
+                      <img src={codLogo} alt="COD" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
+                    </div>
+                    <span>Cash On Delivery</span>
+                  </div>
+                  <input 
+                    type="radio" 
+                    name="payment" 
+                    checked={selectedPayment === 'cod'}
+                    readOnly
+                  />
+                </div>
+
+                <div className="payment-option" onClick={() => handlePaymentSelect('mandiri')}>
+                  <div className="payment-info">
+                    <div className="bank-logo mandiri-logo">
+                      <img src={mandiriLogo} alt="Mandiri" style={{height: 30, width: 'auto', objectFit: 'contain'}} />
+                    </div>
+                    <span>Mandiri Virtual Account</span>
+                  </div>
+                  <input 
+                    type="radio" 
+                    name="payment" 
+                    checked={selectedPayment === 'mandiri'}
+                    readOnly
+                  />
+                </div>
+
+                <div className="payment-option" onClick={() => handlePaymentSelect('bri')}>
+                  <div className="payment-info">
+                    <div className="bank-logo bri-logo">
+                        <img src={briLogo} alt="BRI" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
+                    </div>
+                    <span>BRI Virtual Account</span>
+                  </div>
+                  <input 
+                    type="radio" 
+                    name="payment" 
+                    checked={selectedPayment === 'bri'}
+                    readOnly
+                  />
+                </div>
+
+                <div className="payment-option" onClick={() => handlePaymentSelect('bni')}>
+                  <div className="payment-info">
+                    <div className="bank-logo bni-logo">
+                      <img src={bniLogo} alt="BNI" style={{height: 40, width: 'auto', objectFit: 'contain'}} />
+                    </div>
+                    <span>BNI Virtual Account</span>
+                  </div>
+                  <input 
+                    type="radio" 
+                    name="payment" 
+                    checked={selectedPayment === 'bni'}
+                    readOnly
+                  />
+                </div>
+
+                <div className="payment-option" onClick={() => handlePaymentSelect('CIMB NIAGA')}>
                   <div className="payment-info">
                     <div className="bank-logo niaga-logo">
                       <img src={niagaLogo} alt="CIMB NIAGA" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
@@ -1944,83 +2004,8 @@ const Checkout = () => {
                     readOnly
                   />
                 </div>
-                
-              <div className="payment-option" onClick={() => handlePaymentSelect('bni')}>
-                  <div className="payment-info">
-                    <div className="bank-logo bni-logo">
-                      <img src={bniLogo} alt="BNI" style={{height: 40, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>BNI Virtual Account</span>
                   </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'bni'}
-                    readOnly
-                  />
-                </div>
-
-                <div className="payment-option" onClick={() => handlePaymentSelect('mandiri')}>
-                  <div className="payment-info">
-                    <div className="bank-logo mandiri-logo">
-                      <img src={mandiriLogo} alt="Mandiri" style={{height: 30, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>Mandiri Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'mandiri'}
-                    readOnly
-                  />
-                </div>
-                <div className="payment-option" onClick={() => handlePaymentSelect('bri')}>
-                  <div className="payment-info">
-                    <div className="bank-logo bri-logo">
-                        <img src={briLogo} alt="BRI" style={{height: 35, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>BRI Virtual Account</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'bri'}
-                    readOnly
-                  />
-                </div>
-
-
-                <div className="payment-option" onClick={() => handlePaymentSelect('gopay')}>
-                  <div className="payment-info">
-                    <div className="bank-logo gopay-logo">
-                      <img src={gopayLogo} alt="GoPay" style={{height: 44, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>GoPay</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'gopay'}
-                    readOnly
-                  />
-                </div>
-
-                <div className="payment-option" onClick={() => handlePaymentSelect('cod')}>
-                  <div className="payment-info">
-                    <div className="bank-logo cod-logo">
-                      <img src={codLogo} alt="COD" style={{height: 45, width: 'auto', objectFit: 'contain'}} />
-                    </div>
-                    <span>Cash On Delivery</span>
-                  </div>
-                  <input 
-                    type="radio" 
-                    name="payment" 
-                    checked={selectedPayment === 'cod'}
-                    readOnly
-                  />
-                </div>
-              </div>
-
+            
               {/* ✅ Enhanced Voucher Section for Buy Now */}
               {isBuyNow && (
                 <div className="buy-now-voucher-section">
