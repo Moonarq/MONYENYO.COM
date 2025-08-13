@@ -1849,7 +1849,7 @@ const Checkout = () => {
                         textAlign: 'center',
                         color: '#155724'
                       }}>
-                        💰 <strong>Cash On Delivery</strong> - Pengiriman akan diatur secara manual
+                         <strong>Cash On Delivery</strong> - Pengiriman akan diatur secara manual
                       </div>
                     )}
                     
