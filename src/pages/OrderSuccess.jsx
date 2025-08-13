@@ -117,13 +117,28 @@ const OrderSuccess = () => {
 
   // Payment method names mapping
   const paymentMethodNames = {
+    // Virtual Accounts
     bca: 'BCA Virtual Account',
     mandiri: 'Mandiri Virtual Account', 
     bri: 'BRI Virtual Account',
-    alfamart: 'Alfamart / Alfamidi / Lawson',
+    bni: 'BNI Virtual Account',
+    permata: 'Permata Virtual Account',
+    'CIMB NIAGA': 'CIMB Niaga Virtual Account',
+    
+    // E-Wallets
     gopay: 'GoPay',
     ovo: 'OVO',
-    dana: 'DANA'
+    dana: 'DANA',
+    shopeepay: 'ShopeePay',
+    linkaja: 'LinkAja',
+    
+    // Retail Outlets
+    alfamart: 'Alfamart / Alfamidi / Lawson',
+    indomaret: 'Indomaret',
+    
+    // Cash on Delivery
+    COD: 'Cash on Delivery (COD)',
+    cod: 'Cash on Delivery (COD)'
   }
 
   // Copy VA number to clipboard
@@ -197,12 +212,68 @@ const OrderSuccess = () => {
           'Masukkan nominal pembayaran yang tepat',
           'Konfirmasi dan selesaikan pembayaran'
         ]
+      case 'bni':
+        return [
+          'Buka aplikasi BNI Mobile Banking',
+          'Pilih menu "Transfer" → "Virtual Account Billing"',
+          'Masukkan nomor Virtual Account',
+          'Masukkan nominal pembayaran yang tepat',
+          'Konfirmasi dan selesaikan pembayaran'
+        ]
+      case 'permata':
+        return [
+          'Buka aplikasi PermataMobile X',
+          'Pilih menu "Pembayaran" → "Virtual Account"',
+          'Masukkan nomor Virtual Account',
+          'Masukkan nominal pembayaran yang tepat',
+          'Konfirmasi dan selesaikan pembayaran'
+        ]
+      case 'CIMB NIAGA':
+        return [
+          'Buka aplikasi OCTO Mobile',
+          'Pilih menu "Pay Bills" → "Virtual Account"',
+          'Masukkan nomor Virtual Account',
+          'Masukkan nominal pembayaran yang tepat',
+          'Konfirmasi dan selesaikan pembayaran'
+        ]
       case 'gopay':
         return [
           'Buka aplikasi Gojek atau GoPay',
           'Pilih "Bayar" dan scan QR code',
           'Atau masukkan kode pembayaran manual',
           'Konfirmasi dengan PIN GoPay Anda',
+          'Simpan bukti pembayaran'
+        ]
+      case 'ovo':
+        return [
+          'Buka aplikasi OVO',
+          'Pilih "Pay" dan scan QR code',
+          'Atau masukkan kode pembayaran manual',
+          'Konfirmasi dengan PIN OVO Anda',
+          'Simpan bukti pembayaran'
+        ]
+      case 'dana':
+        return [
+          'Buka aplikasi DANA',
+          'Pilih "Bayar" dan scan QR code',
+          'Atau masukkan kode pembayaran manual',
+          'Konfirmasi dengan PIN DANA Anda',
+          'Simpan bukti pembayaran'
+        ]
+      case 'shopeepay':
+        return [
+          'Buka aplikasi ShopeePay',
+          'Pilih "Bayar" dan scan QR code',
+          'Atau masukkan kode pembayaran manual',
+          'Konfirmasi dengan PIN ShopeePay Anda',
+          'Simpan bukti pembayaran'
+        ]
+      case 'linkaja':
+        return [
+          'Buka aplikasi LinkAja',
+          'Pilih "Bayar" dan scan QR code',
+          'Atau masukkan kode pembayaran manual',
+          'Konfirmasi dengan PIN LinkAja Anda',
           'Simpan bukti pembayaran'
         ]
       case 'alfamart':
@@ -212,6 +283,23 @@ const OrderSuccess = () => {
           'Bayar sesuai nominal yang tertera',
           'Simpan struk sebagai bukti pembayaran', 
           'Pembayaran akan diproses otomatis'
+        ]
+      case 'indomaret':
+        return [
+          'Kunjungi Indomaret terdekat',
+          'Berikan kode pembayaran ke kasir',
+          'Bayar sesuai nominal yang tertera',
+          'Simpan struk sebagai bukti pembayaran',
+          'Pembayaran akan diproses otomatis'
+        ]
+      case 'COD':
+      case 'cod':
+        return [
+          'Pesanan akan dikirim ke alamat tujuan',
+          'Siapkan uang pas sesuai total pembayaran',
+          'Bayar langsung ke kurir saat barang tiba',
+          'Periksa kondisi barang sebelum pembayaran',
+          'Simpan struk pembayaran dari kurir'
         ]
       default:
         return ['Ikuti instruksi pembayaran yang dikirim via email/SMS']
@@ -310,7 +398,10 @@ const OrderSuccess = () => {
               Pesanan Berhasil Dibuat!
             </h1>
             <p style={{ margin: '0', color: '#666', fontSize: '0.95rem' }}>
-              Silakan selesaikan pembayaran dalam 24 jam
+              {['COD', 'cod'].includes(safeCheckoutData.paymentMethod) 
+                ? 'Pesanan akan diproses dan dikirim ke alamat tujuan'
+                : 'Silakan selesaikan pembayaran dalam 24 jam'
+              }
             </p>
             {/* ✅ Show order number prominently */}
             <p style={{ 
@@ -345,11 +436,11 @@ const OrderSuccess = () => {
                 </div>
               </div>
 
-              {/* ✅ FIXED: Better VA number handling */}
-              {safeOrderData.va_number && (
+              {/* ✅ FIXED: Better VA number handling - Hide for COD */}
+              {safeOrderData.va_number && !['COD', 'cod'].includes(safeCheckoutData.paymentMethod) && (
                 <div style={{ marginBottom: '1.25rem' }}>
                   <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.4rem' }}>
-                    {safeCheckoutData.paymentMethod === 'alfamart' ? 'Kode Pembayaran' : 'Nomor Virtual Account'}
+                    {safeCheckoutData.paymentMethod === 'alfamart' || safeCheckoutData.paymentMethod === 'indomaret' ? 'Kode Pembayaran' : 'Nomor Virtual Account'}
                   </div>
                   <div style={{ 
                     display: 'flex', 
@@ -401,8 +492,8 @@ const OrderSuccess = () => {
                 </div>
               )}
 
-              {/* ✅ Show message if no VA number yet */}
-              {!safeOrderData.va_number && (
+              {/* ✅ Show message if no VA number yet (except for COD) */}
+              {!safeOrderData.va_number && !['COD', 'cod'].includes(safeCheckoutData.paymentMethod) && (
                 <div style={{
                   marginBottom: '1.25rem',
                   padding: '1rem',
@@ -416,6 +507,21 @@ const OrderSuccess = () => {
                 </div>
               )}
 
+              {/* ✅ Special message for COD */}
+              {['COD', 'cod'].includes(safeCheckoutData.paymentMethod) && (
+                <div style={{
+                  marginBottom: '1.25rem',
+                  padding: '1rem',
+                  backgroundColor: '#d1ecf1',
+                  borderRadius: '6px',
+                  border: '1px solid #bee5eb'
+                }}>
+                  <div style={{ fontSize: '0.85rem', color: '#0c5460', fontWeight: '500' }}>
+                    ✅ Pesanan COD berhasil dibuat! Pembayaran dilakukan saat barang diterima.
+                  </div>
+                </div>
+              )}
+
               <div style={{ marginBottom: '1.25rem' }}>
                 <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.4rem' }}>
                   Total Pembayaran
@@ -425,19 +531,22 @@ const OrderSuccess = () => {
                 </div>
               </div>
 
-              <div style={{ 
-                padding: '1rem', 
-                backgroundColor: '#fff3cd', 
-                borderRadius: '6px',
-                border: '1px solid #ffeaa7'
-              }}>
-                <div style={{ fontWeight: '600', color: '#000000ff', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
-                  Selesaikan pembayaran sebelum:
+              {/* ✅ Show expiration time only for non-COD payments */}
+              {!['COD', 'cod'].includes(safeCheckoutData.paymentMethod) && (
+                <div style={{ 
+                  padding: '1rem', 
+                  backgroundColor: '#fff3cd', 
+                  borderRadius: '6px',
+                  border: '1px solid #ffeaa7'
+                }}>
+                  <div style={{ fontWeight: '600', color: '#000000ff', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
+                    Selesaikan pembayaran sebelum:
+                  </div>
+                  <div style={{ color: '#000000ff', fontSize: '0.85rem' }}>
+                    {getExpirationTime()}
+                  </div>
                 </div>
-                <div style={{ color: '#000000ff', fontSize: '0.85rem' }}>
-                  {getExpirationTime()}
-                </div>
-              </div>
+              )}
 
               {/* Payment Instructions */}
               <div style={{ marginTop: '1.5rem' }}>
