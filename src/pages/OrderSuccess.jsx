@@ -100,7 +100,7 @@ const OrderSuccess = () => {
       province: checkoutData?.shippingAddress?.province || safeOrderData.province || 'N/A',
       zipCode: checkoutData?.shippingAddress?.zipCode || safeOrderData.zip_code || 'N/A'
     },
-    paymentMethod: checkoutData?.paymentMethod || 'bca',
+    paymentMethod: checkoutData?.paymentMethod || orderData?.payment_method || 'Unknown',
     useInsurance: checkoutData?.useInsurance ?? false,
     insuranceCost: checkoutData?.insuranceCost || 0,
     selectedShipping: checkoutData?.selectedShipping || 'reguler',
@@ -113,6 +113,11 @@ const OrderSuccess = () => {
   useEffect(() => {
     console.log('OrderSuccess - Processed safeOrderData:', safeOrderData)
     console.log('OrderSuccess - Processed safeCheckoutData:', safeCheckoutData)
+    console.log('OrderSuccess - Payment Method Debug:', {
+      checkoutDataPaymentMethod: checkoutData?.paymentMethod,
+      orderDataPaymentMethod: orderData?.payment_method,
+      finalPaymentMethod: safeCheckoutData.paymentMethod
+    })
   }, [])
 
   // Payment method names mapping
