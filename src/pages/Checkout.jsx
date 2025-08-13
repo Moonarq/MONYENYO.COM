@@ -1279,19 +1279,10 @@ const Checkout = () => {
             grandTotal: calculateTotal()
           },
           isBuyNow: isBuyNow,
-          notes: notes,
-          // ✅ Tambahan flag eksplisit untuk debug
-          order_type: isBuyNow ? 'buy_now' : 'cart'
+          notes: notes
         }
 
-        console.log('📦 Sending COD order data to backend:', {
-          ...checkoutPayload,
-          debugInfo: {
-            isBuyNow: isBuyNow,
-            voucherType: isBuyNow ? 'buy_now' : 'cart',
-            checkoutItemsSource: isBuyNow ? 'buyNowData' : 'cart'
-          }
-        })
+        console.log('📦 Sending COD order data to backend:', checkoutPayload)
 
         // Send COD order directly to checkout endpoint
         const codResponse = await fetch('https://api.monyenyo.com/api/checkout', {
