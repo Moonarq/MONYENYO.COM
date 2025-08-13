@@ -522,7 +522,7 @@ const OrderSuccess = () => {
                   border: '1px solid #bee5eb'
                 }}>
                   <div style={{ fontSize: '0.85rem', color: '#0c5460', fontWeight: '500' }}>
-                    ✅ Pesanan COD berhasil dibuat! Pembayaran dilakukan saat barang diterima.
+                     Pesanan COD berhasil dibuat! Pembayaran dilakukan saat barang diterima.
                   </div>
                 </div>
               )}
