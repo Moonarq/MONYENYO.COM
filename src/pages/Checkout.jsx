@@ -1083,10 +1083,25 @@ const Checkout = () => {
 
   // ✅ Helper function untuk mengkonversi nama kunci menjadi nama lengkap
   const getReadableLocationNames = () => {
-    const province = addressData.provinces[shippingAddress.province]?.name || shippingAddress.province
-    const city = province && addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.name || shippingAddress.regency
-    const district = city && addressData.provinces[shippingAddress.province]?.cities[shippingAddress.regency]?.districts[shippingAddress.district]?.name || shippingAddress.district
+    console.log('🔍 Address Data Check:', {
+      hasAddressData: !!addressData.provinces,
+      provinceCount: Object.keys(addressData.provinces || {}).length,
+      shippingAddress: shippingAddress,
+      province: shippingAddress.province,
+      regency: shippingAddress.regency,
+      district: shippingAddress.district
+    })
+
+    // ✅ FIXED: Hapus kondisi && yang menyebabkan fallback ke ID
+    const province = addressData.provinces?.[shippingAddress.province]?.name || shippingAddress.province
+    const city = addressData.provinces?.[shippingAddress.province]?.cities?.[shippingAddress.regency]?.name || shippingAddress.regency
+    const district = addressData.provinces?.[shippingAddress.province]?.cities?.[shippingAddress.regency]?.districts?.[shippingAddress.district]?.name || shippingAddress.district
     const subdistrict = shippingAddress.subdistrict
+
+    console.log('🏠 Location Names:', {
+      original: { province: shippingAddress.province, regency: shippingAddress.regency, district: shippingAddress.district },
+      converted: { province, city, district, subdistrict }
+    })
 
     return {
       province,
@@ -1100,6 +1115,12 @@ const Checkout = () => {
   const handlePay = async () => {
     // ✅ Enhanced validation with shipping check
     if (!validateCheckoutData()) {
+      return
+    }
+
+    // ✅ Wait for address data to load if still loading
+    if (addressLoading) {
+      alert('Mohon tunggu data alamat sedang dimuat...')
       return
     }
 
