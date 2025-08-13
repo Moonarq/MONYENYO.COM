@@ -1322,16 +1322,16 @@ const Checkout = () => {
                 no_resi: codData.data.no_resi,
                 is_cod: true,
                 jne_service: codData.data.jne_service,
-                // ✅ Tambahkan field alamat dari database
-                name: readableLocationNames.name,
-                email: readableLocationNames.email,
-                phone: readableLocationNames.phone,
-                address: readableLocationNames.address,
-                district: readableLocationNames.district,
-                regency: readableLocationNames.regency,
-                province: readableLocationNames.province,
-                zip_code: readableLocationNames.zipCode,
-                subdistrict: readableLocationNames.subdistrict
+                // ✅ FIXED: Use actual form values instead of undefined variable
+                name: shippingAddress.name,
+                email: shippingAddress.email,
+                phone: shippingAddress.phone,
+                address: shippingAddress.address,
+                district: readableAddress.district,
+                regency: readableAddress.city,
+                province: readableAddress.province,
+                zip_code: shippingAddress.zipCode,
+                subdistrict: readableAddress.subdistrict
               },
               checkoutData: completeOrderData 
             } 
@@ -1462,16 +1462,16 @@ const Checkout = () => {
                     etd_from: selectedService.etd_from,
                     etd_thru: selectedService.etd_thru
                   } : null,
-                  // ✅ Tambahkan field alamat dari form input
-                  name: readableLocationNames.name,
-                  email: readableLocationNames.email,
-                  phone: readableLocationNames.phone,
-                  address: readableLocationNames.address,
-                  district: readableLocationNames.district,
-                  regency: readableLocationNames.regency,
-                  province: readableLocationNames.province,
-                  zip_code: readableLocationNames.zipCode,
-                  subdistrict: readableLocationNames.subdistrict
+                  // ✅ FIXED: Use actual form values instead of undefined variable
+                  name: shippingAddress.name,
+                  email: shippingAddress.email,
+                  phone: shippingAddress.phone,
+                  address: shippingAddress.address,
+                  district: readableAddress.district,
+                  regency: readableAddress.city,
+                  province: readableAddress.province,
+                  zip_code: shippingAddress.zipCode,
+                  subdistrict: readableAddress.subdistrict
                 },
                 checkoutData: completeOrderData 
               } 
@@ -1495,16 +1495,16 @@ const Checkout = () => {
                     etd_from: selectedService.etd_from,
                     etd_thru: selectedService.etd_thru
                   } : null,
-                  // ✅ Tambahkan field alamat dari form input
-                  name: readableLocationNames.name,
-                  email: readableLocationNames.email,
-                  phone: readableLocationNames.phone,
-                  address: readableLocationNames.address,
-                  district: readableLocationNames.district,
-                  regency: readableLocationNames.regency,
-                  province: readableLocationNames.province,
-                  zip_code: readableLocationNames.zipCode,
-                  subdistrict: readableLocationNames.subdistrict
+                  // ✅ FIXED: Use actual form values instead of undefined variable
+                  name: shippingAddress.name,
+                  email: shippingAddress.email,
+                  phone: shippingAddress.phone,
+                  address: shippingAddress.address,
+                  district: readableAddress.district,
+                  regency: readableAddress.city,
+                  province: readableAddress.province,
+                  zip_code: shippingAddress.zipCode,
+                  subdistrict: readableAddress.subdistrict
                 },
                 checkoutData: completeOrderData 
               } 
