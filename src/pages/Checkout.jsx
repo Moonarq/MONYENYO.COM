@@ -290,37 +290,64 @@ const Checkout = () => {
 
       // Search strategies (in order of preference)
       const searchStrategies = [
-        // 1. Exact city match with province/kabupaten context
+        // 1. Exact city match with correct province context (prevent cross-province matches)
         (destination) => {
           const destName = destination.City_Name.toLowerCase();
           const hasCity = destName.includes(cleanCity);
           const hasProvince = destName.includes(cleanProvince) || 
                              destName.includes(cleanProvince.replace('daerah istimewa ', '')) ||
                              destName.includes(cleanProvince.replace('di ', ''));
-          return hasCity && hasProvince;
+          
+          // 🚨 CRITICAL: Prevent cross-province false positives
+          const wrongProvince = (cleanProvince === 'sulawesi selatan' && destName.includes('jakarta')) ||
+                               (cleanProvince === 'dki jakarta' && destName.includes('sulawesi')) ||
+                               (cleanProvince === 'jawa barat' && (destName.includes('jakarta') || destName.includes('sulawesi')));
+          
+          return hasCity && hasProvince && !wrongProvince;
         },
         
-        // 2. City name with common region indicators
+        // 2. City name match with province context in second part
         (destination) => {
           const destName = destination.City_Name.toLowerCase();
-          return destName.includes(cleanCity) && (
+          const [cityPart, provincePart] = destName.split(',').map(s => s.trim());
+          
+          const cityMatch = cityPart.includes(cleanCity);
+          const provinceMatch = provincePart && (
+            provincePart.includes(cleanProvince) ||
+            provincePart.includes(cleanProvince.replace('daerah istimewa ', '')) ||
+            provincePart.includes(cleanProvince.replace('di ', ''))
+          );
+          
+          return cityMatch && provinceMatch;
+        },
+        
+        // 3. Exact city name match with region indicators (but filter out wrong provinces)
+        (destination) => {
+          const destName = destination.City_Name.toLowerCase();
+          const cityMatch = destName.includes(cleanCity) && (
             destName.includes('kab.') || 
             destName.includes('kabupaten') ||
             destName.includes('kota')
           );
+          
+          // Filter out obvious wrong provinces
+          const wrongProvince = (cleanProvince === 'sulawesi selatan' && destName.includes('jakarta')) ||
+                               (cleanProvince === 'dki jakarta' && destName.includes('sulawesi'));
+          
+          return cityMatch && !wrongProvince;
         },
         
-        // 3. Exact city name match
+        // 4. Last resort: partial city name match with strict province filtering
         (destination) => {
           const destName = destination.City_Name.toLowerCase();
-          const cityParts = destName.split(',')[0].trim();
-          return cityParts === cleanCity;
-        },
-        
-        // 4. Partial city name match
-        (destination) => {
-          const destName = destination.City_Name.toLowerCase();
-          return destName.includes(cleanCity);
+          const cityMatch = destName.includes(cleanCity);
+          
+          // Very strict filtering for cross-province issues
+          const wrongProvince = (cleanProvince === 'sulawesi selatan' && destName.includes('jakarta')) ||
+                               (cleanProvince === 'dki jakarta' && destName.includes('sulawesi')) ||
+                               (cleanProvince === 'jawa barat' && (destName.includes('jakarta') || destName.includes('sulawesi')));
+          
+          return cityMatch && !wrongProvince;
         }
       ];
 
@@ -331,6 +358,11 @@ const Checkout = () => {
         
         if (matches.length > 0) {
           console.log(`✅ Found ${matches.length} matches using strategy ${i + 1}:`, matches.slice(0, 3));
+          
+          // 🔍 Show all matches for debugging
+          matches.forEach((match, idx) => {
+            console.log(`   ${idx + 1}. ${match.City_Name} (${match.City_Code})`);
+          });
           
           // Prefer exact matches or those with kabupaten/kota indicators
           const preferredMatch = matches.find(m => {
