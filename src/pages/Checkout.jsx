@@ -537,17 +537,19 @@ const Checkout = () => {
     }
   }, [isBuyNow]);
 
-  // ✅ Main useEffect untuk fetch JNE services dengan anti infinite loop
+  // ✅ Main useEffect untuk fetch JNE services dengan live API integration
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (shippingAddress.province && shippingAddress.regency && !addressLoading && addressData.provinces) {
-        const destinationCode = getDestinationCode(shippingAddress.province, shippingAddress.regency);
-        
-        if (destinationCode) {
-          console.log('🚀 Triggering JNE fetch with:', { destinationCode, itemsCount: checkoutItems?.length || 0 });
-          fetchJneServices(destinationCode);
+        // Get city name from address data for JNE API
+        const province = addressData.provinces[shippingAddress.province];
+        if (province && province.cities && province.cities[shippingAddress.regency]) {
+          const cityName = province.cities[shippingAddress.regency].name;
+          
+          console.log('🚀 Triggering JNE fetch with city:', { cityName, itemsCount: checkoutItems?.length || 0 });
+          fetchJneServices(cityName);
         } else {
-          console.log('⚠️ No valid destination code, clearing JNE services');
+          console.log('⚠️ City name not found, clearing JNE services');
           setJneServices([]);
           setSelectedService(null);
           setJneShippingCost(0);
@@ -1041,42 +1043,40 @@ const Checkout = () => {
       return false
     }
 
-    // ✅ ENHANCED SHIPPING VALIDATION - Skip for COD
-    if (selectedPayment !== 'cod') {
-      // Check if JNE services are available and loaded
-      if (jneServices.length === 0 && !isLoadingJne && !jneError) {
-        alert('Layanan pengiriman JNE tidak tersedia untuk lokasi ini. Silakan pilih lokasi lain atau refresh halaman.')
-        return false
-      }
+    // ✅ ENHANCED SHIPPING VALIDATION - Required for all payment methods including COD
+    // Check if JNE services are available and loaded
+    if (jneServices.length === 0 && !isLoadingJne && !jneError) {
+      alert('Layanan pengiriman JNE tidak tersedia untuk lokasi ini. Silakan pilih lokasi lain atau refresh halaman.')
+      return false
+    }
 
-      // Check if JNE is still loading
-      if (isLoadingJne) {
-        alert('Sedang memuat layanan pengiriman JNE. Mohon tunggu sebentar.')
-        return false
-      }
+    // Check if JNE is still loading
+    if (isLoadingJne) {
+      alert('Sedang memuat layanan pengiriman JNE. Mohon tunggu sebentar.')
+      return false
+    }
 
-      // Check if there's JNE error
-      if (jneError && jneServices.length === 0) {
-        alert(`Gagal memuat layanan pengiriman: ${jneError}. Silakan refresh halaman atau coba lagi.`)
-        return false
-      }
+    // Check if there's JNE error
+    if (jneError && jneServices.length === 0) {
+      alert(`Gagal memuat layanan pengiriman: ${jneError}. Silakan refresh halaman atau coba lagi.`)
+      return false
+    }
 
-      // Check if user has selected a JNE service when JNE services are available
-      if (jneServices.length > 0 && (!selectedService || selectedShipping !== 'jne')) {
-        alert('Silakan pilih salah satu layanan pengiriman JNE yang tersedia.')
-        return false
-      }
+    // Check if user has selected a JNE service when JNE services are available
+    if (jneServices.length > 0 && (!selectedService || selectedShipping !== 'jne')) {
+      alert('Silakan pilih salah satu layanan pengiriman JNE yang tersedia.')
+      return false
+    }
 
-      // Check if selected service is still valid
-      if (selectedService && selectedShipping === 'jne') {
-        const isServiceValid = jneServices.some(service => 
-          service.service_code === selectedService.service_code
-        )
-        
-        if (!isServiceValid) {
-          alert('Layanan pengiriman yang dipilih sudah tidak valid. Silakan pilih ulang.')
-          return false
-        }
+    // Check if selected service is still valid
+    if (selectedService && selectedShipping === 'jne') {
+      const isServiceValid = jneServices.some(service => 
+        service.service_code === selectedService.service_code
+      )
+      
+      if (!isServiceValid) {
+        alert('Layanan pengiriman yang dipilih sudah tidak valid. Silakan pilih ulang.')
+        return false
       }
     }
 
@@ -1786,7 +1786,7 @@ const Checkout = () => {
                       gap: '8px'
                     }}>
                       JNE Services:
-                      {selectedPayment !== 'cod' && isLoadingJne && (
+                      {isLoadingJne && (
                         <div className="jne-loading-spinner" style={{
                           display: 'inline-block',
                           width: '16px',
@@ -1800,7 +1800,7 @@ const Checkout = () => {
                     </h5>
                     
                     {/* Debug Info - Remove in production */}
-                    {process.env.NODE_ENV === 'development' && selectedPayment !== 'cod' && (
+                    {process.env.NODE_ENV === 'development' && (
                       <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
                         Debug: Province: {shippingAddress.province}, City: {shippingAddress.regency}, 
                         Address Loading: {addressLoading.toString()}, 
@@ -1808,7 +1808,7 @@ const Checkout = () => {
                       </div>
                     )}
                     
-                    {selectedPayment !== 'cod' && isLoadingJne && (
+                    {isLoadingJne && (
                       <div className="jne-loading" style={{
                         padding: '12px',
                         backgroundColor: '#f8f9fa',
@@ -1821,7 +1821,7 @@ const Checkout = () => {
                       </div>
                     )}
                     
-                    {selectedPayment !== 'cod' && jneError && (
+                    {jneError && (
                       <div className="jne-error" style={{ 
                         color: '#dc3545', 
                         fontSize: '14px', 
@@ -1840,9 +1840,9 @@ const Checkout = () => {
                       </div>
                     )}
                     
-                    {/* COD Bypass Message */}
+                    {/* COD Message - Now informational only */}
                     {selectedPayment === 'cod' && (
-                      <div className="cod-bypass-message" style={{
+                      <div className="cod-info-message" style={{
                         padding: '12px',
                         backgroundColor: '#d4edda',
                         border: '1px solid #c3e6cb',
@@ -1851,11 +1851,11 @@ const Checkout = () => {
                         textAlign: 'center',
                         color: '#155724'
                       }}>
-                         <strong>Cash On Delivery</strong> - Pengiriman akan diatur secara manual
+                        💰 <strong>Cash On Delivery</strong> - Bayar saat barang diterima
                       </div>
                     )}
                     
-                    {selectedPayment !== 'cod' && !isLoadingJne && !jneError && jneServices.length > 0 && (
+                    {!isLoadingJne && !jneError && jneServices.length > 0 && (
                       <>
                         <div className="jne-services-list">
                           {jneServices.map((service, idx) => (
@@ -1896,8 +1896,8 @@ const Checkout = () => {
                       </>
                     )}
 
-                    {/* Show message when no JNE services available (non-COD only) */}
-                    {selectedPayment !== 'cod' && !isLoadingJne && !jneError && jneServices.length === 0 && shippingAddress.regency && (
+                    {/* Show message when no JNE services available */}
+                    {!isLoadingJne && !jneError && jneServices.length === 0 && shippingAddress.regency && (
                       <div className="jne-unavailable" style={{ 
                         color: '#6c757d', 
                         fontSize: '14px', 
@@ -1912,8 +1912,8 @@ const Checkout = () => {
                       </div>
                     )}
 
-                    {/* Show message when address is not complete (non-COD only) */}
-                    {selectedPayment !== 'cod' && !shippingAddress.regency && (
+                    {/* Show message when address is not complete */}
+                    {!shippingAddress.regency && (
                       <div className="jne-waiting" style={{ 
                         color: '#6c757d', 
                         fontSize: '14px', 
@@ -2220,12 +2220,7 @@ const Checkout = () => {
                         {selectedService.service_display}
                       </small>
                     )}
-                    {selectedPayment === 'cod' && (
-                      <small style={{display: 'block', color: '#28a745', fontSize: '12px'}}>
-                        COD - Diatur manual
-                      </small>
-                    )}
-                    {selectedPayment !== 'cod' && isLoadingJne && (
+                    {isLoadingJne && (
                       <small style={{display: 'block', color: '#6c757d', fontSize: '11px'}}>
                         🔄 Memuat...
                       </small>
@@ -2255,23 +2250,23 @@ const Checkout = () => {
                   <strong>Rp{calculateTotal().toLocaleString('id-ID')}</strong>
                 </div>
                 
-                {/* ✅ Enhanced Pay Button with COD support and validation status */}
+                {/* ✅ Enhanced Pay Button with validation for all payment methods */}
                 <button 
                   className="pay-button" 
                   onClick={handlePay}
                   style={{
-                    opacity: (selectedPayment !== 'cod' && ((jneServices.length > 0 && !selectedService) || isLoadingJne)) ? 0.7 : 1,
-                    cursor: (selectedPayment !== 'cod' && ((jneServices.length > 0 && !selectedService) || isLoadingJne)) ? 'not-allowed' : 'pointer',
+                    opacity: ((jneServices.length > 0 && !selectedService) || isLoadingJne) ? 0.7 : 1,
+                    cursor: ((jneServices.length > 0 && !selectedService) || isLoadingJne) ? 'not-allowed' : 'pointer',
                     backgroundColor: selectedPayment === 'cod' ? '#28a745' : undefined
                   }}
                 >
-                  {selectedPayment === 'cod' ? 'Konfirmasi Pesanan COD' :
-                   isLoadingJne ? 'Memuat Ongkir...' : 
+                  {isLoadingJne ? 'Memuat Ongkir...' : 
                    (jneServices.length > 0 && !selectedService) ? 'Pilih Ongkir Dulu' : 
+                   selectedPayment === 'cod' ? 'Konfirmasi Pesanan COD' :
                    'Bayar Sekarang'}
                 </button>
                 
-                {selectedPayment !== 'cod' && isLoadingJne && (
+                {isLoadingJne && (
                   <div style={{ 
                     color: '#6c757d', 
                     fontSize: '12px', 
