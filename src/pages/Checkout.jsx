@@ -15,6 +15,7 @@ import { useNavbarScroll } from '../hooks/useNavbarScroll'
 import AdditionalVoucherSelector from '../components/common/AdditionalVoucherSelector'
 import './Checkout.css'
 import { API_ENDPOINTS, getImageUrl as getApiImageUrl } from '../config/api'
+import jneCityMap from '../data/jneCityMap.json';
 
 // ✅ Helper functions untuk mengelola menuVoucher di localStorage
 const getMenuVoucher = () => {
@@ -141,18 +142,18 @@ const Checkout = () => {
   const [addressData, setAddressData] = useState({ provinces: {} });
   const [addressLoading, setAddressLoading] = useState(true);
 
-  // ✅ JNE Services State dengan refs untuk mencegah infinite loops
+  // ✅ JNE Services State with better naming and refs for preventing infinite loops
   const [jneServices, setJneServices] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
   const [jneShippingCost, setJneShippingCost] = useState(0);
   const [isLoadingJne, setIsLoadingJne] = useState(false);
   const [jneError, setJneError] = useState('');
   
-  // ✅ Refs untuk mencegah infinite loops
+  // ✅ Refs to prevent infinite loops
   const currentRequestRef = useRef(null);
   const lastRequestParamsRef = useRef(null);
 
-  // Load address data dari JSON file saat komponen mount
+  // Load address data from JSON file on mount
   useEffect(() => {
     const loadAddressData = async () => {
       setAddressLoading(true);
@@ -183,7 +184,7 @@ const Checkout = () => {
   const navigate = useNavigate()
   const location = useLocation()
   
-  // Check if this is a "Buy Now" checkout
+  // Check if this is a "Buy Now" checkout (data passed from MenuDetail)
   const buyNowData = location.state?.buyNowItem
   const isBuyNow = !!buyNowData
   
@@ -195,17 +196,17 @@ const Checkout = () => {
   const [useInsurance, setUseInsurance] = useState(true)
   const [notes, setNotes] = useState('')
   
-  // Enhanced voucher system for Buy Now
+  // Enhanced voucher system for Buy Now (max 2 vouchers)
   const [primaryVoucher, setPrimaryVoucher] = useState(null)
   const [primaryVoucherDiscount, setPrimaryVoucherDiscount] = useState(0)
   const [secondaryVoucher, setSecondaryVoucher] = useState(null)
   const [secondaryVoucherDiscount, setSecondaryVoucherDiscount] = useState(0)
 
-  // Additional voucher for Cart checkout
+  // Additional voucher for Cart checkout (in addition to existing cart voucher)
   const [additionalCartVoucher, setAdditionalCartVoucher] = useState(null)
   const [additionalCartVoucherDiscount, setAdditionalCartVoucherDiscount] = useState(0)
 
-  // ✅ Shipping Address Form State dengan email field
+  // ✅ Shipping Address Form State - Added email field
   const [shippingAddress, setShippingAddress] = useState({
     name: '',
     email: '',
@@ -219,21 +220,21 @@ const Checkout = () => {
     subdistrict: ''
   })
 
-  // Available options untuk dropdowns berdasarkan selections
+  // Available options for dropdowns based on selections
   const [availableCities, setAvailableCities] = useState({})
   const [availableDistricts, setAvailableDistricts] = useState({})
   const [availableSubdistricts, setAvailableSubdistricts] = useState([])
 
-  // ✅ Enhanced shipping data dengan JNE integration
+  // ✅ Enhanced shipping data with JNE integration
   const [shippingData] = useState({
     reguler: { name: 'Reguler', price: 0 },
     ninja: { name: 'Ninja Xpress', price: 6500, estimate: 'Estimasi tiba besok - 30 Jul' }
   })
 
-  // ✅ FIXED: Get JNE destination code dari selected city dengan fallback
-  const getJneDestinationCode = (provinceKey, cityKey) => {
+  // ✅ Get destination code from selected city with multiple fallbacks
+  const getDestinationCode = (provinceKey, cityKey) => {
     try {
-      console.log('🔍 Getting JNE destination code for:', { provinceKey, cityKey });
+      console.log('🔍 Getting destination code for:', { provinceKey, cityKey });
 
       if (!addressData || !addressData.provinces) {
         console.log('❌ addressData belum siap');
@@ -262,17 +263,17 @@ const Checkout = () => {
         return null;
       }
 
-      console.log('✅ JNE destination code found:', city.jne_code);
+      console.log('✅ Destination code found:', city.jne_code);
       return city.jne_code;
     } catch (error) {
-      console.error('💥 Error getting JNE destination code:', error);
+      console.error('💥 Error getting destination code:', error);
       return null;
     }
   };
 
-  // ✅ COMPLETELY FIXED: Enhanced fetchJneServices dengan proper error handling
+  // ✅ FIXED: Enhanced fetchJneServices dengan automatic weight calculation via backend
   const fetchJneServices = async (destinationCode) => {
-    // Validasi checkout items
+    // Create items array for JNE API
     if (!checkoutItems || !Array.isArray(checkoutItems) || checkoutItems.length === 0) {
       console.log('⚠️ No checkout items available, cannot calculate shipping');
       setJneServices([]);
@@ -282,13 +283,11 @@ const Checkout = () => {
       return;
     }
     
-    // Siapkan items array untuk JNE API
     const items = checkoutItems.map(item => ({
       name: item.name,
       quantity: parseInt(item.quantity)
     }));
     
-    // Cek apakah request sudah sama dengan sebelumnya
     const requestParams = `${destinationCode}-${JSON.stringify(items)}`;
     
     if (lastRequestParamsRef.current === requestParams) {
@@ -296,13 +295,11 @@ const Checkout = () => {
       return;
     }
     
-    // Cancel request sebelumnya jika ada
     if (currentRequestRef.current) {
       currentRequestRef.current.cancelled = true;
       console.log('🚫 Cancelling previous JNE request');
     }
 
-    // Validasi destination code
     if (!destinationCode) {
       console.log('⚠️ No destination code provided, clearing JNE services');
       setJneServices([]);
@@ -315,7 +312,6 @@ const Checkout = () => {
 
     console.log('🚀 Fetching JNE services for:', { destinationCode, items: items.length + ' items' });
     
-    // Setup current request tracking
     const currentRequest = { cancelled: false };
     currentRequestRef.current = currentRequest;
     lastRequestParamsRef.current = requestParams;
@@ -323,124 +319,165 @@ const Checkout = () => {
     setIsLoadingJne(true);
     setJneError('');
     
-    // Setup timeout untuk request
     const timeoutId = setTimeout(() => {
       if (!currentRequest.cancelled) {
         console.log('⏰ JNE fetch timeout, stopping loading...');
         setIsLoadingJne(false);
-        setJneError('Request timeout. Silakan coba lagi dalam beberapa saat.');
+        setJneError('Request timeout. Silakan coba lagi.');
         currentRequestRef.current = null;
       }
-    }, 25000); // 25 detik timeout
+    }, 20000);
     
     try {
-      // ✅ FIXED: Construct proper API URL dengan encoding yang benar
+      // ✅ SOLUTION: Send items to backend for automatic weight calculation
       const itemsParam = encodeURIComponent(JSON.stringify(items));
-      const apiUrl = `https://api.monyenyo.com/jne.php?thru=${destinationCode}&items=${itemsParam}`;
-      
-      console.log('📡 Calling JNE API:', apiUrl);
-      
-      // Setup AbortController untuk request cancellation
-      const controller = new AbortController();
-      const requestTimeout = setTimeout(() => controller.abort(), 20000);
-      
-      // ✅ FIXED: Proper fetch request dengan error handling yang lebih baik
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
-          'X-Requested-With': 'XMLHttpRequest'
+      const apiEndpoints = [
+        // Primary endpoint with items parameter
+        {
+          url: `https://api.monyenyo.com/jne.php?thru=${destinationCode}&items=${itemsParam}`,
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
         },
-        mode: 'cors',
-        credentials: 'omit',
-        signal: controller.signal,
-        cache: 'no-cache'
-      });
-      
-      clearTimeout(requestTimeout);
-      clearTimeout(timeoutId);
-      
-      // Check if request was cancelled
-      if (currentRequest.cancelled) {
-        console.log('🚫 JNE request was cancelled during fetch');
-        return;
-      }
-      
-      console.log('📊 JNE API Response status:', response.status, response.statusText);
-      console.log('📊 JNE API Response headers:', Object.fromEntries(response.headers.entries()));
-      
-      // Handle different response status codes
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('JNE services not found for this destination');
-        } else if (response.status === 500) {
-          throw new Error('JNE server error. Please try again later.');
-        } else {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Backup with JSONP approach jika diperlukan
+        {
+          url: `https://api.monyenyo.com/jne.php?thru=${destinationCode}&items=${itemsParam}&callback=jneCallback`,
+          method: 'GET',
+          headers: {
+            'Accept': 'application/javascript',
+          }
         }
-      }
+      ];
       
-      // Parse response dengan proper error handling
-      let data;
-      const contentType = response.headers.get('content-type') || '';
+      let lastError = null;
+      let success = false;
       
-      if (contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        // Try to parse as JSON anyway
-        const textData = await response.text();
-        console.log('📄 Raw JNE response (first 500 chars):', textData.substring(0, 500));
-        
-        try {
-          data = JSON.parse(textData);
-        } catch (parseError) {
-          console.error('💥 JSON parse error:', parseError);
-          throw new Error('Invalid response format from JNE API');
-        }
-      }
+      // Try primary endpoint with proper CORS headers
+      const primaryUrl = apiEndpoints[0].url;
+      console.log('📡 Trying primary API:', primaryUrl);
       
-      console.log('📊 JNE API Response data:', data);
+      const controller = new AbortController();
+      const requestTimeout = setTimeout(() => controller.abort(), 15000);
       
-      if (currentRequest.cancelled) {
-        console.log('🚫 JNE request was cancelled during processing');
-        return;
-      }
-      
-      // ✅ FIXED: Handle response berdasarkan struktur API yang benar
-      if (data && data.status === 'success' && data.price && Array.isArray(data.price) && data.price.length > 0) {
-        // Process services dengan null ETD handling
-        const processedServices = data.price.map(service => {
-          const etdFrom = service.etd_from ?? '?';
-          const etdThru = service.etd_thru ?? '?';
-          
-          return {
-            ...service,
-            etd_from: etdFrom,
-            etd_thru: etdThru,
-            estimateText: (etdFrom !== '?' && etdThru !== '?' && etdFrom !== null && etdThru !== null) 
-              ? `${etdFrom} - ${etdThru} hari kerja`
-              : 'Estimasi tidak tersedia'
-          };
+      try {
+        // ✅ FIXED: Proper fetch with all necessary options
+        const response = await fetch(primaryUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors', // Try CORS first
+          credentials: 'omit', // Don't send credentials
+          signal: controller.signal,
+          // Add cache control to prevent caching issues
+          cache: 'no-cache'
         });
         
-        setJneServices(processedServices);
-        setJneError('');
-        console.log('✅ JNE Services loaded successfully:', processedServices.length, 'services');
+        clearTimeout(requestTimeout);
+        clearTimeout(timeoutId);
         
-      } else if (data && data.error) {
-        console.log('❌ JNE API Error:', data.error);
-        setJneError(`${data.error}`);
-        setJneServices([]);
+        if (currentRequest.cancelled) {
+          console.log('🚫 JNE request was cancelled');
+          return;
+        }
         
-      } else {
-        console.warn('⚠️ Unexpected JNE API response format:', data);
-        setJneServices([]);
-        setJneError('Format respons tidak sesuai. Silakan coba lagi.');
+        console.log('📊 JNE API Response status:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        // Check content type
+        const contentType = response.headers.get('content-type');
+        console.log('📄 Response content type:', contentType);
+        
+        let data;
+        if (contentType && contentType.includes('application/json')) {
+          data = await response.json();
+        } else {
+          // Try to parse as JSON anyway
+          const textData = await response.text();
+          console.log('📄 Raw response:', textData.substring(0, 500));
+          data = JSON.parse(textData);
+        }
+        
+        console.log('📊 JNE API Response data:', data);
+        
+        if (currentRequest.cancelled) {
+          console.log('🚫 JNE request was cancelled during processing');
+          return;
+        }
+        
+        // Handle successful response dengan null ETD handling
+        if (data && data.price && Array.isArray(data.price) && data.price.length > 0) {
+          const processedServices = data.price.map(service => {
+            const etdFrom = service.etd_from ?? '?';
+            const etdThru = service.etd_thru ?? '?';
+            
+            return {
+              ...service,
+              etd_from: etdFrom,
+              etd_thru: etdThru,
+              estimateText: (etdFrom !== '?' && etdThru !== '?' && etdFrom !== null && etdThru !== null) 
+                ? `${etdFrom} - ${etdThru} hari kerja`
+                : 'Estimasi tidak tersedia'
+            };
+          });
+          
+          setJneServices(processedServices);
+          setJneError('');
+          success = true;
+          console.log('✅ JNE Services loaded successfully:', processedServices.length, 'services');
+          
+        } else if (data && data.error) {
+          console.log('❌ JNE API Error:', data.error);
+          setJneError(`API Error: ${data.error}`);
+          setJneServices([]);
+        } else {
+          console.warn('⚠️ No JNE services available or unexpected response format:', data);
+          setJneServices([]);
+          setJneError('Tidak ada layanan JNE tersedia untuk lokasi ini.');
+        }
+        
+      } catch (fetchError) {
+        clearTimeout(requestTimeout);
+        lastError = fetchError;
+        
+        if (currentRequest.cancelled) {
+          console.log('🚫 JNE request was cancelled during fetch error');
+          return;
+        }
+        
+        console.error("💥 Primary fetch failed:", fetchError);
+        
+        // ✅ FALLBACK: Try with no-cors mode untuk handle CORS issue
+        if (fetchError.name === 'TypeError' && fetchError.message.includes('CORS')) {
+          console.log('🔄 Trying no-cors fallback...');
+          
+          try {
+            const fallbackResponse = await fetch(primaryUrl, {
+              method: 'GET',
+              mode: 'no-cors',
+              credentials: 'omit',
+              cache: 'no-cache'
+            });
+            
+            // no-cors mode doesn't allow reading response, so we'll show a user-friendly message
+            console.log('📡 no-cors request sent, but cannot read response due to CORS policy');
+            setJneError('JNE services tersedia tapi terkendala CORS policy. Silakan refresh halaman atau coba lagi.');
+            setJneServices([]);
+            
+          } catch (noCorsError) {
+            console.error("💥 No-CORS fallback also failed:", noCorsError);
+          }
+        }
       }
       
-    } catch (fetchError) {
+    } catch (error) {
       clearTimeout(timeoutId);
       
       if (currentRequest.cancelled) {
@@ -448,24 +485,23 @@ const Checkout = () => {
         return;
       }
       
-      console.error("💥 Error fetching JNE services:", fetchError);
+      console.error("💥 Error fetching JNE services:", error);
       
-      // Handle specific error types dengan user-friendly messages
-      let errorMessage = 'Gagal memuat layanan pengiriman JNE.';
-      
-      if (fetchError.name === 'AbortError') {
-        errorMessage = 'Request timeout. Koneksi terlalu lambat.';
-      } else if (fetchError.name === 'TypeError') {
-        if (fetchError.message.includes('fetch')) {
-          errorMessage = 'Tidak dapat terhubung ke server JNE. Periksa koneksi internet.';
-        } else if (fetchError.message.includes('JSON')) {
-          errorMessage = 'Format data tidak valid dari server JNE.';
-        }
-      } else if (fetchError.message) {
-        errorMessage = fetchError.message;
+      // Handle specific error types dengan detailed logging
+      if (error.name === 'AbortError') {
+        console.error('🚨 JNE API Timeout - Request took too long');
+        setJneError('Request timeout. Koneksi terlalu lambat, silakan coba lagi.');
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        console.error('🚨 JNE API Network Error - Cannot connect to server');
+        setJneError('Masalah CORS atau koneksi. API berfungsi tapi browser memblokir akses. Coba refresh halaman.');
+      } else if (error.message.includes('JSON')) {
+        console.error('🚨 JNE API JSON Parse Error - Invalid response format');
+        setJneError('Server JNE mengirim respons yang tidak valid. Silakan coba lagi.');
+      } else {
+        console.error('🚨 JNE API Unknown Error:', error.message);
+        setJneError('Gagal memuat layanan pengiriman JNE. Silakan coba lagi.');
       }
       
-      setJneError(errorMessage + ' Silakan coba lagi.');
       setJneServices([]);
       
     } finally {
@@ -488,7 +524,7 @@ const Checkout = () => {
     setSelectedShipping('jne');
   };
 
-  // ✅ Load menu voucher on component mount untuk Buy Now mode
+  // ✅ Load menu voucher on component mount for Buy Now mode
   useEffect(() => {
     if (isBuyNow) {
       const savedMenuVoucher = getMenuVoucher();
@@ -501,28 +537,17 @@ const Checkout = () => {
     }
   }, [isBuyNow]);
 
-  // ✅ FIXED: Main useEffect untuk fetch JNE services dengan proper debouncing
+  // ✅ Main useEffect untuk fetch JNE services dengan anti infinite loop
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      // Pastikan semua data sudah tersedia sebelum fetch JNE
-      if (shippingAddress.province && 
-          shippingAddress.regency && 
-          !addressLoading && 
-          addressData.provinces &&
-          Object.keys(addressData.provinces).length > 0) {
-        
-        const destinationCode = getJneDestinationCode(shippingAddress.province, shippingAddress.regency);
+      if (shippingAddress.province && shippingAddress.regency && !addressLoading && addressData.provinces) {
+        const destinationCode = getDestinationCode(shippingAddress.province, shippingAddress.regency);
         
         if (destinationCode) {
-          console.log('🚀 Triggering JNE fetch with:', { 
-            destinationCode, 
-            itemsCount: checkoutItems?.length || 0,
-            province: shippingAddress.province,
-            city: shippingAddress.regency
-          });
+          console.log('🚀 Triggering JNE fetch with:', { destinationCode, itemsCount: checkoutItems?.length || 0 });
           fetchJneServices(destinationCode);
         } else {
-          console.log('⚠️ No valid JNE destination code found, clearing services');
+          console.log('⚠️ No valid destination code, clearing JNE services');
           setJneServices([]);
           setSelectedService(null);
           setJneShippingCost(0);
@@ -530,24 +555,19 @@ const Checkout = () => {
           lastRequestParamsRef.current = null;
         }
       } else {
-        console.log('⏳ Waiting for complete address data...', {
-          province: !!shippingAddress.province,
-          regency: !!shippingAddress.regency,
-          addressLoading,
-          provincesCount: Object.keys(addressData.provinces || {}).length
-        });
+        console.log('⏳ Waiting for complete address or address data loading...');
         setJneServices([]);
         setSelectedService(null);
         setJneShippingCost(0);
         setIsLoadingJne(false);
         lastRequestParamsRef.current = null;
       }
-    }, 500); // 500ms debounce
+    }, 500);
 
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [shippingAddress.province, shippingAddress.regency, addressLoading, checkoutItems, addressData.provinces]);
+  }, [shippingAddress.province, shippingAddress.regency, addressLoading, checkoutItems]);
 
   // ✅ Fungsi untuk menghitung discount voucher dengan struktur data yang benar
   const calculateVoucherDiscount = (voucher, subtotal) => {
@@ -611,7 +631,7 @@ const Checkout = () => {
     return getImageUrl(item);
   }
 
-  // Update available options ketika province/city/district berubah
+  // Update available options when province/city/district changes
   useEffect(() => {
     if (shippingAddress.province) {
       const provinceData = addressData.provinces[shippingAddress.province]
@@ -876,7 +896,7 @@ const Checkout = () => {
     }
   }, [cart, navigate, isBuyNow])
 
-  // ✅ Calculate total dengan JNE shipping cost
+  // ✅ Calculate total with JNE shipping cost
   const calculateTotal = () => {
     const { finalTotal } = calculateCheckoutTotals()
     const shippingCost = getShippingCost()
@@ -890,7 +910,7 @@ const Checkout = () => {
   }
 
   const handleAddressChange = (field, value) => {
-    console.log(`🔄 Address field changed: ${field} = ${value}`);
+    console.log(`📝 Address field changed: ${field} = ${value}`);
     setShippingAddress(prev => ({
       ...prev,
       [field]: value
@@ -984,7 +1004,7 @@ const Checkout = () => {
     return emailRegex.test(email);
   }
 
-  // ✅ FIXED: Enhanced validation function dengan shipping validation yang lebih baik
+  // ✅ Enhanced validation function with shipping validation
   const validateCheckoutData = () => {
     // Basic field validation
     const requiredFields = ['name', 'email', 'phone', 'address', 'zipCode', 'province', 'regency', 'district', 'subdistrict']
@@ -1021,29 +1041,29 @@ const Checkout = () => {
       return false
     }
 
-    // ✅ ENHANCED SHIPPING VALIDATION - Skip untuk COD
+    // ✅ ENHANCED SHIPPING VALIDATION - Skip for COD
     if (selectedPayment !== 'cod') {
+      // Check if JNE services are available and loaded
+      if (jneServices.length === 0 && !isLoadingJne && !jneError) {
+        alert('Layanan pengiriman JNE tidak tersedia untuk lokasi ini. Silakan pilih lokasi lain atau refresh halaman.')
+        return false
+      }
+
       // Check if JNE is still loading
       if (isLoadingJne) {
         alert('Sedang memuat layanan pengiriman JNE. Mohon tunggu sebentar.')
         return false
       }
 
-      // Check if there's JNE error dan tidak ada services available
+      // Check if there's JNE error
       if (jneError && jneServices.length === 0) {
-        alert(`Gagal memuat layanan pengiriman: ${jneError}`)
+        alert(`Gagal memuat layanan pengiriman: ${jneError}. Silakan refresh halaman atau coba lagi.`)
         return false
       }
 
-      // Check if JNE services are available but user hasn't selected any
+      // Check if user has selected a JNE service when JNE services are available
       if (jneServices.length > 0 && (!selectedService || selectedShipping !== 'jne')) {
         alert('Silakan pilih salah satu layanan pengiriman JNE yang tersedia.')
-        return false
-      }
-
-      // Check if no JNE services available dan tidak ada alternatif
-      if (jneServices.length === 0 && !jneError && !isLoadingJne) {
-        alert('Layanan pengiriman JNE tidak tersedia untuk lokasi ini. Silakan pilih lokasi lain atau gunakan COD.')
         return false
       }
 
@@ -1078,9 +1098,9 @@ const Checkout = () => {
     }
   }
 
-  // ✅ COMPLETE FIXED handlePay function dengan COD support dan validation status
+  // ✅ COMPLETE FIXED handlePay function with COD support
   const handlePay = async () => {
-    // ✅ Enhanced validation dengan shipping check
+    // ✅ Enhanced validation with shipping check
     if (!validateCheckoutData()) {
       return
     }
@@ -1101,7 +1121,7 @@ const Checkout = () => {
       const orderNumber = `ORD${Date.now()}`
       const currentDate = new Date().toISOString()
 
-      // Get readable names untuk address fields
+      // Get readable names for address fields
       const readableAddress = getReadableLocationNames()
 
       // ✅ Check if payment method is COD
@@ -1113,7 +1133,7 @@ const Checkout = () => {
         order_number: orderNumber,
         created_at: currentDate,
         
-        // ✅ Customer Information
+        // ✅ Customer Information (sesuai dengan fillable fields)
         name: shippingAddress.name,
         email: shippingAddress.email,
         phone: shippingAddress.phone,
@@ -1133,7 +1153,7 @@ const Checkout = () => {
         shipping_cost: getShippingCost(),
         is_shipping_free: hasFreeShippingVoucher(),
         
-        // ✅ JNE Service Details
+        // ✅ JNE Service Details (akan null jika bukan JNE)
         jne_service_code: selectedService?.service_code || null,
         jne_service_display: selectedService?.service_display || null,
         jne_price: selectedService ? parseInt(selectedService.price) : null,
@@ -1147,7 +1167,7 @@ const Checkout = () => {
         // ✅ Notes
         notes: notes || null,
         
-        // ✅ Items
+        // ✅ Items (as JSON array sesuai dengan cast di model)
         items: checkoutItems.map(item => ({
           id: item.id,
           name: item.name,
@@ -1156,7 +1176,7 @@ const Checkout = () => {
           sku: item.sku || null
         })),
         
-        // ✅ Vouchers
+        // ✅ Vouchers (as JSON object sesuai dengan cast di model)
         vouchers: isBuyNow ? {
           type: 'buy_now',
           primary: primaryVoucher ? {
@@ -1191,7 +1211,7 @@ const Checkout = () => {
           } : null
         },
         
-        // ✅ Financial Totals
+        // ✅ Financial Totals (sesuai dengan cast decimal di model)
         subtotal_before_voucher: parseFloat(calculateCheckoutTotals().subtotalBeforeVoucher),
         total_voucher_discount: parseFloat(calculateCheckoutTotals().totalVoucherDiscount),
         final_total: parseFloat(calculateCheckoutTotals().finalTotal),
@@ -1199,19 +1219,20 @@ const Checkout = () => {
         grand_total: parseFloat(calculateTotal()),
         
         // ✅ Order Status & Type
-        status: isCOD ? 'paid' : 'pending',
+        status: isCOD ? 'paid' : 'pending', // COD langsung paid
         is_buy_now: isBuyNow,
         
-        // ✅ Admin notes
+        // ✅ Admin notes (null by default, bisa diisi admin nanti)
         admin_notes: null
       }
 
       console.log('📦 Sending comprehensive order data to backend:', completeOrderData)
 
-      // ✅ COD Logic - Skip Midtrans dan langsung ke checkout API
+      // ✅ COD Logic - Skip Midtrans and go directly to checkout API
       if (isCOD) {
         console.log('💰 COD Payment - Processing directly without Midtrans')
         
+        // ✅ FIXED: Use correct nested structure with converted address names
         const checkoutPayload = {
           shippingAddress: {
             name: shippingAddress.name,
@@ -1220,6 +1241,7 @@ const Checkout = () => {
             country: shippingAddress.country,
             address: shippingAddress.address,
             zipCode: shippingAddress.zipCode,
+            // ✅ Use converted names instead of IDs
             province: readableAddress.province,
             regency: readableAddress.city,
             district: readableAddress.district,
@@ -1264,7 +1286,7 @@ const Checkout = () => {
 
         console.log('📦 Sending COD order data to backend:', checkoutPayload)
 
-        // Send COD order langsung ke checkout endpoint
+        // Send COD order directly to checkout endpoint
         const codResponse = await fetch('https://api.monyenyo.com/api/checkout', {
           method: 'POST',
           headers: {
