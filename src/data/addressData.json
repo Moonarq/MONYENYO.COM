@@ -3171,7 +3171,8 @@
                 "BUKLOH",
                 "LAMBARIH JURONG RAYA",
                 "LAMBARIH BAKMEE"
-              ]
+              ],
+              "jne_code": "BTJ21800"
             },
             "1108101": {
               "name": "KUTA MALAKA",
@@ -4752,7 +4753,8 @@
                 "TEUPIN RAYA",
                 "AWE GEUTAH PAYA",
                 "DAYAH BAROE"
-              ]
+              ],
+              "jne_code": "BTJ20115"
             },
             "1110090": {
               "name": "MAKMUR",
@@ -5975,7 +5977,8 @@
                 "KUTA TUHA",
                 "GUDANG",
                 "BABAH LHUNG"
-              ]
+              ],
+              "jne_code": "BTJ21000"
             },
             "1112031": {
               "name": "JEUMPA",
@@ -6374,7 +6377,8 @@
                 "KEBUN RANTAU",
                 "ALUR MANIS",
                 "MEKAR JAYA"
-              ]
+              ],
+              "jne_code": "BDJ20500"
             },
             "1114040": {
               "name": "KOTA KUALASIMPANG",
@@ -6801,7 +6805,8 @@
                 "KUTA BARO BM",
                 "ALUE PEUSAJA",
                 "ALUE GAJAH"
-              ]
+              ],
+              "jne_code": "BTJ21800"
             },
             "1115050": {
               "name": "SEUNAGAN TIMUR",
@@ -7789,7 +7794,8 @@
                 "BATEE SHOEK",
                 "PAYA SEUNARA",
                 "IBOIH"
-              ]
+              ],
+              "jne_code": "BTJ21800"
             },
             "1172020": {
               "name": "SUKAKARYA",
@@ -7802,7 +7808,7 @@
               ]
             }
           },
-          "jne_code": "MXG10000"
+          "jne_code": "BTJ20700"
         },
         "1173": {
           "name": "KOTA LANGSA",
@@ -7896,7 +7902,8 @@
                 "GAMPONG MUTIA",
                 "BLANG SINIBONG",
                 "TUALANG TEUNGOH"
-              ]
+              ],
+              "jne_code": "BTJ10100"
             }
           },
           "jne_code": "BTJ10100"
@@ -8657,7 +8664,8 @@
                 "SABA JAMBU",
                 "PANGGORENGAN",
                 "MANYABAR JAE"
-              ]
+              ],
+              "jne_code": "DTB20900"
             },
             "1202051": {
               "name": "PANYABUNGAN SELATAN",
@@ -9140,7 +9148,8 @@
                 "MARSADA",
                 "LUAT LOMBANG",
                 "PAHAE AEK SAGALA"
-              ]
+              ],
+              "jne_code": "DTB21100"
             },
             "1203120": {
               "name": "ARSE",
@@ -10471,7 +10480,8 @@
                 "BAGAN ASAHAN BARU",
                 "BAGAN ASAHAN PEKAN",
                 "BAGAN ASAHAN"
-              ]
+              ],
+              "jne_code": "MES22500"
             },
             "1208060": {
               "name": "SIMPANG EMPAT",
@@ -10484,7 +10494,8 @@
                 "SUNGAI LAMA",
                 "SIPAKU AREA",
                 "ANJUNG GANJANG"
-              ]
+              ],
+              "jne_code": "PDG21500"
             },
             "1208061": {
               "name": "TELUK DALAM",
@@ -10575,7 +10586,8 @@
                 "GAJAH",
                 "AIR PUTIH",
                 "SUKAJADI"
-              ]
+              ],
+              "jne_code": "PKU21300"
             },
             "1208091": {
               "name": "PULO BANDRING",
@@ -11690,7 +11702,8 @@
                 "GAJAH",
                 "BULAN BARU",
                 "GAMBER"
-              ]
+              ],
+              "jne_code": "PDG21500"
             },
             "1211081": {
               "name": "NAMAN TERAN",
@@ -12607,7 +12620,8 @@
                 "BATU MALENGGANG",
                 "TAMARAN",
                 "SUKA DAMAI TIMUR"
-              ]
+              ],
+              "jne_code": "CNX10000"
             },
             "1213130": {
               "name": "SECANGGANG",
@@ -14065,7 +14079,8 @@
                 "PAYA LOMBANG",
                 "PAYA MABAR",
                 "SEI PERIOK"
-              ]
+              ],
+              "jne_code": "MES21100"
             },
             "1218051": {
               "name": "TEBING SYAHBANDAR",
@@ -16076,7 +16091,8 @@
                 "PASAR BARU",
                 "BADAK BEJUANG",
                 "BANDAR UTAMA"
-              ]
+              ],
+              "jne_code": "MES21100"
             },
             "1274020": {
               "name": "RAMBUTAN",
@@ -16200,7 +16216,8 @@
                 "PASAR BARU",
                 "PUSAT PASAR",
                 "PANDAU HULU I"
-              ]
+              ],
+              "jne_code": "MES10000"
             },
             "1275070": {
               "name": "MEDAN MAIMUN",
@@ -16374,7 +16391,8 @@
                 "BELAWAN II",
                 "BAGAN DELI",
                 "BELAWAN I"
-              ]
+              ],
+              "jne_code": "MES10045"
             }
           },
           "jne_code": "MES10000"
@@ -16445,7 +16463,7 @@
               ]
             }
           },
-          "jne_code": "UPG21500"
+          "jne_code": "MES20200"
         },
         "1277": {
           "name": "KOTA PADANG SIDEMPUAN",
@@ -16471,7 +16489,8 @@
                 "HUTA LOMBANG",
                 "PERKEBUNAN P KOLING",
                 "LABUHAN LABO"
-              ]
+              ],
+              "jne_code": "DTB20506"
             },
             "1277020": {
               "name": "PADANGSIDIMPUAN SELATAN",
@@ -16488,7 +16507,8 @@
                 "LOSUNG",
                 "PADANG MATINGGI LESTARI",
                 "SITAMIANG BARU"
-              ]
+              ],
+              "jne_code": "DTB20505"
             },
             "1277030": {
               "name": "PADANGSIDIMPUAN BATUNADUA",
@@ -16508,7 +16528,8 @@
                 "SIMIRIK",
                 "BATUNADUA JAE",
                 "BATUNADUA JULU"
-              ]
+              ],
+              "jne_code": "DTB20502"
             },
             "1277040": {
               "name": "PADANGSIDIMPUAN UTARA",
@@ -16529,7 +16550,8 @@
                 "BINCAR",
                 "TIMBANGAN",
                 "KAYU OMBUN"
-              ]
+              ],
+              "jne_code": "DTB20507"
             },
             "1277050": {
               "name": "PADANGSIDIMPUAN HUTAIMBARU",
@@ -16544,7 +16566,8 @@
                 "HUTA PADANG",
                 "LUBUK RAYA",
                 "TINJOMAN"
-              ]
+              ],
+              "jne_code": "DTB20504"
             },
             "1277051": {
               "name": "PADANGSIDIMPUAN ANGKOLA JULU",
@@ -16560,7 +16583,7 @@
               ]
             }
           },
-          "jne_code": "DTB20505"
+          "jne_code": "DTB20500"
         },
         "1278": {
           "name": "KOTA GUNUNGSITOLI",
@@ -17664,7 +17687,8 @@
                 "III KOTO AUA MALINTANG TIMUR",
                 "III KOTO AUA MALINTANG UTARA",
                 "BALAI BAIAK MALAI III KOTO"
-              ]
+              ],
+              "jne_code": "PDG20628"
             }
           },
           "jne_code": "PDG20620"
@@ -17873,7 +17897,8 @@
                 "TAEH BARUAH",
                 "PIOBANG",
                 "TAEH BUKIK"
-              ]
+              ],
+              "jne_code": "PDG20700"
             },
             "1308011": {
               "name": "AKABILURU",
@@ -18223,7 +18248,8 @@
                 "PAKAN RABAA UTARA DUO",
                 "BALUN PAKAN RABAA TENGAH",
                 "BATANG LOLO"
-              ]
+              ],
+              "jne_code": "PDG21801"
             }
           },
           "jne_code": "PDG20900"
@@ -18927,7 +18953,8 @@
                 "TOBOH PALABAH",
                 "RAMBAI",
                 "PUNGGUNG LADING"
-              ]
+              ],
+              "jne_code": "PDG20625"
             },
             "1377020": {
               "name": "PARIAMAN TENGAH",
@@ -18954,7 +18981,8 @@
                 "RAWANG",
                 "JATI HILIR",
                 "JATI MUDIK"
-              ]
+              ],
+              "jne_code": "PDG20626"
             },
             "1377021": {
               "name": "PARIAMAN TIMUR",
@@ -18997,7 +19025,8 @@
                 "PADANG BIRIK-BIRIK",
                 "SINTUK",
                 "SUNGAI RAMBAI"
-              ]
+              ],
+              "jne_code": "PDG20627"
             }
           },
           "jne_code": "PDG20625"
@@ -20167,7 +20196,8 @@
                 "RAWANG AIR PUTIH",
                 "SUAK LANJUT",
                 "BUANTAN BESAR"
-              ]
+              ],
+              "jne_code": "PKU21209"
             },
             "1405021": {
               "name": "KERINCI KANAN",
@@ -21445,7 +21475,8 @@
                 "ALAH AIR TIMUR",
                 "SELAT PANJANG BARAT",
                 "SELAT PANJANG KOTA"
-              ]
+              ],
+              "jne_code": "MES21100"
             },
             "1410021": {
               "name": "TEBING TINGGI TIMUR",
@@ -21667,7 +21698,8 @@
                 "KOTA BARU",
                 "SUKARAMAI",
                 "KOTA TINGGI"
-              ]
+              ],
+              "jne_code": "PKU10000"
             },
             "1471060": {
               "name": "SUKAJADI",
@@ -21802,7 +21834,7 @@
               ]
             }
           },
-          "jne_code": "SRG20700"
+          "jne_code": "PKU10100"
         }
       }
     },
@@ -23294,7 +23326,7 @@
               ]
             }
           },
-          "jne_code": "AMI20807"
+          "jne_code": "DJB20806"
         },
         "1507": {
           "name": "KAB. TANJUNG JABUNG BARAT",
@@ -23358,7 +23390,8 @@
                 "DELIMA",
                 "TALANG MAKMUR",
                 "TELUK PENGKAH"
-              ]
+              ],
+              "jne_code": "MES21100"
             },
             "1507014": {
               "name": "RENAH MENDALUH",
@@ -23861,7 +23894,8 @@
                 "SUNGAI LILIN",
                 "SUNGAI TEMBANG",
                 "RANTAU MAKMUR"
-              ]
+              ],
+              "jne_code": "DJB20325"
             },
             "1509050": {
               "name": "TANAH TUMBUH",
@@ -23951,7 +23985,8 @@
                 "PAAL LIMA",
                 "Talang Gulo",
                 "Kenali Asam"
-              ]
+              ],
+              "jne_code": "AWX10000"
             },
             "1571011": {
               "name": "ALAM BARAJO",
@@ -24182,7 +24217,8 @@
           },
           "jne_code": "DJB20407"
         }
-      }
+      },
+      "jne_code": "DJB10000"
     },
     "16": {
       "name": "SUMATERA SELATAN",
@@ -25253,7 +25289,8 @@
                 "BATU RANCING",
                 "GUNUNG MERAKSA",
                 "KEMBANG AYUN"
-              ]
+              ],
+              "jne_code": "PLM20327"
             },
             "1604040": {
               "name": "KOTA AGUNG",
@@ -27146,7 +27183,8 @@
                 "JAYAPURA",
                 "PERACAK JAYA",
                 "KAMBANG"
-              ]
+              ],
+              "jne_code": "DJJ10000"
             },
             "1609020": {
               "name": "BUAY PEMUKA PELIUNG",
@@ -28055,7 +28093,8 @@
                 "KOTA GADING",
                 "JAYA LOKA",
                 "TANJUNG KUPANG BARU"
-              ]
+              ],
+              "jne_code": "MES21100"
             },
             "1611071": {
               "name": "SALING",
@@ -29007,7 +29046,8 @@
                 "DERATI",
                 "KOTA PADANG BARU",
                 "TANJUNG GELANG"
-              ]
+              ],
+              "jne_code": "PDG10000"
             },
             "1702021": {
               "name": "SINDANG BELITI ILIR",
@@ -29857,7 +29897,8 @@
                 "RIMBO BESAR",
                 "KARANG DAPO",
                 "MARAS BANTAN"
-              ]
+              ],
+              "jne_code": "BKS23010"
             },
             "1705020": {
               "name": "SEMIDANG ALAS",
@@ -29907,7 +29948,8 @@
                 "NAPAL MELINTANG",
                 "SIMPANG TIGA PAGAR GASING",
                 "HARAPAN MULYA"
-              ]
+              ],
+              "jne_code": "BKS23012"
             },
             "1705031": {
               "name": "ILIR TALO",
@@ -29961,7 +30003,8 @@
                 "PAGAR BANYU",
                 "TANJUNG AGUNG",
                 "MUARA NIBUNG"
-              ]
+              ],
+              "jne_code": "BKS23013"
             },
             "1705040": {
               "name": "SELUMA",
@@ -30991,7 +31034,8 @@
           },
           "jne_code": "BKS10000"
         }
-      }
+      },
+      "jne_code": "BKS10000"
     },
     "18": {
       "name": "LAMPUNG",
@@ -31247,7 +31291,8 @@
                 "SUMUR TUJUH",
                 "DADI MULYO",
                 "SRI MELATI"
-              ]
+              ],
+              "jne_code": "MGL10200"
             },
             "1802011": {
               "name": "SEMAKA",
@@ -31970,7 +32015,7 @@
               ]
             }
           },
-          "jne_code": "BDO10000"
+          "jne_code": "TKG20117"
         },
         "1804": {
           "name": "KAB. LAMPUNG TIMUR",
@@ -32311,7 +32356,8 @@
                 "WONO SARI",
                 "ADIJAYA",
                 "GANTIMULYO"
-              ]
+              ],
+              "jne_code": "SRG10300"
             },
             "1804110": {
               "name": "RAMAN UTARA",
@@ -33547,7 +33593,8 @@
                 "KARYA MURNI JAYA",
                 "PANCA KARSA PURNA JAYA",
                 "PANCA MULIA"
-              ]
+              ],
+              "jne_code": "BDJ10500"
             },
             "1808040": {
               "name": "GEDUNG AJI",
@@ -33728,7 +33775,7 @@
               ]
             }
           },
-          "jne_code": "SRG20202"
+          "jne_code": "TKG21200"
         },
         "1809": {
           "name": "KAB. PESAWARAN",
@@ -34082,7 +34129,8 @@
                 "SINAR BARU TIMUR",
                 "PANGGUNG REJO UTARA",
                 "SUKOHARJO III BARAT"
-              ]
+              ],
+              "jne_code": "SOC20500"
             },
             "1810070": {
               "name": "BANYUMAS",
@@ -34816,7 +34864,8 @@
                 "CAMPANG JAYA",
                 "WAY GUBAK",
                 "WAY LAGA"
-              ]
+              ],
+              "jne_code": "SMI10000"
             },
             "1871092": {
               "name": "WAY HALIM",
@@ -34883,7 +34932,7 @@
               ]
             }
           },
-          "jne_code": "UPG20800"
+          "jne_code": "TKG20300"
         }
       }
     },
@@ -35015,7 +35064,7 @@
               ]
             }
           },
-          "jne_code": "BTJ10100"
+          "jne_code": "PGK10207"
         },
         "1902": {
           "name": "KAB. BELITUNG",
@@ -35056,7 +35105,8 @@
                 "AIK RAYAK",
                 "AIK PELEMPANG JAYA",
                 "KAMPONG DAMAI"
-              ]
+              ],
+              "jne_code": "TJQ10000"
             },
             "1902061": {
               "name": "BADAU",
@@ -35710,7 +35760,7 @@
               ]
             }
           },
-          "jne_code": "MDN10000"
+          "jne_code": "BTH10405"
         },
         "2102": {
           "name": "KAB. BINTAN",
@@ -35985,7 +36035,7 @@
               ]
             }
           },
-          "jne_code": "MDC20400"
+          "jne_code": "BTH10300"
         },
         "2104": {
           "name": "KAB. LINGGA",
@@ -36337,7 +36387,8 @@
                 "TELUK TERING",
                 "SUNGAI PANAS",
                 "SUKAJADI"
-              ]
+              ],
+              "jne_code": "BTH10000"
             },
             "2171060": {
               "name": "SEKUPANG",
@@ -36421,7 +36472,8 @@
                 "PENYENGAT",
                 "KAMPUNG BUGIS",
                 "SENGGARANG"
-              ]
+              ],
+              "jne_code": "TNJ10000"
             },
             "2172040": {
               "name": "TANJUNGPINANG BARAT",
@@ -36581,7 +36633,7 @@
               ]
             }
           },
-          "jne_code": "CGK10000"
+          "jne_code": "CGK10200"
         },
         "3172": {
           "name": "KOTA ADM. JAKARTA TIMUR",
@@ -36627,7 +36679,8 @@
                 "KEBON PALA",
                 "HALIM PERDANA KUSUMAH",
                 "CIPINANG MELAYU"
-              ]
+              ],
+              "jne_code": "UPG10000"
             },
             "3172050": {
               "name": "KRAMAT JATI",
@@ -37270,7 +37323,8 @@
                 "PABUARAN",
                 "SUKADAMAI",
                 "SUKARESMI"
-              ]
+              ],
+              "jne_code": "BTJ21800"
             },
             "3201160": {
               "name": "CARIU",
@@ -37884,7 +37938,8 @@
                 "PAGELARAN",
                 "CITAMIANG",
                 "CIMERANG"
-              ]
+              ],
+              "jne_code": "SUB10000"
             },
             "3202140": {
               "name": "CIKEMBAR",
@@ -37982,7 +38037,8 @@
                 "SUDAJAYA GIRANG",
                 "KARAWANG",
                 "PERBAWATI"
-              ]
+              ],
+              "jne_code": "SMI10000"
             },
             "3202190": {
               "name": "KADUDAMPIT",
@@ -39601,7 +39657,8 @@
                 "CIWALEN",
                 "PAKUWON",
                 "SUKAMANTRI"
-              ]
+              ],
+              "jne_code": "BDO20746"
             },
             "3205200": {
               "name": "KARANGPAWITAN",
@@ -41032,7 +41089,8 @@
                 "MULYAJAYA",
                 "SUKAJAYA",
                 "MEKARJAYA"
-              ]
+              ],
+              "jne_code": "BDO20100"
             },
             "3208090": {
               "name": "CIDAHU",
@@ -41750,7 +41808,8 @@
                 "DEPOK",
                 "KASUGENGAN KIDUL",
                 "KASUGENGAN LOR"
-              ]
+              ],
+              "jne_code": "DPK10000"
             },
             "3209150": {
               "name": "WERU",
@@ -42189,7 +42248,8 @@
                 "MAJALENGKA KULON",
                 "MUNJUL",
                 "SIDAMUKTI"
-              ]
+              ],
+              "jne_code": "CBN20300"
             },
             "3210080": {
               "name": "CIGASONG",
@@ -43028,7 +43088,8 @@
                 "UJUNGPENDOKJAYA",
                 "LEUWIGEDE",
                 "KASMARAN"
-              ]
+              ],
+              "jne_code": "CLG20142"
             },
             "3212080": {
               "name": "KERTASEMAYA",
@@ -43196,7 +43257,8 @@
                 "KARANGSONG",
                 "PABEANUDIK",
                 "TAMBAK"
-              ]
+              ],
+              "jne_code": "CBN20100"
             },
             "3212160": {
               "name": "SINDANG",
@@ -44233,7 +44295,8 @@
                 "WANCIMEKAR",
                 "PUCUNG",
                 "CIKAMPEK UTARA"
-              ]
+              ],
+              "jne_code": "AWX10000"
             },
             "3215081": {
               "name": "CILAMAYA WETAN",
@@ -44607,7 +44670,8 @@
                 "TANJUNGBARU",
                 "LABANSARI",
                 "KARANGSARI"
-              ]
+              ],
+              "jne_code": "CKR10004"
             },
             "3216050": {
               "name": "KEDUNGWARINGIN",
@@ -44635,7 +44699,8 @@
                 "KARANGASIH",
                 "KARANGRAHARJA",
                 "WALUYA"
-              ]
+              ],
+              "jne_code": "CKR10005"
             },
             "3216062": {
               "name": "KARANGBAHAGIA",
@@ -45024,7 +45089,8 @@
                 "WANGUNHARJA",
                 "CIBODAS",
                 "SUNTENJAYA"
-              ]
+              ],
+              "jne_code": "PLM10000"
             },
             "3217130": {
               "name": "CISARUA",
@@ -45851,7 +45917,8 @@
                 "PEKAYON JAYA",
                 "MARGA JAYA",
                 "KAYURINGIN JAYA"
-              ]
+              ],
+              "jne_code": "BKI10040"
             },
             "3275060": {
               "name": "BEKASI BARAT",
@@ -45899,7 +45966,8 @@
                 "SAWANGAN",
                 "KEDAUNG",
                 "CINANGKA"
-              ]
+              ],
+              "jne_code": "DPK10058"
             },
             "3276011": {
               "name": "BOJONGSARI",
@@ -47767,7 +47835,8 @@
                 "KARANGTENGAH",
                 "KEPAKISAN",
                 "PEKASIRAN"
-              ]
+              ],
+              "jne_code": "MXG20200"
             },
             "3304170": {
               "name": "WANAYASA",
@@ -48193,7 +48262,8 @@
                 "GEMEKSEKTI",
                 "KARANGSARI",
                 "JEMUR"
-              ]
+              ],
+              "jne_code": "MGL10100"
             },
             "3305130": {
               "name": "PEJAGOAN",
@@ -49155,7 +49225,8 @@
                 "KALIBENING",
                 "GARUNGLOR",
                 "JEBENGPLAMPITAN"
-              ]
+              ],
+              "jne_code": "SOC20500"
             },
             "3307060": {
               "name": "SELOMERTO",
@@ -49259,7 +49330,8 @@
                 "TLOGOJATI",
                 "WONOSOBO BARAT",
                 "WONOSOBO TIMUR"
-              ]
+              ],
+              "jne_code": "MGL10200"
             },
             "3307100": {
               "name": "WATUMALANG",
@@ -49533,7 +49605,8 @@
                 "KETEP",
                 "WONOLELO",
                 "BANYUROTO"
-              ]
+              ],
+              "jne_code": "DPK10058"
             },
             "3308100": {
               "name": "CANDIMULYO",
@@ -50825,7 +50898,8 @@
                 "SUKOHARJO",
                 "BULAKREJO",
                 "SONOREJO"
-              ]
+              ],
+              "jne_code": "SOC20500"
             },
             "3311050": {
               "name": "NGUTER",
@@ -51836,7 +51910,8 @@
                 "KARANG TENGAH",
                 "TANGKIL",
                 "KEDUNGUPIT"
-              ]
+              ],
+              "jne_code": "SOC20400"
             },
             "3314110": {
               "name": "SIDOHARJO",
@@ -54270,7 +54345,8 @@
                 "KEDONDONG",
                 "SEDO",
                 "MULYOREJO"
-              ]
+              ],
+              "jne_code": "SRG20700"
             },
             "3321080": {
               "name": "WONOSALAM",
@@ -54650,7 +54726,8 @@
                 "JIMBARAN",
                 "PAKOPEN",
                 "SIDOMUKTI"
-              ]
+              ],
+              "jne_code": "BDO10000"
             },
             "3322110": {
               "name": "BAWEN",
@@ -57596,7 +57673,8 @@
                 "LAMPER KIDUL",
                 "LAMPER LOR",
                 "LAMPER TENGAH"
-              ]
+              ],
+              "jne_code": "SRG10011"
             },
             "3374060": {
               "name": "CANDISARI",
@@ -58515,7 +58593,8 @@
                 "CATUR TUNGGAL",
                 "MAGUWOHARJO",
                 "CONDONG CATUR"
-              ]
+              ],
+              "jne_code": "DPK10000"
             },
             "3404080": {
               "name": "BERBAH",
@@ -58743,7 +58822,8 @@
           },
           "jne_code": "JOG10000"
         }
-      }
+      },
+      "jne_code": "JOG10000"
     },
     "35": {
       "name": "JAWA TIMUR",
@@ -58892,7 +58972,8 @@
                 "PENGGUNG",
                 "PAKISBARU",
                 "NGROMO"
-              ]
+              ],
+              "jne_code": "DPK10058"
             },
             "3501080": {
               "name": "BANDAR",
@@ -59264,7 +59345,8 @@
                 "MENANG",
                 "SRANDIL",
                 "SIDOHARJO"
-              ]
+              ],
+              "jne_code": "AMQ10000"
             },
             "3502140": {
               "name": "BADEGAN",
@@ -59675,7 +59757,8 @@
                 "BULUS",
                 "NGEPEH",
                 "SOKO"
-              ]
+              ],
+              "jne_code": "BDO10000"
             },
             "3504030": {
               "name": "PAKEL",
@@ -59827,7 +59910,8 @@
                 "JABALSARI",
                 "SAMBIROBYONG",
                 "BUKUR"
-              ]
+              ],
+              "jne_code": "CBN20414"
             },
             "3504110": {
               "name": "BOYOLANGU",
@@ -61631,7 +61715,8 @@
                 "KALISEMUT",
                 "MERAKAN",
                 "TANGGUNG"
-              ]
+              ],
+              "jne_code": "PDG10000"
             },
             "3508150": {
               "name": "PASRUJAMBE",
@@ -62439,7 +62524,8 @@
                 "PENGANTIGAN",
                 "SUMBERREJO",
                 "TAMAN BARU"
-              ]
+              ],
+              "jne_code": "JBR20106"
             },
             "3510190": {
               "name": "GIRI",
@@ -63486,7 +63572,8 @@
                 "KLAMPOK",
                 "TANJUNGREJO",
                 "TAMBAKREJO"
-              ]
+              ],
+              "jne_code": "TOX10000"
             },
             "3513240": {
               "name": "SUMBERASIH",
@@ -65257,7 +65344,7 @@
               ]
             }
           },
-          "jne_code": "BTG10000"
+          "jne_code": "MJK10100"
         },
         "3518": {
           "name": "KAB. NGANJUK",
@@ -65647,7 +65734,7 @@
               ]
             }
           },
-          "jne_code": "BDO20746"
+          "jne_code": "MJK10200"
         },
         "3519": {
           "name": "KAB. MADIUN",
@@ -65776,7 +65863,8 @@
                 "GEMARANG",
                 "SEBAYI",
                 "NAMPU"
-              ]
+              ],
+              "jne_code": "SRG10000"
             },
             "3519080": {
               "name": "SARADAN",
@@ -65894,7 +65982,8 @@
                 "TIRON",
                 "GUNUNGSARI",
                 "BAGI"
-              ]
+              ],
+              "jne_code": "MDN10000"
             },
             "3519140": {
               "name": "SAWAHAN",
@@ -69808,7 +69897,8 @@
                 "KALEBENGAN",
                 "RUBARU",
                 "DUKO"
-              ]
+              ],
+              "jne_code": "AWX10000"
             },
             "3529140": {
               "name": "DASUK",
@@ -69906,7 +69996,8 @@
                 "NYABAKAN BARAT",
                 "BATANGBATANG DAYA",
                 "KOLPO"
-              ]
+              ],
+              "jne_code": "SRG20200"
             },
             "3529190": {
               "name": "DUNGKEK",
@@ -70078,7 +70169,8 @@
                 "BALOWERTI",
                 "POCANAN",
                 "SEMAMPIR"
-              ]
+              ],
+              "jne_code": "KDR10000"
             },
             "3571030": {
               "name": "PESANTREN",
@@ -70768,7 +70860,8 @@
                 "SONGGOKERTO",
                 "SUMBEREJO",
                 "SIDOMULYO"
-              ]
+              ],
+              "jne_code": "MXG20200"
             },
             "3579020": {
               "name": "JUNREJO",
@@ -71764,7 +71857,8 @@
                 "CIJORO LEBAK",
                 "MUARA CIUJUNG BARAT",
                 "NARIMBANG MULIA"
-              ]
+              ],
+              "jne_code": "CLG20200"
             },
             "3602181": {
               "name": "KALANGANYAR",
@@ -72423,7 +72517,8 @@
                 "BLOKANG",
                 "BABAKAN",
                 "PRINGWULUNG"
-              ]
+              ],
+              "jne_code": "BDO10000"
             },
             "3604100": {
               "name": "JAWILAN",
@@ -72800,7 +72895,8 @@
                 "TANAH TINGGI",
                 "SUKAASIH",
                 "SUKARASA"
-              ]
+              ],
+              "jne_code": "TGR10000"
             },
             "3671031": {
               "name": "KARAWACI",
@@ -72955,7 +73051,8 @@
                 "BENDUNGAN",
                 "CIWADUK",
                 "KETILENG"
-              ]
+              ],
+              "jne_code": "CLG10000"
             },
             "3672031": {
               "name": "JOMBANG",
@@ -73046,7 +73143,8 @@
                 "KALIGANDU",
                 "TERONDOL",
                 "SUKAWANA"
-              ]
+              ],
+              "jne_code": "CLG20300"
             },
             "3673050": {
               "name": "TAKTAKAN",
@@ -73350,7 +73448,8 @@
                 "TUNJUK",
                 "WANASARI",
                 "SESANDAN"
-              ]
+              ],
+              "jne_code": "DPS20700"
             },
             "5102040": {
               "name": "KEDIRI",
@@ -73370,7 +73469,8 @@
                 "KEDIRI",
                 "ABIAN TUWUNG",
                 "BANJAR ANYAR"
-              ]
+              ],
+              "jne_code": "KDR10000"
             },
             "5102050": {
               "name": "MARGA",
@@ -73477,7 +73577,8 @@
                 "KUTA",
                 "LEGIAN",
                 "SEMINYAK"
-              ]
+              ],
+              "jne_code": "DPS21102"
             },
             "5103030": {
               "name": "KUTA UTARA",
@@ -73607,7 +73708,8 @@
                 "PETAK KAJA",
                 "SUMITA",
                 "TEGAL TUGU"
-              ]
+              ],
+              "jne_code": "DPS20300"
             },
             "5104040": {
               "name": "TAMPAKSIRING",
@@ -74326,7 +74428,8 @@
                 "DASAN BARU",
                 "KEDIRI SELATAN",
                 "LELEDE"
-              ]
+              ],
+              "jne_code": "KDR10000"
             },
             "5201041": {
               "name": "KURIPAN",
@@ -75938,7 +76041,8 @@
                 "PAGUTAN",
                 "PAGUTAN BARAT",
                 "PAGUTAN TIMUR"
-              ]
+              ],
+              "jne_code": "AMI10000"
             },
             "5271021": {
               "name": "SELAPARANG",
@@ -76143,7 +76247,8 @@
                 "PADA EWETA",
                 "MODU WAIMARINGU",
                 "PUU MAWO"
-              ]
+              ],
+              "jne_code": "KOE21100"
             },
             "5301072": {
               "name": "TANA RIGHU",
@@ -76928,7 +77033,8 @@
                 "TUBLOPO/MEOMETAN",
                 "NUSA",
                 "NIFUKANI"
-              ]
+              ],
+              "jne_code": "KOE20706"
             },
             "5304041": {
               "name": "BATU PUTIH",
@@ -76968,7 +77074,8 @@
                 "LINAMNUTU",
                 "MIO",
                 "ENO NETTEN"
-              ]
+              ],
+              "jne_code": "KOE20704"
             },
             "5304051": {
               "name": "NOEBEBA",
@@ -77027,7 +77134,8 @@
                 "NIKI NIKI",
                 "BONE",
                 "SOPO"
-              ]
+              ],
+              "jne_code": "KOE20709"
             },
             "5304071": {
               "name": "KOLBANO",
@@ -77071,7 +77179,8 @@
                 "BILLA",
                 "SINI",
                 "TLIU"
-              ]
+              ],
+              "jne_code": "KOE20710"
             },
             "5304081": {
               "name": "FAUTMOLO",
@@ -77144,7 +77253,8 @@
                 "NIFULEO",
                 "FAE",
                 "NETUTNANA"
-              ]
+              ],
+              "jne_code": "KOE20702"
             },
             "5304101": {
               "name": "BOKING",
@@ -77204,7 +77314,8 @@
                 "FATUONI",
                 "SONO",
                 "MUNA"
-              ]
+              ],
+              "jne_code": "KOE20701"
             },
             "5304111": {
               "name": "TOIANAS",
@@ -77551,7 +77662,7 @@
               ]
             }
           },
-          "jne_code": "KOE20700"
+          "jne_code": "KOE20313"
         },
         "5306": {
           "name": "KAB. BELU",
@@ -78732,7 +78843,8 @@
                 "LADOLAKA",
                 "TUANGGEO",
                 "ROKIROLE"
-              ]
+              ],
+              "jne_code": "PLW10000"
             },
             "5310062": {
               "name": "KOTING",
@@ -79123,7 +79235,8 @@
                 "PISE",
                 "NUANAGA",
                 "NEOTONDA"
-              ]
+              ],
+              "jne_code": "AWX10000"
             },
             "5311062": {
               "name": "DETUKELI",
@@ -79160,7 +79273,8 @@
                 "MUKUREKU SAATE",
                 "LISEKURU",
                 "RUTUJEJA"
-              ]
+              ],
+              "jne_code": "LBJ10520"
             },
             "5311070": {
               "name": "DETUSOKO",
@@ -79804,7 +79918,8 @@
                 "SAKUBATUN",
                 "FUAFUNI",
                 "DALEK ESA"
-              ]
+              ],
+              "jne_code": "KOE21503"
             },
             "5314020": {
               "name": "ROTE BARAT LAUT",
@@ -79821,7 +79936,8 @@
                 "SAINDULE",
                 "BUSALANGGA TIMUR",
                 "BUSALANGGA BARAT"
-              ]
+              ],
+              "jne_code": "KOE21504"
             },
             "5314021": {
               "name": "LOAHOLU",
@@ -81371,7 +81487,8 @@
                 "SUNGAI TOMAN",
                 "SERUMPUN",
                 "SERUNAI"
-              ]
+              ],
+              "jne_code": "SRG21300"
             },
             "6101030": {
               "name": "TEBAS",
@@ -82008,7 +82125,8 @@
                 "SELANGE",
                 "MORO BETUNG",
                 "TAHU"
-              ]
+              ],
+              "jne_code": "PKU21300"
             },
             "6103100": {
               "name": "KUALA BEHE",
@@ -83508,7 +83626,8 @@
                 "PENEPIAN RAYA",
                 "KARYA BARU",
                 "NANGA SERIAN"
-              ]
+              ],
+              "jne_code": "HKX10000"
             },
             "6108140": {
               "name": "SELIMBAU",
@@ -84333,7 +84452,8 @@
                 "TANJUNG HILIR",
                 "DALAM BUGIS",
                 "TAMBELAN SAMPIT"
-              ]
+              ],
+              "jne_code": "PNK10031"
             },
             "6171030": {
               "name": "PONTIANAK BARAT",
@@ -84352,7 +84472,8 @@
                 "TENGAH",
                 "MARIANA",
                 "SUNGAI JAWI"
-              ]
+              ],
+              "jne_code": "PNK10000"
             },
             "6171040": {
               "name": "PONTIANAK UTARA",
@@ -84376,7 +84497,8 @@
                 "SIJANGKUNG",
                 "PANGMILANG",
                 "SAGATANI"
-              ]
+              ],
+              "jne_code": "PNK10327"
             },
             "6172020": {
               "name": "SINGKAWANG TIMUR",
@@ -84853,7 +84975,8 @@
                 "PEMATANG",
                 "WARGO MULYO",
                 "SEI BAKUT"
-              ]
+              ],
+              "jne_code": "PKY20300"
             },
             "6203021": {
               "name": "TAMBAN CATUR",
@@ -85885,7 +86008,8 @@
                 "KARYA UNGGANG",
                 "TEWANG RANGKANG",
                 "TEWANG MANYANGEN"
-              ]
+              ],
+              "jne_code": "PKY20209"
             },
             "6209070": {
               "name": "PULAU MALAN",
@@ -87097,7 +87221,8 @@
                 "SELARU",
                 "SUNGUP KANAN",
                 "PANTAI BARU"
-              ]
+              ],
+              "jne_code": "BDJ10320"
             },
             "6302062": {
               "name": "PULAU LAUT SIGAM",
@@ -87285,7 +87410,7 @@
               ]
             }
           },
-          "jne_code": "MXG20200"
+          "jne_code": "AWX10000"
         },
         "6303": {
           "name": "KAB. BANJAR",
@@ -87633,7 +87758,8 @@
                 "MATARAMAN",
                 "SIMPANG TIGA",
                 "LOK TAMU"
-              ]
+              ],
+              "jne_code": "AMI10000"
             },
             "6303120": {
               "name": "SIMPANG EMPAT",
@@ -87653,7 +87779,8 @@
                 "SUNGKAI BARU",
                 "BERKAT MULYA",
                 "PAKU"
-              ]
+              ],
+              "jne_code": "PDG21500"
             },
             "6303121": {
               "name": "TELAGA BAUNTUNG",
@@ -89280,7 +89407,8 @@
                 "SEJAHTERA",
                 "BERSUJUD",
                 "GUNUNG ANTASARI"
-              ]
+              ],
+              "jne_code": "PDG21500"
             },
             "6310053": {
               "name": "MANTEWE",
@@ -89403,7 +89531,8 @@
                 "TEBING TINGGI",
                 "AJUNG",
                 "KAMBIYAIN"
-              ]
+              ],
+              "jne_code": "MES21100"
             },
             "6311040": {
               "name": "PARINGIN",
@@ -89522,7 +89651,8 @@
                 "PEKAUMAN",
                 "KELAYAN BARAT",
                 "BASIRIH SELATAN"
-              ]
+              ],
+              "jne_code": "BDJ10002"
             },
             "6371020": {
               "name": "BANJARMASIN TIMUR",
@@ -89567,7 +89697,8 @@
                 "PASAR LAMA",
                 "SEBERANG MESJID",
                 "MELAYU"
-              ]
+              ],
+              "jne_code": "BDJ10003"
             },
             "6371040": {
               "name": "BANJARMASIN UTARA",
@@ -90180,7 +90311,8 @@
                 "PENDINGIN",
                 "SARIJAYA",
                 "SANGA-SANGA MUARA"
-              ]
+              ],
+              "jne_code": "SMD20128"
             },
             "6403040": {
               "name": "LOA JANAN",
@@ -90193,7 +90325,8 @@
                 "BAKUNGAN",
                 "LOA DURI ILIR",
                 "TANI HARAPAN"
-              ]
+              ],
+              "jne_code": "SMD20126"
             },
             "6403050": {
               "name": "LOA KULU",
@@ -90366,7 +90499,8 @@
                 "BADAK MEKAR",
                 "SALO CELLA",
                 "SUNGAI BAWANG"
-              ]
+              ],
+              "jne_code": "SMD20127"
             },
             "6403140": {
               "name": "MARANG KAYU",
@@ -91076,7 +91210,8 @@
                 "KLANDASAN ULU",
                 "KLANDASAN ILIR",
                 "DAMAI"
-              ]
+              ],
+              "jne_code": "BPN10000"
             },
             "6471020": {
               "name": "BALIKPAPAN TIMUR",
@@ -91134,7 +91269,8 @@
                 "BANTUAS",
                 "BUKUAN",
                 "RAWA MAKMUR"
-              ]
+              ],
+              "jne_code": "SMD10007"
             },
             "6472020": {
               "name": "SAMARINDA ILIR",
@@ -91154,7 +91290,8 @@
                 "PELABUHAN",
                 "SUNGAI PINANG LUAR",
                 "KARANG MUMUS"
-              ]
+              ],
+              "jne_code": "SMD10000"
             },
             "6472022": {
               "name": "SAMBUTAN",
@@ -91175,7 +91312,8 @@
                 "MANGKUPALAS",
                 "TENUN SAMARINDA",
                 "GUNUNG PANJANG"
-              ]
+              ],
+              "jne_code": "SMD10005"
             },
             "6472031": {
               "name": "LOA JANAN ILIR",
@@ -91210,7 +91348,8 @@
                 "AIR HITAM",
                 "AIR PUTIH",
                 "BUKIT PINANG"
-              ]
+              ],
+              "jne_code": "SMD10010"
             },
             "6472060": {
               "name": "SAMARINDA UTARA",
@@ -93069,7 +93208,8 @@
                 "KALONGAN SELATAN",
                 "KALONGAN UTARA",
                 "MUSI I"
-              ]
+              ],
+              "jne_code": "SRG10300"
             },
             "7104023": {
               "name": "MORONGE",
@@ -93098,7 +93238,8 @@
                 "MALA TIMUR",
                 "SAWANG UTARA",
                 "MAREDAREN KIAMA"
-              ]
+              ],
+              "jne_code": "MDC20700"
             },
             "7104031": {
               "name": "MELONGUANE TIMUR",
@@ -95165,7 +95306,8 @@
                 "HONBOLA",
                 "USO",
                 "BAKUNG"
-              ]
+              ],
+              "jne_code": "MXG20200"
             },
             "7202021": {
               "name": "BATUI SELATAN",
@@ -95713,7 +95855,7 @@
               ]
             }
           },
-          "jne_code": "GTO10000"
+          "jne_code": "PLW20800"
         },
         "7204": {
           "name": "KAB. POSO",
@@ -95911,7 +96053,8 @@
                 "BETALEMBA",
                 "PANTANGOLEMBA",
                 "TAUNCA"
-              ]
+              ],
+              "jne_code": "PLW20231"
             },
             "7204052": {
               "name": "POSO PESISIR UTARA",
@@ -95926,7 +96069,8 @@
                 "MEMBUKE",
                 "TOBE",
                 "MARANDA"
-              ]
+              ],
+              "jne_code": "PLW20232"
             },
             "7204060": {
               "name": "LAGE",
@@ -95959,7 +96103,8 @@
                 "GEBANGREJO TIMUR",
                 "GEBANGREJO BARAT",
                 "KAYAMANYA SENTRAL"
-              ]
+              ],
+              "jne_code": "PLW20200"
             },
             "7204071": {
               "name": "POSO KOTA UTARA",
@@ -96342,7 +96487,8 @@
                 "BUNTUNA",
                 "LELEAN NONO",
                 "PANGI"
-              ]
+              ],
+              "jne_code": "PLW20311"
             },
             "7206041": {
               "name": "LAMPASIO",
@@ -96579,7 +96725,7 @@
               ]
             }
           },
-          "jne_code": "AMQ20200"
+          "jne_code": "PLW20600"
         },
         "7208": {
           "name": "KAB. PARIGI MOUTONG",
@@ -96983,7 +97129,7 @@
               ]
             }
           },
-          "jne_code": "PLW20920"
+          "jne_code": "PLW20904"
         },
         "7209": {
           "name": "KAB. TOJO UNA UNA",
@@ -97391,7 +97537,8 @@
                 "LORU",
                 "NGATABARU",
                 "SIDONDO III"
-              ]
+              ],
+              "jne_code": "PLW20709"
             },
             "7210121": {
               "name": "SIGI KOTA",
@@ -98673,7 +98820,8 @@
                 "JIPANG",
                 "SENGKA",
                 "BONTORAMBA"
-              ]
+              ],
+              "jne_code": "UPG21615"
             },
             "7306020": {
               "name": "BAJENG",
@@ -99884,7 +100032,8 @@
                 "TASSIPI",
                 "BENTENG TELLUE",
                 "LAPONRONG"
-              ]
+              ],
+              "jne_code": "MLX10000"
             },
             "7311210": {
               "name": "AJANGALE",
@@ -100174,7 +100323,8 @@
                 "TADANG PALIE",
                 "LAGOSI",
                 "TONRONG TENGNGA"
-              ]
+              ],
+              "jne_code": "PAX10000"
             },
             "7313040": {
               "name": "BOLA",
@@ -100714,7 +100864,8 @@
                 "BASSEANG",
                 "PANGAPARANG",
                 "BAKARU"
-              ]
+              ],
+              "jne_code": "PLM10000"
             }
           },
           "jne_code": "UPG21100"
@@ -101227,7 +101378,8 @@
                 "SITEBA",
                 "LIMBONG",
                 "BOSSO TIMUR"
-              ]
+              ],
+              "jne_code": "UPG23113"
             },
             "7317092": {
               "name": "WALENRANG BARAT",
@@ -101515,7 +101667,7 @@
               ]
             }
           },
-          "jne_code": "PLM20100"
+          "jne_code": "UPG20605"
         },
         "7322": {
           "name": "KAB. LUWU UTARA",
@@ -101750,7 +101902,8 @@
                 "KANANDEDE",
                 "MINANGA",
                 "RINDING ALLO"
-              ]
+              ],
+              "jne_code": "HKX10000"
             },
             "7322131": {
               "name": "SEKO",
@@ -102308,7 +102461,8 @@
                 "MACCINI GUSUNG",
                 "BARANA",
                 "LARIANG BANGI"
-              ]
+              ],
+              "jne_code": "UPG10000"
             },
             "7371050": {
               "name": "UJUNG PANDANG",
@@ -102395,7 +102549,8 @@
                 "BULOA",
                 "TALLO",
                 "LAKKANG"
-              ]
+              ],
+              "jne_code": "BKS23012"
             },
             "7371100": {
               "name": "PANAKKUKANG",
@@ -102967,7 +103122,8 @@
                 "BAKEALU",
                 "LABUNIA(PURE)",
                 "WAMBONA"
-              ]
+              ],
+              "jne_code": "KDI20316"
             },
             "7402091": {
               "name": "PASIR PUTIH",
@@ -103010,7 +103166,7 @@
               ]
             }
           },
-          "jne_code": "DPS21102"
+          "jne_code": "KDI20334"
         },
         "7403": {
           "name": "KAB. KONAWE",
@@ -106023,7 +106179,8 @@
                 "MATA",
                 "PURIRANO",
                 "JATI MEKAR"
-              ]
+              ],
+              "jne_code": "KDI10000"
             },
             "7471031": {
               "name": "KENDARI BARAT",
@@ -106037,7 +106194,8 @@
                 "SANUA",
                 "DAPU-DAPURA",
                 "LAHUNDAPE"
-              ]
+              ],
+              "jne_code": "KDI10017"
             }
           },
           "jne_code": "KDI10000"
@@ -107187,7 +107345,7 @@
               ]
             }
           },
-          "jne_code": "GTO10000"
+          "jne_code": "GTO10012"
         },
         "7571": {
           "name": "KOTA GORONTALO",
@@ -107290,7 +107448,8 @@
           },
           "jne_code": "GTO10000"
         }
-      }
+      },
+      "jne_code": "GTO10000"
     },
     "76": {
       "name": "SULAWESI BARAT",
@@ -107674,7 +107833,7 @@
               ]
             }
           },
-          "jne_code": "UPG21209"
+          "jne_code": "UPG21219"
         },
         "7603": {
           "name": "KAB. MAMASA",
@@ -108662,7 +108821,8 @@
                 "HAAR OHOIWAIT",
                 "HAAR WASSAR",
                 "SOIN"
-              ]
+              ],
+              "jne_code": "AMQ20209"
             },
             "8102022": {
               "name": "KEI BESAR SELATAN",
@@ -110220,7 +110380,8 @@
                 "OHOITEL",
                 "DULLAH",
                 "DULLAH LAUT"
-              ]
+              ],
+              "jne_code": "AMQ20904"
             },
             "8172040": {
               "name": "PULAU DULLAH SELATAN",
@@ -110230,7 +110391,8 @@
                 "TUAL",
                 "KEL. MASRUM",
                 "KEL. LODAR EL"
-              ]
+              ],
+              "jne_code": "AMQ20902"
             }
           },
           "jne_code": "AMQ20200"
@@ -110280,7 +110442,8 @@
                 "PATENG",
                 "BOBOJIKO",
                 "KURIPASAI"
-              ]
+              ],
+              "jne_code": "TTE20200"
             },
             "8201091": {
               "name": "JAILOLO SELATAN",
@@ -112009,7 +112172,8 @@
                 "GOTO",
                 "TAMBULA",
                 "TUGUWAJI"
-              ]
+              ],
+              "jne_code": "TTE20800"
             },
             "8272031": {
               "name": "TIDORE TIMUR",
@@ -112431,7 +112595,8 @@
                 "WERUA",
                 "JARATI",
                 "ORAY"
-              ]
+              ],
+              "jne_code": "SOQ20100"
             },
             "9102031": {
               "name": "KAMBRAU",
@@ -113002,7 +113167,7 @@
               ]
             }
           },
-          "jne_code": "PKU20900"
+          "jne_code": "MKW20300"
         },
         "9105": {
           "name": "KAB. MANOKWARI",
@@ -113941,7 +114106,8 @@
                 "MALAFLON",
                 "MAIBO",
                 "KABANMOLO"
-              ]
+              ],
+              "jne_code": "SOQ10000"
             },
             "9202110": {
               "name": "MAKBON",
@@ -115221,7 +115387,8 @@
                 "KOFKERBU",
                 "REMU UTARA",
                 "REMU"
-              ]
+              ],
+              "jne_code": "SOQ10000"
             },
             "9271070": {
               "name": "SORONG KOTA",
@@ -115230,7 +115397,8 @@
                 "KLAKUBLIK",
                 "KLABALA",
                 "KLASUUR"
-              ]
+              ],
+              "jne_code": "SOQ10000"
             },
             "9271080": {
               "name": "SORONG KEPULAUAN",
@@ -115950,7 +116118,8 @@
                 "MANGGANDISAPI",
                 "KELURAHAN SORIDO",
                 "KELURAHAN YENURES"
-              ]
+              ],
+              "jne_code": "DJJ20100"
             },
             "9409060": {
               "name": "SAMOFA",
@@ -116563,7 +116732,8 @@
                 "DOKIS",
                 "KAMARISANO",
                 "WAWERI"
-              ]
+              ],
+              "jne_code": "DJJ30013"
             },
             "9426020": {
               "name": "MASIREI",
@@ -118557,7 +118727,8 @@
                 "OGIYAI",
                 "YEGEUGI",
                 "EPOU"
-              ]
+              ],
+              "jne_code": "DJJ30004"
             },
             "9604020": {
               "name": "DIPA",
@@ -118569,7 +118740,8 @@
                 "EPOUWA",
                 "PITOWAGE",
                 "PAGAUTI"
-              ]
+              ],
+              "jne_code": "DJJ30001"
             },
             "9604030": {
               "name": "SIRIWO",
@@ -118590,7 +118762,8 @@
                 "KAMARISANOI",
                 "KEUW",
                 "TAUMI"
-              ]
+              ],
+              "jne_code": "DJJ30013"
             },
             "9604050": {
               "name": "NAPAN",
@@ -118620,7 +118793,8 @@
                 "SAMABUSA",
                 "LANI",
                 "AIR MANDIDI"
-              ]
+              ],
+              "jne_code": "DJJ30009"
             },
             "9604080": {
               "name": "NABIRE",
@@ -118660,7 +118834,8 @@
                 "GERBANG SADU",
                 "KALI SEMEN",
                 "WAROKI"
-              ]
+              ],
+              "jne_code": "DJJ30005"
             },
             "9604110": {
               "name": "WANGGAR",
@@ -118682,7 +118857,8 @@
                 "JAYA MUKTI",
                 "WANGGAR PANTAI",
                 "EPOUGI"
-              ]
+              ],
+              "jne_code": "DJJ30014"
             },
             "9604130": {
               "name": "YAUR",
@@ -118839,7 +119015,8 @@
                 "OBANO",
                 "KEGOUDA",
                 "TUWAUWO"
-              ]
+              ],
+              "jne_code": "DJJ21207"
             },
             "9605090": {
               "name": "NAKAMA",
@@ -120038,7 +120215,8 @@
                 "DIM",
                 "KEMALI",
                 "SRALALA"
-              ]
+              ],
+              "jne_code": "KEX10000"
             },
             "9701060": {
               "name": "MBUWA TENGAH",
@@ -123920,7 +124098,7 @@
               ]
             }
           },
-          "jne_code": "DJJ21307"
+          "jne_code": "DJJ21306"
         }
       }
     }
