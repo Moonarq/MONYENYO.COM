@@ -271,25 +271,27 @@ const Checkout = () => {
     }
   };
 
-  // ✅ Calculate total weight from items dengan logic yang lebih aman
-  const calculateTotalWeight = () => {
-    if (!checkoutItems || !Array.isArray(checkoutItems)) {
-      console.log('⚠️ checkoutItems belum ada, pakai default 1kg');
-      return 1;
+  // ✅ FIXED: Enhanced fetchJneServices dengan automatic weight calculation via backend
+  const fetchJneServices = async (destinationCode) => {
+    // Create items array for JNE API
+    if (!checkoutItems || !Array.isArray(checkoutItems) || checkoutItems.length === 0) {
+      console.log('⚠️ No checkout items available, cannot calculate shipping');
+      setJneServices([]);
+      setSelectedService(null);
+      setJneShippingCost(0);
+      setIsLoadingJne(false);
+      return;
     }
-
-    const totalQuantity = checkoutItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
-    const weight = Math.max(1, totalQuantity);
-    console.log('📦 Calculated total weight:', weight, 'kg from', totalQuantity, 'items');
-    return weight;
-  };
-
-  // ✅ FIXED: Enhanced fetchJneServices dengan CORS solution dan multiple endpoints
-  const fetchJneServices = async (destinationCode, weight = 1) => {
-    const requestParams = `${destinationCode}-${weight}`;
+    
+    const items = checkoutItems.map(item => ({
+      name: item.name,
+      quantity: parseInt(item.quantity)
+    }));
+    
+    const requestParams = `${destinationCode}-${JSON.stringify(items)}`;
     
     if (lastRequestParamsRef.current === requestParams) {
-      console.log('🚫 Skipping duplicate JNE request:', requestParams);
+      console.log('🚫 Skipping duplicate JNE request:', destinationCode);
       return;
     }
     
@@ -308,7 +310,7 @@ const Checkout = () => {
       return;
     }
 
-    console.log('🚀 Fetching JNE services for:', { destinationCode, weight });
+    console.log('🚀 Fetching JNE services for:', { destinationCode, items: items.length + ' items' });
     
     const currentRequest = { cancelled: false };
     currentRequestRef.current = currentRequest;
@@ -327,11 +329,12 @@ const Checkout = () => {
     }, 20000);
     
     try {
-      // ✅ SOLUTION: Multiple approaches to handle CORS and API issues
+      // ✅ SOLUTION: Send items to backend for automatic weight calculation
+      const itemsParam = encodeURIComponent(JSON.stringify(items));
       const apiEndpoints = [
-        // Primary endpoint dengan mode no-cors sebagai fallback
+        // Primary endpoint with items parameter
         {
-          url: `https://api.monyenyo.com/jne.php?thru=${destinationCode}&weight=${weight}`,
+          url: `https://api.monyenyo.com/jne.php?thru=${destinationCode}&items=${itemsParam}`,
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -339,9 +342,9 @@ const Checkout = () => {
             'Access-Control-Allow-Origin': '*'
           }
         },
-        // Backup dengan JSONP approach jika diperlukan
+        // Backup with JSONP approach jika diperlukan
         {
-          url: `https://api.monyenyo.com/jne.php?thru=${destinationCode}&weight=${weight}&callback=jneCallback`,
+          url: `https://api.monyenyo.com/jne.php?thru=${destinationCode}&items=${itemsParam}&callback=jneCallback`,
           method: 'GET',
           headers: {
             'Accept': 'application/javascript',
@@ -541,9 +544,8 @@ const Checkout = () => {
         const destinationCode = getDestinationCode(shippingAddress.province, shippingAddress.regency);
         
         if (destinationCode) {
-          const weight = calculateTotalWeight();
-          console.log('🚀 Triggering JNE fetch with:', { destinationCode, weight });
-          fetchJneServices(destinationCode, weight);
+          console.log('🚀 Triggering JNE fetch with:', { destinationCode, itemsCount: checkoutItems?.length || 0 });
+          fetchJneServices(destinationCode);
         } else {
           console.log('⚠️ No valid destination code, clearing JNE services');
           setJneServices([]);
@@ -565,7 +567,7 @@ const Checkout = () => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [shippingAddress.province, shippingAddress.regency, addressLoading]);
+  }, [shippingAddress.province, shippingAddress.regency, addressLoading, checkoutItems]);
 
   // ✅ Fungsi untuk menghitung discount voucher dengan struktur data yang benar
   const calculateVoucherDiscount = (voucher, subtotal) => {
