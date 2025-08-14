@@ -433,13 +433,17 @@ const Checkout = () => {
       }));
       
       // Call backend PHP proxy with destination code
-      const apiUrl = `http://localhost/monyenyo/backend/jne.php?thru=${destinationInfo.code}&items=${encodeURIComponent(JSON.stringify(items))}`;
+      const apiUrl = `https://api.monyenyo.com/jne.php?thru=${destinationInfo.code}&items=${encodeURIComponent(JSON.stringify(items))}`;
+      
+      console.log('📡 Calling JNE API:', apiUrl);
       
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
         },
+        mode: 'cors',
+        credentials: 'omit'
       });
 
       if (currentRequest.cancelled) {
