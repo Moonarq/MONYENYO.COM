@@ -1,21 +1,69 @@
 import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 
 const OrderSuccess = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [copied, setCopied] = useState(false)
+  const [fetchedOrderData, setFetchedOrderData] = useState(null)
+  const [fetchedCheckoutData, setFetchedCheckoutData] = useState(null)
+  const [isLoadingFromUrl, setIsLoadingFromUrl] = useState(false)
   
   // ✅ FIXED: Better data extraction with safer fallbacks
-  const orderData = location.state?.orderData
-  const checkoutData = location.state?.checkoutData
+  const orderData = location.state?.orderData || fetchedOrderData
+  const checkoutData = location.state?.checkoutData || fetchedCheckoutData
+
+  // ✅ Handle Midtrans redirect with URL parameters
+  useEffect(() => {
+    const handleMidtransRedirect = async () => {
+      // Check if we have URL parameters but no location.state (Midtrans redirect case)
+      const orderIdFromUrl = searchParams.get('order_id')
+      const statusCode = searchParams.get('status_code')
+      const transactionStatus = searchParams.get('transaction_status')
+      
+      if (orderIdFromUrl && !location.state) {
+        console.log('🎯 Midtrans redirect detected:', {
+          order_id: orderIdFromUrl,
+          status_code: statusCode,
+          transaction_status: transactionStatus
+        })
+        
+        setIsLoadingFromUrl(true)
+        
+        try {
+          // Fetch order data from backend
+          const response = await fetch(`/api/checkout/order/${orderIdFromUrl}`)
+          const result = await response.json()
+          
+          if (result.success && result.data) {
+            console.log('✅ Fetched order data from API:', result.data)
+            setFetchedOrderData(result.data.orderData)
+            setFetchedCheckoutData(result.data.checkoutData)
+          } else {
+            console.error('❌ Failed to fetch order data:', result.message)
+            // Don't redirect immediately, let other useEffect handle it
+          }
+        } catch (error) {
+          console.error('❌ Error fetching order data:', error)
+        } finally {
+          setIsLoadingFromUrl(false)
+        }
+      }
+    }
+
+    handleMidtransRedirect()
+  }, [searchParams, location.state])
 
   // ✅ Enhanced debug logging
   useEffect(() => {
     console.log('OrderSuccess - Full location.state:', location.state)
+    console.log('OrderSuccess - URL searchParams:', Object.fromEntries(searchParams))
     console.log('OrderSuccess - orderData:', orderData)
     console.log('OrderSuccess - checkoutData:', checkoutData)
+    console.log('OrderSuccess - fetchedOrderData:', fetchedOrderData)
+    console.log('OrderSuccess - fetchedCheckoutData:', fetchedCheckoutData)
     
     // Log specific fields that might be missing
     if (orderData) {
@@ -27,27 +75,33 @@ const OrderSuccess = () => {
       console.log('OrderSuccess - checkoutData.items:', checkoutData.items)
       console.log('OrderSuccess - checkoutData.totals:', checkoutData.totals)
     }
-  }, [orderData, checkoutData, location.state])
+  }, [orderData, checkoutData, location.state, searchParams, fetchedOrderData, fetchedCheckoutData])
 
-  // ✅ FIXED: More lenient validation - only redirect if absolutely no data
+  // ✅ FIXED: More lenient validation - only redirect if absolutely no data AND not loading
   useEffect(() => {
-    // Give some time for state to settle before checking
+    // Give more time for state to settle and for fetch to complete
     const timeoutId = setTimeout(() => {
-      if (!location.state || (!orderData && !checkoutData)) {
-        console.warn('Missing all order and checkout data, redirecting to home')
+      const hasUrlParams = searchParams.get('order_id')
+      const hasAnyData = location.state || orderData || checkoutData || fetchedOrderData || fetchedCheckoutData
+      const effectiveOrderData = orderData || fetchedOrderData
+      const effectiveCheckoutData = checkoutData || fetchedCheckoutData
+      
+      if (!hasAnyData && !hasUrlParams && !isLoadingFromUrl) {
+        console.warn('Missing all data and no URL params, redirecting to home')
         navigate('/', { replace: true })
-      } else if (!orderData) {
-        console.warn('Missing orderData but checkoutData exists, continuing...')
-      } else if (!checkoutData) {
-        console.warn('Missing checkoutData but orderData exists, continuing...')
+      } else if (!effectiveOrderData && !effectiveCheckoutData && !hasUrlParams && !isLoadingFromUrl) {
+        console.warn('Missing effective order and checkout data, no URL params, redirecting to home')
+        navigate('/', { replace: true })
+      } else {
+        console.log('✅ Have sufficient data or still loading, continuing...')
       }
-    }, 100) // Small delay to allow state to settle
+    }, 500) // Increased delay to allow fetch to complete
 
     return () => clearTimeout(timeoutId)
-  }, [orderData, checkoutData, navigate, location.state])
+  }, [orderData, checkoutData, navigate, location.state, searchParams, isLoadingFromUrl, fetchedOrderData, fetchedCheckoutData])
 
-  // ✅ FIXED: Better loading state - show loading for longer while we have partial data
-  if (!location.state) {
+  // ✅ FIXED: Better loading state - show loading while fetching from URL or no data
+  if (isLoadingFromUrl || (!location.state && !fetchedOrderData && searchParams.get('order_id'))) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -58,58 +112,66 @@ const OrderSuccess = () => {
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '18px', marginBottom: '10px' }}>Loading...</div>
-          <div style={{ fontSize: '14px', color: '#666' }}>Memuat data pesanan...</div>
+          <div style={{ fontSize: '14px', color: '#666' }}>
+            {isLoadingFromUrl ? 'Mengambil data pesanan...' : 'Memuat data pesanan...'}
+          </div>
         </div>
       </div>
     )
   }
 
   // ✅ ENHANCED: Much safer data access with comprehensive fallbacks
+  // Get effective data, prioritizing fetched data for Midtrans redirects
+  const effectiveOrderData = orderData || fetchedOrderData
+  const effectiveCheckoutData = checkoutData || fetchedCheckoutData
+  
   const safeOrderData = {
-    order_number: orderData?.order_number || 'N/A',
-    grand_total: orderData?.grand_total || checkoutData?.totals?.grandTotal || 0,
-    status: orderData?.status || 'pending',
-    created_at: orderData?.created_at || new Date().toISOString(),
-    va_number: orderData?.va_number || null,
-    name: orderData?.name || checkoutData?.shippingAddress?.name || 'N/A',
-    email: orderData?.email || checkoutData?.shippingAddress?.email || 'N/A',
-    phone: orderData?.phone || checkoutData?.shippingAddress?.phone || 'N/A',
-    address: orderData?.address || checkoutData?.shippingAddress?.address || 'N/A',
-    district: orderData?.district || checkoutData?.shippingAddress?.district || 'N/A',
-    regency: orderData?.regency || checkoutData?.shippingAddress?.regency || 'N/A',
-    province: orderData?.province || checkoutData?.shippingAddress?.province || 'N/A',
-    zip_code: orderData?.zip_code || checkoutData?.shippingAddress?.zipCode || 'N/A',
-    subdistrict: orderData?.subdistrict || checkoutData?.shippingAddress?.subdistrict || 'N/A',
-    jne_service: orderData?.jne_service || null
+    order_number: effectiveOrderData?.order_number || 'N/A',
+    grand_total: effectiveOrderData?.grand_total || effectiveCheckoutData?.totals?.grandTotal || 0,
+    status: effectiveOrderData?.status || 'pending',
+    created_at: effectiveOrderData?.created_at || new Date().toISOString(),
+    va_number: effectiveOrderData?.va_number || null,
+    name: effectiveOrderData?.name || effectiveCheckoutData?.shippingAddress?.name || 'N/A',
+    email: effectiveOrderData?.email || effectiveCheckoutData?.shippingAddress?.email || 'N/A',
+    phone: effectiveOrderData?.phone || effectiveCheckoutData?.shippingAddress?.phone || 'N/A',
+    address: effectiveOrderData?.address || effectiveCheckoutData?.shippingAddress?.address || 'N/A',
+    district: effectiveOrderData?.district || effectiveCheckoutData?.shippingAddress?.district || 'N/A',
+    regency: effectiveOrderData?.regency || effectiveCheckoutData?.shippingAddress?.regency || 'N/A',
+    province: effectiveOrderData?.province || effectiveCheckoutData?.shippingAddress?.province || 'N/A',
+    zip_code: effectiveOrderData?.zip_code || effectiveCheckoutData?.shippingAddress?.zipCode || 'N/A',
+    subdistrict: effectiveOrderData?.subdistrict || effectiveCheckoutData?.shippingAddress?.subdistrict || 'N/A',
+    jne_service: effectiveOrderData?.jne_service || null,
+    no_resi: effectiveOrderData?.no_resi || null,
+    payment_method: effectiveOrderData?.payment_method || effectiveCheckoutData?.paymentMethod || 'Unknown'
   }
 
   const safeCheckoutData = {
-    items: checkoutData?.items || [],
+    items: effectiveCheckoutData?.items || [],
     totals: {
-      subtotalBeforeVoucher: checkoutData?.totals?.subtotalBeforeVoucher || 0,
-      totalVoucherDiscount: checkoutData?.totals?.totalVoucherDiscount || 0,
-      shippingCost: checkoutData?.totals?.shippingCost || 0,
-      finalTotal: checkoutData?.totals?.finalTotal || 0,
-      grandTotal: checkoutData?.totals?.grandTotal || safeOrderData.grand_total || 0
+      subtotalBeforeVoucher: effectiveCheckoutData?.totals?.subtotalBeforeVoucher || 0,
+      totalVoucherDiscount: effectiveCheckoutData?.totals?.totalVoucherDiscount || 0,
+      shippingCost: effectiveCheckoutData?.totals?.shippingCost || 0,
+      finalTotal: effectiveCheckoutData?.totals?.finalTotal || 0,
+      grandTotal: effectiveCheckoutData?.totals?.grandTotal || safeOrderData.grand_total || 0
     },
     shippingAddress: {
-      name: orderData?.name || checkoutData?.shippingAddress?.name || 'N/A',
-      email: orderData?.email || checkoutData?.shippingAddress?.email || 'N/A',
-      phone: orderData?.phone || checkoutData?.shippingAddress?.phone || 'N/A',
-      address: orderData?.address || checkoutData?.shippingAddress?.address || 'N/A',
-      district: orderData?.district || checkoutData?.shippingAddress?.district || 'N/A',
-      regency: orderData?.regency || checkoutData?.shippingAddress?.regency || 'N/A',
-      province: orderData?.province || checkoutData?.shippingAddress?.province || 'N/A',
-      zipCode: orderData?.zip_code || checkoutData?.shippingAddress?.zipCode || 'N/A',
-      subdistrict: orderData?.subdistrict || checkoutData?.shippingAddress?.subdistrict || 'N/A'
+      name: effectiveOrderData?.name || effectiveCheckoutData?.shippingAddress?.name || 'N/A',
+      email: effectiveOrderData?.email || effectiveCheckoutData?.shippingAddress?.email || 'N/A',
+      phone: effectiveOrderData?.phone || effectiveCheckoutData?.shippingAddress?.phone || 'N/A',
+      address: effectiveOrderData?.address || effectiveCheckoutData?.shippingAddress?.address || 'N/A',
+      district: effectiveOrderData?.district || effectiveCheckoutData?.shippingAddress?.district || 'N/A',
+      regency: effectiveOrderData?.regency || effectiveCheckoutData?.shippingAddress?.regency || 'N/A',
+      province: effectiveOrderData?.province || effectiveCheckoutData?.shippingAddress?.province || 'N/A',
+      zipCode: effectiveOrderData?.zip_code || effectiveCheckoutData?.shippingAddress?.zipCode || 'N/A',
+      subdistrict: effectiveOrderData?.subdistrict || effectiveCheckoutData?.shippingAddress?.subdistrict || 'N/A'
     },
-    paymentMethod: checkoutData?.paymentMethod || orderData?.payment_method || 'Unknown',
-    useInsurance: checkoutData?.useInsurance ?? false,
-    insuranceCost: checkoutData?.insuranceCost || 0,
-    selectedShipping: checkoutData?.selectedShipping || 'reguler',
-    selectedService: checkoutData?.selectedService || safeOrderData.jne_service || null,
-    notes: checkoutData?.notes || null,
-    vouchers: checkoutData?.vouchers || {}
+    paymentMethod: effectiveCheckoutData?.paymentMethod || effectiveOrderData?.payment_method || 'Unknown',
+    useInsurance: effectiveCheckoutData?.useInsurance ?? false,
+    insuranceCost: effectiveCheckoutData?.insuranceCost || 0,
+    selectedShipping: effectiveCheckoutData?.selectedShipping || 'reguler',
+    selectedService: effectiveCheckoutData?.selectedService || safeOrderData.jne_service || null,
+    notes: effectiveCheckoutData?.notes || null,
+    vouchers: effectiveCheckoutData?.vouchers || {}
   }
 
   // ✅ Enhanced debug logging for processed data
@@ -117,11 +179,11 @@ const OrderSuccess = () => {
     console.log('OrderSuccess - Processed safeOrderData:', safeOrderData)
     console.log('OrderSuccess - Processed safeCheckoutData:', safeCheckoutData)
     console.log('OrderSuccess - Payment Method Debug:', {
-      checkoutDataPaymentMethod: checkoutData?.paymentMethod,
-      orderDataPaymentMethod: orderData?.payment_method,
+      effectiveCheckoutDataPaymentMethod: effectiveCheckoutData?.paymentMethod,
+      effectiveOrderDataPaymentMethod: effectiveOrderData?.payment_method,
       finalPaymentMethod: safeCheckoutData.paymentMethod
     })
-  }, [])
+  }, [effectiveOrderData, effectiveCheckoutData])
 
   // Payment method names mapping
   const paymentMethodNames = {
