@@ -1876,20 +1876,7 @@ const Checkout = () => {
                     )}
                     
                     {/* Payment method info message */}
-                    {selectedPayment === 'cod' && !isLoadingJne && jneServices.length > 0 && (
-                      <div className="cod-jne-message" style={{
-                        padding: '8px 12px',
-                        backgroundColor: '#d4edda',
-                        border: '1px solid #c3e6cb',
-                        borderRadius: '4px',
-                        margin: '8px 0',
-                        fontSize: '13px',
-                        color: '#155724'
-                      }}>
-                        💰 COD + JNE: Bayar produk saat terima, ongkir sudah dibayar
-                      </div>
-                    )}
-                    
+                  
                     {!isLoadingJne && !jneError && jneServices.length > 0 && (
                       <>
                         <div className="jne-services-list">
@@ -2255,11 +2242,7 @@ const Checkout = () => {
                         {selectedService.service_display}
                       </small>
                     )}
-                    {selectedPayment === 'cod' && (
-                      <small style={{display: 'block', color: '#28a745', fontSize: '12px'}}>
-                        COD - Diatur manual
-                      </small>
-                    )}
+              
                     {selectedPayment !== 'cod' && isLoadingJne && (
                       <small style={{display: 'block', color: '#6c757d', fontSize: '11px'}}>
                         🔄 Memuat...
