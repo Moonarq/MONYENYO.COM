@@ -1188,7 +1188,7 @@ const Checkout = () => {
         
         // ✅ Payment & Shipping Methods
         payment_method: selectedPayment,
-        shipping_method: selectedShipping,
+        shipping_method: selectedService ? 'jne' : selectedShipping, // Auto-set to jne if JNE service selected
         shipping_cost: getShippingCost(),
         is_shipping_free: hasFreeShippingVoucher(),
         
