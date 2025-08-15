@@ -165,7 +165,7 @@ const OrderSuccess = () => {
       zipCode: effectiveOrderData?.zip_code || effectiveCheckoutData?.shippingAddress?.zipCode || 'N/A',
       subdistrict: effectiveOrderData?.subdistrict || effectiveCheckoutData?.shippingAddress?.subdistrict || 'N/A'
     },
-    paymentMethod: effectiveCheckoutData?.paymentMethod || effectiveOrderData?.payment_method || 'Unknown',
+    paymentMethod: effectiveOrderData?.payment_method || effectiveCheckoutData?.paymentMethod || 'Unknown',
     useInsurance: effectiveCheckoutData?.useInsurance ?? false,
     insuranceCost: effectiveCheckoutData?.insuranceCost || 0,
     selectedShipping: effectiveCheckoutData?.selectedShipping || 'reguler',
@@ -179,9 +179,12 @@ const OrderSuccess = () => {
     console.log('OrderSuccess - Processed safeOrderData:', safeOrderData)
     console.log('OrderSuccess - Processed safeCheckoutData:', safeCheckoutData)
     console.log('OrderSuccess - Payment Method Debug:', {
-      effectiveCheckoutDataPaymentMethod: effectiveCheckoutData?.paymentMethod,
       effectiveOrderDataPaymentMethod: effectiveOrderData?.payment_method,
-      finalPaymentMethod: safeCheckoutData.paymentMethod
+      effectiveCheckoutDataPaymentMethod: effectiveCheckoutData?.paymentMethod,
+      finalPaymentMethod: safeCheckoutData.paymentMethod,
+      safeOrderDataPaymentMethod: safeOrderData.payment_method,
+      paymentMethodNameLookup: paymentMethodNames[safeCheckoutData.paymentMethod],
+      availablePaymentMethods: Object.keys(paymentMethodNames)
     })
   }, [effectiveOrderData, effectiveCheckoutData])
 
@@ -209,6 +212,29 @@ const OrderSuccess = () => {
     // Cash on Delivery
     COD: 'Cash on Delivery (COD)',
     cod: 'Cash on Delivery (COD)'
+  }
+
+  // ✅ Function to get payment method display name with fallback
+  const getPaymentMethodDisplayName = (paymentMethod) => {
+    if (!paymentMethod || paymentMethod === 'Unknown') {
+      return 'Unknown Payment Method'
+    }
+    
+    // Try exact match first
+    if (paymentMethodNames[paymentMethod]) {
+      return paymentMethodNames[paymentMethod]
+    }
+    
+    // Try case-insensitive match
+    const lowerPaymentMethod = paymentMethod.toLowerCase()
+    for (const [key, value] of Object.entries(paymentMethodNames)) {
+      if (key.toLowerCase() === lowerPaymentMethod) {
+        return value
+      }
+    }
+    
+    // Fallback: capitalize the payment method
+    return paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)
   }
 
   // Copy VA number to clipboard
@@ -502,7 +528,7 @@ const OrderSuccess = () => {
                   Metode Pembayaran
                 </div>
                 <div style={{ fontSize: '0.95rem', fontWeight: '500', color: '#333' }}>
-                  {paymentMethodNames[safeCheckoutData.paymentMethod] || 'Unknown Payment Method'}
+                  {getPaymentMethodDisplayName(safeCheckoutData.paymentMethod)}
                 </div>
               </div>
 
