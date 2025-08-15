@@ -282,9 +282,23 @@ const Checkout = () => {
         return null;
       }
 
-      // Clean up search terms
-      const cleanCity = cityName.toLowerCase().replace(/kota |kabupaten |kab\.|kab /gi, '').trim();
+      // Clean up search terms with special handling for Jakarta
+      let cleanCity = cityName.toLowerCase().replace(/kota |kabupaten |kab\.|kab |adm\. |adm /gi, '').trim();
       const cleanProvince = provinceName.toLowerCase().trim();
+      
+      // Special handling for Jakarta cities
+      if (cleanProvince.includes('dki jakarta') || cleanProvince.includes('jakarta')) {
+        cleanCity = cleanCity.replace('kota adm. ', '').replace('adm. ', '');
+        // For Jakarta, we want to match "jakarta selatan", "jakarta timur", etc.
+        if (cleanCity.includes('jakarta')) {
+          // Already contains jakarta, use as is
+        } else {
+          // Add jakarta if it's just "selatan", "timur", etc.
+          if (['selatan', 'timur', 'barat', 'utara', 'pusat'].includes(cleanCity)) {
+            cleanCity = `jakarta ${cleanCity}`;
+          }
+        }
+      }
       
       console.log('🔍 Cleaned search terms:', { cleanCity, cleanProvince });
 
@@ -296,17 +310,27 @@ const Checkout = () => {
           const hasCity = destName.includes(cleanCity);
           const hasProvince = destName.includes(cleanProvince) || 
                              destName.includes(cleanProvince.replace('daerah istimewa ', '')) ||
-                             destName.includes(cleanProvince.replace('di ', ''));
+                             destName.includes(cleanProvince.replace('di ', '')) ||
+                             (cleanProvince.includes('jakarta') && destName.includes('jakarta'));
           
           // 🚨 CRITICAL: Prevent cross-province false positives
           const wrongProvince = (cleanProvince === 'sulawesi selatan' && destName.includes('jakarta')) ||
-                               (cleanProvince === 'dki jakarta' && destName.includes('sulawesi')) ||
+                               (cleanProvince.includes('jakarta') && destName.includes('sulawesi')) ||
                                (cleanProvince === 'jawa barat' && (destName.includes('jakarta') || destName.includes('sulawesi')));
           
           return hasCity && hasProvince && !wrongProvince;
         },
         
-        // 2. City name match with province context in second part
+        // 2. Jakarta specific matching (for DKI Jakarta cities)
+        (destination) => {
+          if (!cleanProvince.includes('jakarta')) return false;
+          
+          const destName = destination.City_Name.toLowerCase();
+          // Direct match for Jakarta areas
+          return destName.includes(cleanCity) && destName.includes('jakarta');
+        },
+        
+        // 3. City name match with province context in second part
         (destination) => {
           const destName = destination.City_Name.toLowerCase();
           const [cityPart, provincePart] = destName.split(',').map(s => s.trim());
@@ -315,36 +339,38 @@ const Checkout = () => {
           const provinceMatch = provincePart && (
             provincePart.includes(cleanProvince) ||
             provincePart.includes(cleanProvince.replace('daerah istimewa ', '')) ||
-            provincePart.includes(cleanProvince.replace('di ', ''))
+            provincePart.includes(cleanProvince.replace('di ', '')) ||
+            (cleanProvince.includes('jakarta') && provincePart.includes('jakarta'))
           );
           
           return cityMatch && provinceMatch;
         },
         
-        // 3. Exact city name match with region indicators (but filter out wrong provinces)
+        // 4. Exact city name match with region indicators (but filter out wrong provinces)
         (destination) => {
           const destName = destination.City_Name.toLowerCase();
           const cityMatch = destName.includes(cleanCity) && (
             destName.includes('kab.') || 
             destName.includes('kabupaten') ||
-            destName.includes('kota')
+            destName.includes('kota') ||
+            (cleanProvince.includes('jakarta') && destName.includes('jakarta'))
           );
           
           // Filter out obvious wrong provinces
           const wrongProvince = (cleanProvince === 'sulawesi selatan' && destName.includes('jakarta')) ||
-                               (cleanProvince === 'dki jakarta' && destName.includes('sulawesi'));
+                               (cleanProvince.includes('jakarta') && destName.includes('sulawesi'));
           
           return cityMatch && !wrongProvince;
         },
         
-        // 4. Last resort: partial city name match with strict province filtering
+        // 5. Last resort: partial city name match with strict province filtering
         (destination) => {
           const destName = destination.City_Name.toLowerCase();
           const cityMatch = destName.includes(cleanCity);
           
           // Very strict filtering for cross-province issues
           const wrongProvince = (cleanProvince === 'sulawesi selatan' && destName.includes('jakarta')) ||
-                               (cleanProvince === 'dki jakarta' && destName.includes('sulawesi')) ||
+                               (cleanProvince.includes('jakarta') && destName.includes('sulawesi')) ||
                                (cleanProvince === 'jawa barat' && (destName.includes('jakarta') || destName.includes('sulawesi')));
           
           return cityMatch && !wrongProvince;
