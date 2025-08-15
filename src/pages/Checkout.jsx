@@ -1807,11 +1807,7 @@ const Checkout = () => {
                 <div className="shipping-section">
                   <h4 style={{ margin: '16px 0 8px 0', fontSize: '16px', fontWeight: '600' }}>
                     Pilih Metode Pengiriman:
-                    {selectedPayment === 'cod' && (
-                      <small style={{ display: 'block', color: '#28a745', fontSize: '12px', fontWeight: 'normal' }}>
-                        ✨ COD: Validasi pengiriman otomatis dilewati
-                      </small>
-                    )}
+                  
                   </h4>
                   
                   {/* ✅ Enhanced JNE Services Section with COD bypass */}
