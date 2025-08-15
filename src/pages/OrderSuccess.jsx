@@ -39,14 +39,27 @@ const OrderSuccess = () => {
           
           if (result.success && result.data) {
             console.log('✅ Fetched order data from API:', result.data)
-            setFetchedOrderData(result.data.orderData)
-            setFetchedCheckoutData(result.data.checkoutData)
+            
+            // ✅ Auto redirect to clean URL with data in location.state (like COD)
+            navigate('/order-success', {
+              replace: true,
+              state: {
+                orderData: result.data.orderData,
+                checkoutData: result.data.checkoutData
+              }
+            })
+            return // Exit early since we're redirecting
           } else {
             console.error('❌ Failed to fetch order data:', result.message)
-            // Don't redirect immediately, let other useEffect handle it
+            // Fallback: set data directly without redirect
+            setFetchedOrderData(null)
+            setFetchedCheckoutData(null)
           }
         } catch (error) {
           console.error('❌ Error fetching order data:', error)
+          // Fallback: set data directly without redirect  
+          setFetchedOrderData(null)
+          setFetchedCheckoutData(null)
         } finally {
           setIsLoadingFromUrl(false)
         }
@@ -54,7 +67,7 @@ const OrderSuccess = () => {
     }
 
     handleMidtransRedirect()
-  }, [searchParams, location.state])
+  }, [searchParams, location.state, navigate])
 
   // ✅ Enhanced debug logging
   useEffect(() => {
