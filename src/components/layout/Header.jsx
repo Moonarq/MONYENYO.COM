@@ -251,7 +251,7 @@ const cartItemsCount = cartCount; // Jumlah jenis produk, bukan total quantity
             className={`nav-link ${isActive('/blogs') ? 'active' : ''}`}
             onClick={handleDesktopNavClick}
           >
-            TRACKING
+            TRACK
           </Link>
           <Link 
             to="/outlets" 
