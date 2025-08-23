@@ -103,7 +103,7 @@ const Tracking = () => {
                       type="text"
                       value={awb}
                       onChange={(e) => setAwb(e.target.value)}
-                      placeholder="Masukkan nomor resi (AWB)"
+                      placeholder="Masukkan nomor resi"
                       className="tracking-input"
                       disabled={loading}
                     />
@@ -127,9 +127,7 @@ const Tracking = () => {
                   </button>
                 </div>
                 
-                <p className="tracking-example">
-                  Contoh: CGK10003999781, 0226022200068098
-                </p>
+              
               </form>
             </div>
           </div>
