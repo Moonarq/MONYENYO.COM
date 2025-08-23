@@ -232,27 +232,6 @@ const Tracking = () => {
         )}
 
         {/* Info Section */}
-        <section className="tracking-info">
-          <div className="container">
-            <div className="info-cards">
-              <div className="info-card">
-                <i className="fas fa-clock"></i>
-                <h3>Update Real-time</h3>
-                <p>Status pengiriman diperbarui secara real-time dari sistem JNE</p>
-              </div>
-              <div className="info-card">
-                <i className="fas fa-shield-alt"></i>
-                <h3>Aman & Terpercaya</h3>
-                <p>Data tracking langsung dari kurir resmi JNE</p>
-              </div>
-              <div className="info-card">
-                <i className="fas fa-headset"></i>
-                <h3>Bantuan 24/7</h3>
-                <p>Tim customer service siap membantu Anda kapan saja</p>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </>
   )
