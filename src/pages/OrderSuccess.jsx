@@ -904,7 +904,7 @@ const OrderSuccess = () => {
 
             {/* Tombol Lacak Pesanan */}
             <button 
-              onClick={() => alert('Fitur tracking akan segera hadir!')}
+              onClick={() => navigate('/blogs')}
               style={{
                 padding: '0.75rem 2rem',
                 backgroundColor: '#ffffff',
