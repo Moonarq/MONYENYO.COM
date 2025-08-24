@@ -169,7 +169,7 @@
 }
 
 .tracking-submit-btn {
-    background: linear-gradient(135deg, #8B5C2A, #A67C3A);
+    background: linear-gradient(135deg, #2c2c2c , #2c2c2c );
     color: white;
     border: none;
     padding: 18px 35px;
@@ -464,7 +464,7 @@
 }
 
 .track-again-btn {
-    background: linear-gradient(135deg, #8B5C2A, #A67C3A);
+    background: linear-gradient(135deg, #2c2c2c , #2c2c2c );
     color: white;
     border: none;
     padding: 15px 30px;
