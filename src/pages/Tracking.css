@@ -21,12 +21,12 @@
 }
 
 .header.desktop-solid .nav-link:hover {
-    color: #2c2c2c !important;
+    color: #8B5C2A !important;
 }
 
 .header.desktop-solid .nav-link.active {
-    color: #2c2c2c  !important;
-    border-bottom: 3px solid #2c2c2c  !important;
+    color: #8B5C2A !important;
+    border-bottom: 3px solid #8B5C2A !important;
 }
 
 .header.desktop-solid .logo-text {
@@ -38,7 +38,7 @@
 }
 
 .header.desktop-solid .social-link:hover {
-    color: #2c2c2c !important;
+    color: #8B5C2A !important;
 }
 
 .header.desktop-solid .lang-btn {
@@ -46,7 +46,7 @@
 }
 
 .header.desktop-solid .lang-btn.active {
-    color: #2c2c2c  !important;
+    color: #8B5C2A !important;
 }
 
 .header.desktop-solid .lang-separator {
@@ -140,7 +140,7 @@
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    color: #2c2c2c;
+    color: #8B5C2A;
     font-size: 18px;
     z-index: 2;
 }
@@ -169,7 +169,7 @@
 }
 
 .tracking-submit-btn {
-    background: linear-gradient(135deg, #2c2c2c , #2c2c2c );
+    background: linear-gradient(135deg, #8B5C2A, #A67C3A);
     color: white;
     border: none;
     padding: 18px 35px;
@@ -464,7 +464,7 @@
 }
 
 .track-again-btn {
-    background: linear-gradient(135deg, #2c2c2c , #2c2c2c );
+    background: linear-gradient(135deg, #8B5C2A, #A67C3A);
     color: white;
     border: none;
     padding: 15px 30px;
