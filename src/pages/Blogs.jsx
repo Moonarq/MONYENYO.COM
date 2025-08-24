@@ -81,10 +81,9 @@ const Tracking = () => {
           <div className="container">
             <div className="tracking-hero-content">
               <div className="hero-text-center">
-               
-                <h1 className="hero-main-title">Lacak Paket Anda</h1>
+                <h1 className="hero-main-title">Lacak Paket</h1>
                 <p className="hero-description">
-                  Masukkan nomor resi untuk mengetahui status terkini pengiriman paket Monyenyo Anda
+                  Masukkan nomor resi untuk melihat status pengiriman
                 </p>
               </div>
             </div>
@@ -96,36 +95,36 @@ const Tracking = () => {
           <div className="container">
             <div className="tracking-form-wrapper">
               <form onSubmit={handleTrackPackage} className="tracking-form">
-                <div className="tracking-input-group">
-                  <div className="input-wrapper">
-                    <i className="fas fa-search input-icon"></i>
-                    <input
-                      type="text"
-                      value={awb}
-                      onChange={(e) => setAwb(e.target.value)}
-                      placeholder="Masukkan nomor resi"
-                      className="tracking-input"
+                  <div className="tracking-input-group">
+                    <div className="input-wrapper">
+                      <i className="fas fa-search input-icon"></i>
+                      <input
+                        type="text"
+                        value={awb}
+                        onChange={(e) => setAwb(e.target.value)}
+                        placeholder="Contoh: JNE123456789"
+                        className="tracking-input"
+                        disabled={loading}
+                      />
+                    </div>
+                    <button 
+                      type="submit" 
+                      className="tracking-submit-btn"
                       disabled={loading}
-                    />
+                    >
+                      {loading ? (
+                        <>
+                          <i className="fas fa-spinner fa-spin"></i>
+                          Lacak
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-search"></i>
+                          Lacak
+                        </>
+                      )}
+                    </button>
                   </div>
-                  <button 
-                    type="submit" 
-                    className="tracking-submit-btn"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <i className="fas fa-spinner fa-spin"></i>
-                        Melacak...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-search"></i>
-                        Lacak Paket
-                      </>
-                    )}
-                  </button>
-                </div>
                 
               
               </form>
@@ -157,14 +156,14 @@ const Tracking = () => {
                 <div className="tracking-success">
                   <div className="result-header">
                     <i className="fas fa-check-circle"></i>
-                    <h2>Paket Ditemukan!</h2>
-                    <p>Nomor Resi: <strong>{trackingResult.data.awb}</strong></p>
+                    <h2>Paket Ditemukan</h2>
+                    <p>Resi: <strong>{trackingResult.data.awb}</strong></p>
                   </div>
 
                   {trackingResult.data.cnote && (
                     <div className="package-status">
                       <div className="status-card">
-                        <h3>Status Paket</h3>
+                        <h3><i className="fas fa-info-circle"></i> Status Paket</h3>
                         <div className="status-info">
                           <div className="status-item">
                             <span className="status-label">Status Terakhir:</span>
@@ -185,7 +184,7 @@ const Tracking = () => {
 
                   {trackingResult.data.history && trackingResult.data.history.length > 0 && (
                     <div className="tracking-history">
-                      <h3>Riwayat Pengiriman</h3>
+                      <h3><i className="fas fa-history"></i> Riwayat Pengiriman</h3>
                       <div className="history-timeline">
                         {trackingResult.data.history.map((item, index) => (
                           <div key={index} className="timeline-item">
@@ -229,7 +228,7 @@ const Tracking = () => {
           </section>
         )}
 
-        {/* Info Section */}
+        {/* Info Section - Removed for simpler design */}
       </div>
     </>
   )
