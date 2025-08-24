@@ -75,18 +75,22 @@ const Tracking = () => {
         <link rel="icon" href="/images/favicon_large.ico" type="image/x-icon" />
       </Helmet>
       
-        <div className="blogs-page">
-        <section className="about-hero">
+      <div className="tracking-page">
+        {/* Hero Section */}
+        <section className="tracking-hero">
           <div className="container">
-            <div className="about-hero-content">
+            <div className="tracking-hero-content">
               <div className="hero-text-center">
-                <span className="company-label">{t('KABAR MONYENYO')}</span>
-                <h1 className="hero-main-title">{t('KONTEN PROMO SEDANG KAMI SIAPKAN')}</h1>
+               
+                <h1 className="hero-main-title">Lacak Paket Anda</h1>
+                <p className="hero-description">
+                  Masukkan nomor resi untuk mengetahui status terkini pengiriman paket Monyenyo Anda
+                </p>
               </div>
             </div>
           </div>
         </section>
-      
+
         {/* Tracking Form Section */}
         <section className="tracking-form-section">
           <div className="container">
