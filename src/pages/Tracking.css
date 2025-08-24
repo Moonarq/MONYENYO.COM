@@ -21,12 +21,12 @@
 }
 
 .header.desktop-solid .nav-link:hover {
-    color: #8B5C2A !important;
+    color: #2c2c2c !important;
 }
 
 .header.desktop-solid .nav-link.active {
-    color: #8B5C2A !important;
-    border-bottom: 3px solid #8B5C2A !important;
+    color: #2c2c2c  !important;
+    border-bottom: 3px solid #2c2c2c  !important;
 }
 
 .header.desktop-solid .logo-text {
@@ -38,7 +38,7 @@
 }
 
 .header.desktop-solid .social-link:hover {
-    color: #8B5C2A !important;
+    color: #2c2c2c !important;
 }
 
 .header.desktop-solid .lang-btn {
@@ -46,7 +46,7 @@
 }
 
 .header.desktop-solid .lang-btn.active {
-    color: #8B5C2A !important;
+    color: #2c2c2c  !important;
 }
 
 .header.desktop-solid .lang-separator {
@@ -140,7 +140,7 @@
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    color: #8B5C2A;
+    color: #2c2c2c;
     font-size: 18px;
     z-index: 2;
 }
