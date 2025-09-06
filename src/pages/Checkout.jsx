@@ -977,10 +977,44 @@ const Checkout = () => {
 
   const handleAddressChange = (field, value) => {
     console.log(`📝 Address field changed: ${field} = ${value}`);
+    
+    // Format nomor telepon otomatis
+    if (field === 'phone') {
+      value = formatPhoneNumber(value);
+    }
+    
     setShippingAddress(prev => ({
       ...prev,
       [field]: value
     }))
+  }
+
+  // Helper function untuk format nomor telepon
+  const formatPhoneNumber = (input) => {
+    // Hapus semua karakter non-digit
+    let numbers = input.replace(/\D/g, '');
+    
+    // Jika dimulai dengan 0, hilangkan 0
+    if (numbers.startsWith('0')) {
+      numbers = numbers.substring(1);
+    }
+    
+    // Jika dimulai dengan 62, hilangkan 62
+    if (numbers.startsWith('62')) {
+      numbers = numbers.substring(2);
+    }
+    
+    // Batasi maksimal 12 digit (setelah 62)
+    if (numbers.length > 12) {
+      numbers = numbers.substring(0, 12);
+    }
+    
+    // Jika ada nomor, tambahkan +62
+    if (numbers.length > 0) {
+      return '+62' + numbers;
+    }
+    
+    return '';
   }
 
   const handleQuantityChange = (itemId, delta) => {
@@ -1704,7 +1738,7 @@ const Checkout = () => {
                         className="form-input"
                         value={shippingAddress.phone}
                         onChange={(e) => handleAddressChange('phone', e.target.value)}
-                        placeholder="Nomor Telepon"
+                        placeholder="81234567890 (tanpa 0 depan)"
                       />
                     </div>
                   </div>
