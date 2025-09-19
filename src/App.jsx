@@ -34,7 +34,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/menu" element={<Menu />} />
           <Route path="/menu/:id" element={<MenuDetail />} />
-          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/tracking" element={<Tracking />} />
           <Route path="/outlets" element={<Outlets />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<CartPage />} />
