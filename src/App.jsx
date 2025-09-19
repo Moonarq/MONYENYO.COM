@@ -8,7 +8,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Menu from './pages/Menu'
 import MenuDetail from './pages/MenuDetail'
-import Tracking from './pages/Tracking'
+import Blogs from './pages/Blogs'
 import Outlets from './pages/Outlets'
 import Contact from './pages/Contact'
 import CartPage from './pages/Cart'
@@ -34,7 +34,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/menu" element={<Menu />} />
           <Route path="/menu/:id" element={<MenuDetail />} />
-          <Route path="/tracking" element={<Tracking />} />
+          <Route path="/blogs" element={<Blogs />} />
           <Route path="/outlets" element={<Outlets />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<CartPage />} />
