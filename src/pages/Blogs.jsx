@@ -162,17 +162,17 @@ const Tracking = () => {
                 <div className="tracking-success">
                   <div className="result-header">
                     <i className={`fas ${trackingResult.data.status === 'processing' ? 'fa-clock' : 'fa-check-circle'}`}></i>
-                    <h2>{trackingResult.data.status === 'processing' ? 'Paket Sedang Diproses' : 'Paket Ditemukan!'}</h2>
+                    <h2>{trackingResult.data.status === 'processing' ? 'Menunggu Pengambilan' : 'Paket Ditemukan!'}</h2>
                     <p>Nomor Resi: <strong>{trackingResult.data.awb}</strong></p>
                     
                     {trackingResult.data.status === 'processing' && (
                       <div className="processing-info">
                         <div className="processing-badge">
                           <i className="fas fa-clock"></i>
-                          Sedang Diproses
+                          Menunggu Pengambilan
                         </div>
                         <p className="processing-desc">
-                          {trackingResult.data.description || 'Paket Anda sedang dalam proses di gudang JNE dan belum di-scan. Silakan cek kembali dalam beberapa jam.'}
+                          {trackingResult.data.description || 'Paket Anda menunggu pengambilan oleh kurir JNE dan belum di-scan. Silakan cek kembali dalam beberapa jam.'}
                         </p>
                       </div>
                     )}
