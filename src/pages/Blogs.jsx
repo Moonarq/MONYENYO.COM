@@ -86,7 +86,6 @@ const Tracking = () => {
           <div className="container">
             <div className="tracking-hero-content">
               <div className="hero-text-center">
-                
                 <h1 className="hero-main-title">Lacak Paket Anda</h1>
                 <p className="hero-description">
                   Masukkan nomor resi untuk mengetahui status terkini pengiriman paket Monyenyo Anda
@@ -131,8 +130,6 @@ const Tracking = () => {
                     )}
                   </button>
                 </div>
-                
-              
               </form>
             </div>
           </div>
@@ -168,7 +165,6 @@ const Tracking = () => {
                     {trackingResult.data.status === 'processing' && (
                       <div className="processing-info">
                         <div className="processing-badge">
-                          <i className="fas fa-clock"></i>
                           Menunggu Pengambilan
                         </div>
                         <p className="processing-desc">
