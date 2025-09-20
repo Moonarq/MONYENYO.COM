@@ -278,6 +278,60 @@
     margin-bottom: 20px;
 }
 
+/* Processing status icon */
+.result-header i.fa-clock {
+    color: #f6ad55 !important;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Processing info section */
+.processing-info {
+    margin-top: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+    border-radius: 15px;
+    border: 2px solid #f6ad55;
+}
+
+.processing-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f6ad55;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.processing-badge i {
+    font-size: 1rem !important;
+    margin: 0 !important;
+    animation: pulse 2s infinite;
+}
+
+.processing-desc {
+    color: #92400e;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+    text-align: left;
+}
+
 .result-header h2 {
     color: #2c2c2c;
     margin-bottom: 15px;

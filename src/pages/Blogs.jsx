@@ -44,7 +44,12 @@ const Tracking = () => {
       if (err.response?.status === 404) {
         setError('Nomor resi tidak ditemukan. Pastikan nomor resi sudah benar.')
       } else if (err.response?.status === 400) {
-        setError('Format nomor resi tidak valid. Masukkan nomor resi yang benar.')
+        const errorMsg = err.response?.data?.message || 'Format nomor resi tidak valid'
+        if (errorMsg.includes('Sistem hanya mendukung tracking resi JNE')) {
+          setError('❌ Format tidak didukung: Sistem tracking hanya mendukung nomor resi JNE (13-16 digit angka). Silakan gunakan kurir JNE untuk tracking otomatis.')
+        } else {
+          setError(errorMsg)
+        }
       } else {
         setError('Gagal melacak paket. Silakan coba lagi.')
       }
@@ -156,9 +161,21 @@ const Tracking = () => {
               {trackingResult.success ? (
                 <div className="tracking-success">
                   <div className="result-header">
-                    <i className="fas fa-check-circle"></i>
-                    <h2>Paket Ditemukan!</h2>
+                    <i className={`fas ${trackingResult.data.status === 'processing' ? 'fa-clock' : 'fa-check-circle'}`}></i>
+                    <h2>{trackingResult.data.status === 'processing' ? 'Paket Sedang Diproses' : 'Paket Ditemukan!'}</h2>
                     <p>Nomor Resi: <strong>{trackingResult.data.awb}</strong></p>
+                    
+                    {trackingResult.data.status === 'processing' && (
+                      <div className="processing-info">
+                        <div className="processing-badge">
+                          <i className="fas fa-clock"></i>
+                          Sedang Diproses
+                        </div>
+                        <p className="processing-desc">
+                          {trackingResult.data.description || 'Paket Anda sedang dalam proses di gudang JNE dan belum di-scan. Silakan cek kembali dalam beberapa jam.'}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {trackingResult.data.cnote && (
