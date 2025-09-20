@@ -1,4 +1,4 @@
-/* Professional Tracking Styles for Monyenyo - Black & White */
+/* Professional Tracking Styles for Monyenyo */
 
 /* Hide logo/title and hamburger menu ONLY when at top of Tracking page (transparent header) */
 .tracking-page .header:not(.desktop-solid):not(.show-on-scroll-up) .nav-logo,
@@ -21,12 +21,12 @@
 }
 
 .header.desktop-solid .nav-link:hover {
-    color: #000000 !important;
+    color: #8B5C2A !important;
 }
 
 .header.desktop-solid .nav-link.active {
-    color: #000000 !important;
-    border-bottom: 3px solid #000000 !important;
+    color: #8B5C2A !important;
+    border-bottom: 3px solid #8B5C2A !important;
 }
 
 .header.desktop-solid .logo-text {
@@ -38,7 +38,7 @@
 }
 
 .header.desktop-solid .social-link:hover {
-    color: #000000 !important;
+    color: #8B5C2A !important;
 }
 
 .header.desktop-solid .lang-btn {
@@ -46,7 +46,7 @@
 }
 
 .header.desktop-solid .lang-btn.active {
-    color: #000000 !important;
+    color: #8B5C2A !important;
 }
 
 .header.desktop-solid .lang-separator {
@@ -79,7 +79,7 @@
 
 .company-label {
     display: inline-block;
-    background: #000000;
+    background: linear-gradient(135deg, #8B5C2A, #A67C3A);
     color: white;
     padding: 10px 24px;
     font-size: 12px;
@@ -89,7 +89,7 @@
     margin-bottom: 20px;
 }
 
-.tracking-page .hero-main-title {
+.hero-main-title {
     font-size: 3rem;
     font-weight: 800;
     color: #2c2c2c;
@@ -140,7 +140,7 @@
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    color: #000000;
+    color: #8B5C2A;
     font-size: 18px;
     z-index: 2;
 }
@@ -158,9 +158,9 @@
 }
 
 .tracking-input:focus {
-    border-color: #000000;
+    border-color: #8B5C2A;
     background: white;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 3px rgba(139, 92, 42, 0.1);
 }
 
 .tracking-input:disabled {
@@ -169,7 +169,7 @@
 }
 
 .tracking-submit-btn {
-    background: #000000;
+    background: linear-gradient(135deg, #8B5C2A, #A67C3A);
     color: white;
     border: none;
     padding: 18px 35px;
@@ -182,13 +182,12 @@
     align-items: center;
     gap: 10px;
     white-space: nowrap;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(139, 92, 42, 0.3);
 }
 
 .tracking-submit-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-    background: #333333;
+    box-shadow: 0 8px 25px rgba(139, 92, 42, 0.4);
 }
 
 .tracking-submit-btn:disabled {
@@ -213,8 +212,8 @@
 .error-card {
     max-width: 600px;
     margin: 0 auto;
-    background: #f5f5f5;
-    border: 2px solid #d7d7d7;
+    background: #fff5f5;
+    border: 2px solid #fed7d7;
     border-radius: 15px;
     padding: 30px;
     text-align: center;
@@ -222,24 +221,24 @@
 
 .error-card i {
     font-size: 3rem;
-    color: #333333;
+    color: #e53e3e;
     margin-bottom: 20px;
 }
 
 .error-card h3 {
-    color: #333333;
+    color: #e53e3e;
     margin-bottom: 15px;
     font-size: 1.5rem;
 }
 
 .error-card p {
-    color: #666666;
+    color: #744210;
     margin-bottom: 20px;
     line-height: 1.6;
 }
 
 .error-close-btn {
-    background: #333333;
+    background: #e53e3e;
     color: white;
     border: none;
     padding: 12px 25px;
@@ -250,7 +249,7 @@
 }
 
 .error-close-btn:hover {
-    background: #000000;
+    background: #c53030;
 }
 
 /* Tracking Results */
@@ -275,62 +274,8 @@
 
 .result-header i {
     font-size: 4rem;
-    color: #333333;
+    color: #38a169;
     margin-bottom: 20px;
-}
-
-/* Processing status icon */
-.result-header i.fa-clock {
-    color: #666666 !important;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.7;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-/* Processing info section */
-.processing-info {
-    margin-top: 25px;
-    padding: 20px;
-    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-    border-radius: 15px;
-    border: 2px solid #666666;
-}
-
-.processing-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #666666;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 15px;
-}
-
-.processing-badge i {
-    font-size: 1rem !important;
-    margin: 0 !important;
-    animation: pulse 2s infinite;
-}
-
-.processing-desc {
-    color: #333333;
-    font-size: 1rem;
-    line-height: 1.6;
-    margin: 0;
-    text-align: left;
 }
 
 .result-header h2 {
@@ -379,7 +324,7 @@
     padding: 15px;
     background: #f8f9fa;
     border-radius: 10px;
-    border-left: 4px solid #000000;
+    border-left: 4px solid #8B5C2A;
 }
 
 .status-label {
@@ -388,7 +333,7 @@
 }
 
 .status-value {
-    color: #000000;
+    color: #8B5C2A;
     font-weight: 600;
     text-align: right;
 }
@@ -423,7 +368,7 @@
     top: 0;
     height: 100%;
     width: 2px;
-    background: linear-gradient(to bottom, #000000, #333333);
+    background: linear-gradient(to bottom, #8B5C2A, #A67C3A);
 }
 
 .timeline-item {
@@ -438,15 +383,15 @@
     top: 5px;
     width: 12px;
     height: 12px;
-    background: #000000;
+    background: #8B5C2A;
     border-radius: 50%;
     border: 3px solid white;
-    box-shadow: 0 0 0 2px #000000;
+    box-shadow: 0 0 0 2px #8B5C2A;
 }
 
 .timeline-item:first-child .timeline-dot {
-    background: #333333;
-    box-shadow: 0 0 0 2px #333333;
+    background: #38a169;
+    box-shadow: 0 0 0 2px #38a169;
     width: 16px;
     height: 16px;
     left: -39px;
@@ -457,11 +402,11 @@
     background: #f8f9fa;
     border-radius: 10px;
     padding: 20px;
-    border-left: 4px solid #000000;
+    border-left: 4px solid #8B5C2A;
 }
 
 .timeline-date {
-    color: #000000;
+    color: #8B5C2A;
     font-weight: 600;
     font-size: 14px;
     margin-bottom: 8px;
@@ -483,7 +428,7 @@
 }
 
 .timeline-location i {
-    color: #000000;
+    color: #8B5C2A;
 }
 
 /* Not Found */
@@ -502,7 +447,7 @@
 
 .not-found-card i {
     font-size: 4rem;
-    color: #333333;
+    color: #e53e3e;
     margin-bottom: 20px;
 }
 
@@ -519,7 +464,7 @@
 }
 
 .track-again-btn {
-    background: #000000;
+    background: linear-gradient(135deg, #8B5C2A, #A67C3A);
     color: white;
     border: none;
     padding: 15px 30px;
@@ -527,13 +472,12 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(139, 92, 42, 0.3);
 }
 
 .track-again-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-    background: #333333;
+    box-shadow: 0 8px 25px rgba(139, 92, 42, 0.4);
 }
 
 /* Info Section */
@@ -562,12 +506,12 @@
 .info-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    border-color: rgba(0, 0, 0, 0.2);
+    border-color: rgba(139, 92, 42, 0.2);
 }
 
 .info-card i {
     font-size: 3rem;
-    color: #000000;
+    color: #8B5C2A;
     margin-bottom: 20px;
 }
 
@@ -585,7 +529,7 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-    .tracking-page .hero-main-title {
+    .hero-main-title {
         font-size: 2.5rem;
     }
     
@@ -641,7 +585,7 @@
         padding-bottom: 40px;
     }
     
-    .tracking-page .hero-main-title {
+    .hero-main-title {
         font-size: 2rem;
     }
     

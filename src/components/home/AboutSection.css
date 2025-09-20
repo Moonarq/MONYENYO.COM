@@ -81,20 +81,15 @@
     background: #D4AF37;
 }
 
-.about-hero .hero-content .hero-main-title {
+.hero-main-title {
     font-size: 46px;
     font-weight: 800;
-    color: #D4AF37 !important;
+    color: #1a1a1a;
     line-height: 1.1;
     margin: 0 0 50px 0;
     letter-spacing: -1.5px;
     font-family: 'Inter', sans-serif;
     text-transform: uppercase;
-}
-
-/* Fallback dengan specificity tinggi */
-section.about-hero .hero-main-title {
-    color: #D4AF37 !important;
 }
 
 .hero-features {
@@ -194,7 +189,7 @@ section.about-hero .hero-main-title {
         display: none;
     }
 
-    .about-hero .hero-main-title {
+    .hero-main-title {
         font-size: 32px;
         margin-bottom: 30px;
     }
@@ -213,7 +208,7 @@ section.about-hero .hero-main-title {
 }
 
 @media (max-width: 480px) {
-    .about-hero .hero-main-title {
+    .hero-main-title {
         font-size: 28px;
     }
 
