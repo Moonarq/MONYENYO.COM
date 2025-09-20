@@ -413,21 +413,35 @@
 
 .history-timeline {
     position: relative;
-    padding-left: 0;
+    padding-left: 30px;
 }
 
 .history-timeline::before {
-    display: none;
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background: linear-gradient(to bottom, #000000, #333333);
 }
 
 .timeline-item {
     position: relative;
     margin-bottom: 30px;
-    padding-left: 0;
+    padding-left: 30px;
 }
 
 .timeline-dot {
-    display: none;
+    position: absolute;
+    left: -37px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    background: #000000;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #000000;
 }
 
 .timeline-item:first-child .timeline-dot {
