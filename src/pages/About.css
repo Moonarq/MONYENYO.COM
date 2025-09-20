@@ -149,7 +149,7 @@
     background: #D4AF37;
 }
 
-.about-title, .hero-main-title {
+.about-page .about-title, .about-page .hero-main-title {
     font-size: 46px;
     font-weight: 800;
     color: #D4AF37;
@@ -429,7 +429,7 @@
         padding: 0 30px;
     }
     
-    .hero-main-title, .about-title {
+    .about-page .hero-main-title, .about-page .about-title {
         font-size: 44px;
     }
     
@@ -480,7 +480,7 @@
         background: transparent !important;
     }
     
-    .hero-main-title, .about-title {
+    .about-page .hero-main-title, .about-page .about-title {
         font-size: 32px;
         margin-bottom: 30px;
     }
@@ -545,7 +545,7 @@
         padding: 0 16px;
     }
     
-    .hero-main-title, .about-title {
+    .about-page .hero-main-title, .about-page .about-title {
         font-size: 28px;
         line-height: 1.2;
     }
