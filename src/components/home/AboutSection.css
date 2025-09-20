@@ -62,13 +62,15 @@
 .company-label {
     font-size: 14px;
     font-weight: 600;
-    color: #050505;
+    color: #D4AF37;
     letter-spacing: 3px;
     text-transform: uppercase;
     margin-bottom: 30px;
     display: block;
     font-family: 'Inter', sans-serif;
     position: relative;
+    background: none !important;
+    padding: 0 !important;
 }
 
 .company-label::after {

@@ -77,7 +77,7 @@
     text-align: center;
 }
 
-.company-label {
+.tracking-page .company-label {
     display: inline-block;
     background: linear-gradient(135deg, #8B5C2A, #A67C3A);
     color: white;
