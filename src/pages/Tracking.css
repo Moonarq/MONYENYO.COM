@@ -278,6 +278,10 @@
     margin-bottom: 20px;
 }
 
+.result-header .fa-clock {
+    color: #ffc107 !important;
+}
+
 .result-header h2 {
     color: #2c2c2c;
     margin-bottom: 15px;
@@ -288,6 +292,148 @@
 .result-header p {
     color: #666;
     font-size: 1.1rem;
+}
+
+/* Enhanced Processing Info Section */
+.processing-info {
+    margin-top: 30px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    border-left: 4px solid #ffc107;
+    text-align: left;
+}
+
+.processing-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ffc107, #ff8f00);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+.processing-desc {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Info box for processing status */
+.info-box {
+    background: linear-gradient(135deg, #fff3cd, #ffeeba);
+    border: 1px solid #ffc107;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.info-box-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.info-box-header i {
+    color: #e65100;
+    font-size: 1.3rem;
+}
+
+.info-box-title {
+    color: #2c2c2c;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.info-box-content {
+    color: #6c4e00;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Alternative: More detailed processing card */
+.processing-status-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-top: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 2px solid #ffc107;
+}
+
+.processing-status-card h3 {
+    color: #2c2c2c;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.processing-status-card i {
+    color: #ffc107;
+    font-size: 1.5rem;
+}
+
+.processing-details {
+    display: grid;
+    gap: 15px;
+}
+
+.processing-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #fff8e1;
+    border-radius: 10px;
+    border-left: 4px solid #ffc107;
+}
+
+.processing-label {
+    font-weight: 600;
+    color: #2c2c2c;
+}
+
+.processing-value {
+    color: #e65100;
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Status badge variations */
+.status-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-badge.processing {
+    background: linear-gradient(135deg, #ffc107, #ff8f00);
+    color: white;
+}
+
+.status-badge.shipped {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+}
+
+.status-badge.delivered {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
 }
 
 /* Package Status */
@@ -396,6 +542,24 @@
     height: 16px;
     left: -39px;
     top: 3px;
+}
+
+.timeline-item.processing .timeline-dot {
+    background: #ffc107 !important;
+    box-shadow: 0 0 0 2px #ffc107 !important;
+    animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+    0% {
+        box-shadow: 0 0 0 2px #ffc107;
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(255, 193, 7, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 2px #ffc107;
+    }
 }
 
 .timeline-content {
@@ -576,6 +740,41 @@
     .tracking-history {
         margin: 0 20px;
         padding: 25px 20px;
+    }
+    
+    /* Mobile responsiveness for processing info */
+    .processing-info {
+        padding: 20px 15px;
+        margin: 20px 15px 0;
+    }
+    
+    .processing-badge {
+        font-size: 12px;
+        padding: 6px 16px;
+    }
+    
+    .processing-desc {
+        font-size: 14px;
+    }
+    
+    .processing-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .processing-value {
+        text-align: left;
+    }
+    
+    .info-box {
+        margin: 15px 15px 0;
+        padding: 15px;
+    }
+    
+    .processing-status-card {
+        margin: 15px 15px 0;
+        padding: 20px 15px;
     }
 }
 
