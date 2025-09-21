@@ -305,17 +305,7 @@
 }
 
 .processing-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #ffc107, #ff8f00);
-    color: white;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+    display: none;
 }
 
 .processing-desc {
@@ -730,8 +720,7 @@
     }
     
     .processing-badge {
-        font-size: 12px;
-        padding: 6px 16px;
+        display: none;
     }
     
     .processing-desc {
