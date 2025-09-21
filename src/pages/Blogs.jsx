@@ -167,9 +167,6 @@ const Tracking = () => {
                         <div className="processing-badge">
                           Menunggu Pengambilan
                         </div>
-                        <p className="processing-desc">
-                          {trackingResult.data.description || 'Paket Anda menunggu pengambilan oleh kurir JNE dan belum di-scan. Silakan cek kembali dalam beberapa jam.'}
-                        </p>
                       </div>
                     )}
                   </div>
