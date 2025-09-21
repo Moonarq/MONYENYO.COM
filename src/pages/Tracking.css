@@ -279,7 +279,7 @@
 }
 
 .result-header .fa-clock {
-    color: #ffc107 !important;
+    color: #28a745 !important;
 }
 
 .result-header h2 {
@@ -296,12 +296,7 @@
 
 /* Enhanced Processing Info Section */
 .processing-info {
-    margin-top: 30px;
-    padding: 25px;
-    background: #f8f9fa;
-    border-radius: 15px;
-    border-left: 4px solid #666666;
-    text-align: left;
+    display: none;
 }
 
 .processing-badge {

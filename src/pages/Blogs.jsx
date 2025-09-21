@@ -163,7 +163,7 @@ const Tracking = () => {
                     <p>Nomor Resi: <strong>{trackingResult.data.awb}</strong></p>
                     
                     {trackingResult.data.status === 'processing' && (
-                      <div className="processing-info">
+                      <div className="processing-info" style={{display: 'none'}}>
                         <div className="processing-badge">
                           Menunggu Pengambilan
                         </div>
