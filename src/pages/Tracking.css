@@ -169,7 +169,7 @@
 }
 
 .tracking-submit-btn {
-    background: linear-gradient(135deg, #2c2c2c, #666666);
+    background: #444444;
     color: white;
     border: none;
     padding: 18px 35px;
@@ -182,12 +182,13 @@
     align-items: center;
     gap: 10px;
     white-space: nowrap;
-    box-shadow: 0 4px 15px rgba(139, 92, 42, 0.3);
+    box-shadow: 0 4px 15px rgba(68, 68, 68, 0.3);
 }
 
 .tracking-submit-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(139, 92, 42, 0.4);
+    box-shadow: 0 8px 25px rgba(68, 68, 68, 0.4);
+    background: #555555;
 }
 
 .tracking-submit-btn:disabled {
